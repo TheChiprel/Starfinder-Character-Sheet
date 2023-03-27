@@ -471,6 +471,7 @@ function Spell_Likes_Abilities_Block(){
         var daily_cell = row.insertCell(1);
         var dc_cell = row.insertCell(2);
         var remove_cell = row.insertCell(3);
+        
         var onclick_func = self.Show_Descr.bind(null, row.name);
         
         name_cell.innerHTML = entry.name;
@@ -483,8 +484,19 @@ function Spell_Likes_Abilities_Block(){
         remove_cell.innerHTML = "";
         remove_cell.appendChild(remove_button);
         
-        daily_cell.innerHTML = "TODO"; //TODO
-        dc_cell.innerHTML = "TODO"; //TODO
+        daily_cell.appendChild(
+            HTML_Create_Input_Number(
+                1,
+                1,
+                100,
+                "layers.abilities.spell_likes.Set_Daily('" + row.name + "', Number(event.target.value))")
+        );
+        dc_cell.appendChild(HTML_Create_Input_Number(
+            chardata.abilities.spelllike.Get_DC(m_table.rows.length - 2),
+            1,
+            100,
+            "layers.abilities.spell_likes.Set_DC('" + row.name + "', Number(event.target.value))")
+        );
     }
     
     this.Remove = function(row_name){
@@ -492,6 +504,22 @@ function Spell_Likes_Abilities_Block(){
         if (row_num != null){
             chardata.abilities.spelllike.Remove(row_num - 1);
             m_table.deleteRow(row_num);
+        }//else TODO
+    }
+    
+    //TODO: set lvl
+    
+    this.Set_DC = function(row_name, value){
+        var row_num = Get_Spell_Row_Num_By_Name(row_name);
+        if (row_num != null){
+            chardata.abilities.spelllike.Set_DC(row_num - 1, value);
+        }//else TODO
+    }
+    
+    this.Set_Daily = function(row_name, value){
+        var row_num = Get_Spell_Row_Num_By_Name(row_name);
+        if (row_num != null){
+            chardata.abilities.spelllike.Set_Daily(row_num - 1, value);
         }//else TODO
     }
 

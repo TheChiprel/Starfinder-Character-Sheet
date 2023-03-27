@@ -132,8 +132,23 @@ function Get_Spell_Descr(entry){
 
 function Spell_t(id, entry){
 //private methods
+    var Set_Default_Values = function(){
+        let lvl = parseInt(self.entry.lvl);
+        if (lvl == NaN){
+            self.lvl = parseInt(self.entry[0]);
+        }else{
+            self.lvl = lvl;
+        }
+        
+        self.daily = 1;
+        self.dc = 10 + self.lvl + chardata.stats.abiscores.modifiers.Get_Sum(ABISCORES.CHA);
+    }
 
 //public methods
+    this.Set_DC = function(new_value){
+        this.dc = new_value
+    }
+
     this.Show_Descr = function(){
         Popup_Descr.Call(self.entry.name, Get_Spell_Descr(self.entry));
     }
@@ -144,11 +159,12 @@ function Spell_t(id, entry){
 //public properties
     this.id = id;
     this.entry = entry;
-    this.lvl = null;
-    this.daily = null;
-    this.dc = null;
+    this.lvl;
+    this.daily;
+    this.dc;
 
 //additional initialization
+    Set_Default_Values();
 }
 
 function Spell_Collection_t(default_size = undefined){
@@ -171,7 +187,7 @@ function Spell_Collection_t(default_size = undefined){
 
     this.Remove = function(row){
         if (row >= m_arr.length){
-            console.error("Attempting to remove ability out of bounds");
+            console.error("Attempting to remove spell out of bounds");
             return;
         }
         //else NOTHING TO DO
@@ -185,17 +201,67 @@ function Spell_Collection_t(default_size = undefined){
     
     this.Get_Lvl = function(row){
         if (row >= m_arr.length){
-            console.error("Attempting to get level of ability out of bounds");
+            console.error("Attempting to get level of spell out of bounds");
             return;
         }
         //else NOTHING TO DO
         
-        return m_arr[row].entry.lvl;
+        return m_arr[row].lvl;
+    }
+    
+    this.Set_Lvl = function(row, value){
+        if (row >= m_arr.length){
+            console.error("Attempting to set level of spell out of bounds");
+            return;
+        }
+        //else NOTHING TO DO
+        
+        m_arr[row].Set_Lvl(value);
+    }
+    
+    this.Get_Daily = function(row){
+        if (row >= m_arr.length){
+            console.error("Attempting to get daily of spell out of bounds");
+            return;
+        }
+        //else NOTHING TO DO
+        
+        return m_arr[row].daily;
+    }
+    
+    this.Set_Daily = function(row, value){
+        if (row >= m_arr.length){
+            console.error("Attempting to set dc of spell out of bounds");
+            return;
+        }
+        //else NOTHING TO DO
+        
+        m_arr[row].daily = value;
+    }
+    
+    this.Get_DC = function(row){
+        if (row >= m_arr.length){
+            console.error("Attempting to get dc of spell out of bounds");
+            return;
+        }
+        //else NOTHING TO DO
+        
+        return m_arr[row].dc;
+    }
+    
+    this.Set_DC = function(row, value){
+        if (row >= m_arr.length){
+            console.error("Attempting to set dc of spell out of bounds");
+            return;
+        }
+        //else NOTHING TO DO
+        
+        m_arr[row].dc = value;
     }
 
     this.Show_Detail_Popup = function(row){
         if (row >= m_arr.length){
-            console.error("Attempting to show description of ability out of bounds");
+            console.error("Attempting to show description of spell out of bounds");
             return;
         }
         //else NOTHING TO DO
