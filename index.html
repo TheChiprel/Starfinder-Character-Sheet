@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="ru">
+    <head>
+        <title>Лист Starfinder</title>
+        <meta charset="UTF-8">
+
+        <!-- Load the custom CSS style file -->
+        <link rel="stylesheet" type="text/css" href="css\index.css">
+        <link rel="stylesheet" type="text/css" href="css\layer_maininfo.css">
+        <link rel="stylesheet" type="text/css" href="css\layer_abiscores_skills.css">
+        <link rel="stylesheet" type="text/css" href="css\layer_inventory.css">
+        <link rel="stylesheet" type="text/css" href="css\layer_class.css">
+        <link rel="stylesheet" type="text/css" href="css\layer_abilities.css">
+        <link rel="stylesheet" type="text/css" href="css\popups.css">
+    </head>
+
+    <body onload="Reset()">
+        <div class="layer_popup" id="layer_popup_select">
+            <div class="class_popup_header">
+                <output name="outfield_popup_select_name" form="textarea" id="outfield_popup_select_name"></output>
+            </div>
+            <div class ="class_popup_data">
+                <select name="layer_popup_select_selector" id="layer_popup_select_selector"></select><br>
+                <button name="layer_popup_select_confirm" id="layer_popup_select_confirm" onclick="Popup_Selector.Confirm()">OK</button>
+            </div>
+        </div>
+
+        <div class="layer_popup" id="layer_popup_database">
+            <div class="class_popup_header">
+                <button onclick="Popup_Database.Close()")>[X]</button>
+
+                <table id="layer_popup_filters">
+                    <tr></tr>
+                </table>
+            </div>
+            <div class="class_popup_data">
+                <table id="table_popup_database"></table>
+            </div>
+        </div>
+
+        <div class="layer_popup" id="layer_popup_descr">
+            <div class="class_popup_header">
+                <button onclick="Popup_Descr.Close()")>[X]</button>
+                <output name="outfield_popup_descr_name" form="textarea" id="outfield_popup_descr_name"></output>
+            </div>
+            <div class="class_popup_data">
+                <output class="class_popup_outfield" name="outfield_popup_descr_data" form="textarea" id="outfield_popup_descr_data"></output>
+            </div>
+        </div>
+
+        <div class="layer_popup" id="layer_popup_stats_details">
+
+                <div class="class_popup_header">
+                    <button onclick="Popup_Stat_Details.Close()")>[X]</button>
+                    <output name="outfield_popup_stats_details_name" form="textarea" id="outfield_popup_stats_details_name"></output>
+                </div>
+                <div class="class_popup_data">
+                    <output class="class_popup_outfield" name="outfield_popup_stats_details_data" form="textarea" id="outfield_popup_stats_details_data"></output>
+                </div>
+
+        </div>
+
+        <div class="top_layer">
+            <button onclick="Save_Character_To_File()">Сохранить</button>
+            <input type="file" id="file_character_upload" value="Load from file" onchange="Load_Character_From_File()" accept=".json" style="display:none"/>
+            <label class="pseudobutton" for="file_character_upload">Загрузить</label>
+        </div>
+
+        <div class="class_layer_main" id="layer_maininfo">
+            <div class="layer_maininfo_block">
+                <label for="infield_charname">Имя:</label><br>
+                <input type="text" id="infield_charname" name="infield_charname" onchange="layers.maininfo.Set_Name(event.target.value)"><br>
+
+                <label for="race_selector">Раса:</label><br>
+                <select name="race" id="selector_race" onchange="layers.maininfo.Set_Race(event.target.value)"></select><br>
+
+                <label for="theme_selector">Тема:</label><br>
+                <select name="theme" id="selector_theme" onchange="layers.maininfo.Set_Theme(event.target.value)"></select><br>
+
+                <label for="outfield_size">Размер:</label><br>
+                <output class="class_output_field" name="outfield_size" form="textarea" id="outfield_size">---</output><br>
+
+                <label for="outfield_race_type">Тип:</label><br>
+                <output class="class_output_field" name="outfield_race_type" form="textarea" id="outfield_race_type">---</output><br>
+            </div>
+
+            <div class="layer_maininfo_block">
+                <label for="outfield_level">Уровень: </label>
+                <output class="class_output_field" name="outfield_level" form="textarea" id="outfield_level" onclick="chardata.lvl.Show_Detail_Popup()">0</output><br>
+
+                <label for="outfield_initiative">Инициатива: </label>
+                <output class="class_output_field" name="outfield_initiative" form="textarea" id="outfield_initiative" onclick="chardata.stats.initiative.Show_Detail_Popup()">0</output><br>
+
+                <label for="outfield_max_sp">Макс. Пункты Живучести (ПЖ):</label><br>
+                <output class="class_output_field" name="outfield_max_sp" form="textarea" id="outfield_max_sp" onclick="chardata.stats.sp.Show_Detail_Popup()">0</output><br>
+
+                <label for="outfield_max_hp">Макс. Пункты Здоровья (ПЗ):</label><br>
+                <output class="class_output_field" name="outfield_max_hp" form="textarea" id="outfield_max_hp" onclick="chardata.stats.hp.Show_Detail_Popup()">0</output><br>
+
+                <label for="outfield_max_rp">Макс. Пункты Решимости (ПР):</label><br>
+                <output class="class_output_field" name="outfield_max_rp" form="textarea" id="outfield_max_rp" onclick="chardata.stats.rp.Show_Detail_Popup()">(Не выбран класс)</output><br>
+            </div>
+
+            <div class="layer_maininfo_block">
+                Классы:
+                <div class="class_ddlist_classes">
+                    <button class="class_ddbutton_add_class">+</button>
+                    <div class="class_ddlist_classes_content" id="class_ddlist_classes_content"></div>
+                </div><br>
+                <table id = "table_classes_lvl">
+                    <tr>
+                        <th style="width:50%">Имя</th>
+                        <th style="width:25%">Ур.</th>
+                        <th style="width:25%"></th>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="layer_maininfo_block">
+                <table class="class_table_prof" id="table_prof_weapon" style="width:100%">
+                    <tr>
+                        <th style="width:50%">Тип оружия</th>
+                        <th style="width:25%">Владение</th>
+                        <th style="width:25%">Привычное</th>
+                    </tr>
+                </table>
+                <table class="class_table_prof" id="table_prof_armor" style="width:75%">
+                    <tr>
+                        <th style="width:66%">Тип брони</th>
+                        <th style="width:33%">Ношение</th>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="layer_maininfo_block">
+                Атака:<br>
+                <label for="outfield_attack_bab">БМА: </label>
+                <output class="class_output_field" name="outfield_attack_bab" form="textarea" id="outfield_attack_bab" onclick="chardata.stats.attacks.bab.Show_Detail_Popup()">0</output><br>
+
+                <label for="outfield_attack_melee">Ближняя: </label>
+                <output class="class_output_field" name="outfield_attack_melee" form="textarea" id="outfield_attack_melee" onclick="chardata.stats.attacks.melee.Show_Detail_Popup()">0</output><br>
+
+                <label for="outfield_attack_oper">Оперативная: </label>
+                <output class="class_output_field" name="outfield_attack_oper" form="textarea" id="outfield_attack_oper" onclick="chardata.stats.attacks.operative.Show_Detail_Popup()">0</output><br>
+
+                <label for="outfield_attack_ranged">Дистанционная: </label>
+                <output class="class_output_field" name="outfield_attack_ranged" form="textarea" id="outfield_attack_ranged" onclick="chardata.stats.attacks.ranged.Show_Detail_Popup()">0</output><br>
+
+                <label for="outfield_attack_thrown">Метательная: </label>
+                <output class="class_output_field" name="outfield_attack_thrown" form="textarea" id="outfield_attack_thrown" onclick="chardata.stats.attacks.thrown.Show_Detail_Popup()">0</output><br>
+            </div>
+
+            <div class="layer_maininfo_block">
+                Защита:<br>
+                <label for="outfield_defense_eac">ЭКБ: </label>
+                <output class="class_output_field" name="outfield_defense_eac" form="textarea" id="outfield_defense_eac" onclick="chardata.stats.defense.eac.Show_Detail_Popup()">10</output><br>
+
+                <label for="outfield_defense_kac">ККБ: </label>
+                <output class="class_output_field" name="outfield_defense_kac" form="textarea" id="outfield_defense_kac" onclick="chardata.stats.defense.kac.Show_Detail_Popup()">10</output><br>
+
+                <label for="outfield_defense_maneuver">Против манёвров: </label>
+                <output class="class_output_field" name="outfield_defense_maneuver" form="textarea" id="outfield_defense_maneuver" onclick="chardata.stats.defense.against_maneuver.Show_Detail_Popup()">18</output><br>
+
+                <label for="outfield_resistance">Устойчивости:</label><br>
+                <output class="class_output_field" name="outfield_resistance" form="textarea" id="outfield_resistance">Нет</output><br>
+
+                <label for="outfield_dr">СУ:</label>
+                <output class="class_output_field" name="outfield_dr" form="textarea" id="outfield_dr" >0</output>
+            </div>
+
+            <div class="layer_maininfo_block">
+                Скорости:<br>
+                <label for="outfield_mspeed_land">Наземная: </label>
+                <output class="class_output_field" name="outfield_mspeed_land" form="textarea" id="outfield_mspeed_land" onclick="chardata.stats.speeds.land.Show_Detail_Popup()">Нет</output><br>
+
+                <label for="outfield_mspeed_flight">Полёт: </label>
+                <output class="class_output_field" name="outfield_mspeed_flight" form="textarea" id="outfield_mspeed_flight" onclick="chardata.stats.speeds.flight.Show_Detail_Popup()">Нет</output><br>
+
+                <label for="outfield_mspeed_burrow">Рытьё: </label>
+                <output class="class_output_field" name="outfield_mspeed_burrow" form="textarea" id="outfield_mspeed_burrow" onclick="chardata.stats.speeds.burrow.Show_Detail_Popup()">Нет</output><br>
+
+                <label for="outfield_mspeed_swim">Плавание:</label>
+                <output class="class_output_field" name="outfield_mspeed_swim" form="textarea" id="outfield_mspeed_swim" onclick="chardata.stats.speeds.swim.Show_Detail_Popup()">Нет</output><br>
+
+                <label for="outfield_mspeed_climb">Лазание:</label>
+                <output class="class_output_field" name="outfield_mspeed_climb" form="textarea" id="outfield_mspeed_climb" onclick="chardata.stats.speeds.climb.Show_Detail_Popup()">Нет</output><br>
+            </div>
+
+            <div class="layer_maininfo_block">
+                Испытания:<br>
+                <label for="outfield_save_fort">Стойкость: </label>
+                <output class="class_output_field" name="outfield_save_fort" form="textarea" id="outfield_save_fort" onclick="chardata.stats.saves.fortitude.Show_Detail_Popup()">0</output><br>
+
+                <label for="outfield_save_refl">Реакция: </label>
+                <output class="class_output_field" name="outfield_save_refl" form="textarea" id="outfield_save_refl" onclick="chardata.stats.saves.reflex.Show_Detail_Popup()">0</output><br>
+
+                <label for="outfield_save_will">Воля: </label>
+                <output class="class_output_field" name="outfield_save_will" form="textarea" id="outfield_save_will" onclick="chardata.stats.saves.will.Show_Detail_Popup()">0</output><br>
+            </div>
+        </div>
+
+        <div class="class_layer_main" id="layer_abiscores_skills">
+            <div class="layer_abiscores_skills">
+                <div class="block_abiscores">
+                    <div class="layer_abiscores_block">
+                        Характеристики:<br>
+                        Пунктов доступно: <output class="class_output_field" name="outfield_abiscore_points_total" form="textarea" id="outfield_abiscore_points_total">10</output><br>
+                        Потрачено: <output class="class_output_field" name="outfield_abiscore_points_spent" form="textarea" id="outfield_abiscore_points_spent">0</output><br>
+                        Осталось: <output class="class_output_field" name="outfield_abiscore_points_left" form="textarea" id="outfield_abiscore_points_left">10</output><br>
+                    </div>
+
+                    <div class="layer_abiscores_block">
+                        Значения и модификаторы характеристик:
+                        <table style="width:100%">
+                            <tr>
+                                <th>Хар-ка</th>
+                                <th>Значение</th>
+                                <th>Мод.</th>
+                            </tr>
+                            <tr>
+                                <td>СИЛ</td>
+                                <td>
+                                  <button class="class_button_abiscore_decrement" onclick="chardata.stats.abiscores.values.ChangeBaseValue(ABISCORES.STR, -1)">-</button>
+                                  <output class="class_output_field" name="outfield_abiscore_value_str" form="textarea" id="outfield_abiscore_value_str" onclick="chardata.stats.abiscores.values.Show_Detail_Popup(ABISCORES.STR)">10</output>
+                                  <button class="class_button_abiscore_increment" onclick="chardata.stats.abiscores.values.ChangeBaseValue(ABISCORES.STR, 1)">+</button>
+                                </td>
+                                <td><output class="class_output_field" name="outfield_abiscore_mod_str" form="textarea" id="outfield_abiscore_mod_str" onclick="chardata.stats.abiscores.modifiers.Show_Detail_Popup(ABISCORES.STR)">0</output><br></td>
+                            </tr>
+                            <tr>
+                                <td>ЛВК</td>
+                                <td>
+                                  <button class="class_button_abiscore_decrement" onclick="chardata.stats.abiscores.values.ChangeBaseValue(ABISCORES.AGI, -1)">-</button>
+                                  <output class="class_output_field" name="outfield_abiscore_value_agi" form="textarea" id="outfield_abiscore_value_agi" onclick="chardata.stats.abiscores.values.Show_Detail_Popup(ABISCORES.AGI)">10</output>
+                                  <button class="class_button_abiscore_increment" onclick="chardata.stats.abiscores.values.ChangeBaseValue(ABISCORES.AGI, 1)">+</button>
+                                </td>
+                                <td><output class="class_output_field" name="outfield_abiscore_mod_agi" form="textarea" id="outfield_abiscore_mod_agi" onclick="chardata.stats.abiscores.modifiers.Show_Detail_Popup(ABISCORES.AGI)">0</output><br></td>
+                            </tr>
+                            <tr>
+                                <td>ВЫН</td>
+                                <td>
+                                  <button class="class_button_abiscore_decrement" onclick="chardata.stats.abiscores.values.ChangeBaseValue(ABISCORES.CON, -1)">-</button>
+                                  <output class="class_output_field" name="outfield_abiscore_value_con" form="textarea" id="outfield_abiscore_value_con" onclick="chardata.stats.abiscores.values.Show_Detail_Popup(ABISCORES.CON)">10</output>
+                                  <button class="class_button_abiscore_increment" onclick="chardata.stats.abiscores.values.ChangeBaseValue(ABISCORES.CON, 1)">+</button>
+                                </td>
+                                <td><output class="class_output_field" name="outfield_abiscore_mod_con" form="textarea" id="outfield_abiscore_mod_con" onclick="chardata.stats.abiscores.modifiers.Show_Detail_Popup(ABISCORES.CON)">0</output><br></td>
+                            </tr>
+                            <tr>
+                                <td>ИНТ</td>
+                                <td>
+                                  <button class="class_button_abiscore_decrement" onclick="chardata.stats.abiscores.values.ChangeBaseValue(ABISCORES.INT, -1)">-</button>
+                                  <output class="class_output_field" name="outfield_abiscore_value_int" form="textarea" id="outfield_abiscore_value_int" onclick="chardata.stats.abiscores.values.Show_Detail_Popup(ABISCORES.INT)">10</output>
+                                  <button class="class_button_abiscore_increment" onclick="chardata.stats.abiscores.values.ChangeBaseValue(ABISCORES.INT, 1)">+</button>
+                                </td>
+                                <td><output class="class_output_field" name="outfield_abiscore_mod_int" form="textarea" id="outfield_abiscore_mod_int" onclick="chardata.stats.abiscores.modifiers.Show_Detail_Popup(ABISCORES.INT)">0</output><br></td>
+                            </tr>
+                            <tr>
+                                <td>МДР</td>
+                                <td>
+                                  <button class="class_button_abiscore_decrement" onclick="chardata.stats.abiscores.values.ChangeBaseValue(ABISCORES.WIS, -1)">-</button>
+                                  <output class="class_output_field" name="outfield_abiscore_value_wis" form="textarea" id="outfield_abiscore_value_wis" onclick="chardata.stats.abiscores.values.Show_Detail_Popup(ABISCORES.WIS)">10</output>
+                                  <button class="class_button_abiscore_increment" onclick="chardata.stats.abiscores.values.ChangeBaseValue(ABISCORES.WIS, 1)">+</button>
+                                </td>
+                                <td><output class="class_output_field" name="outfield_abiscore_mod_wis" form="textarea" id="outfield_abiscore_mod_wis" onclick="chardata.stats.abiscores.modifiers.Show_Detail_Popup(ABISCORES.WIS)">0</output><br></td>
+                            </tr>
+                            <tr>
+                            <td>ХАР</td>
+                                <td>
+                                  <button class="class_button_abiscore_decrement" onclick="chardata.stats.abiscores.values.ChangeBaseValue(ABISCORES.CHA, -1)">-</button>
+                                  <output class="class_output_field" name="outfield_abiscore_value_cha" form="textarea" id="outfield_abiscore_value_cha" onclick="chardata.stats.abiscores.values.Show_Detail_Popup(ABISCORES.CHA)">10</output>
+                                  <button class="class_button_abiscore_increment" onclick="chardata.stats.abiscores.values.ChangeBaseValue(ABISCORES.CHA, 1)">+</button>
+                                </td>
+                                <td><output class="class_output_field" name="outfield_abiscore_mod_cha" form="textarea" id="outfield_abiscore_mod_cha" onclick="chardata.stats.abiscores.modifiers.Show_Detail_Popup(ABISCORES.CHA)">0</output><br></td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <div class="layer_abiscores_block">
+                        Увеличение характеристик:
+                        <table id="table_abiscores_upgrades" style="width:100%">
+                            <tr>
+                                <th>Хар-ка</th>
+                                <th>Ур. 5</th>
+                                <th>Ур. 10</th>
+                                <th>Ур. 15</th>
+                                <th>Ур. 20</th>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                <div class="block_skills">
+                    <div class="layer_skills_block">
+                        Навыки:<br>
+                        <label for="outfield_skill_points_total">Пунктов доступно: </label>
+                        <output class="class_output_field" name="outfield_skill_points_total" form="textarea" id="outfield_skill_points_total" onclick="chardata.skills.skill_points.Show_Detail_Popup()">0</output><br>
+
+                        <label for="outfield_skill_points_spent">Потрачено: </label>
+                        <output class="class_output_field" name="outfield_skill_points_spent" form="textarea" id="outfield_skill_points_spent">0</output><br>
+
+                        <label for="outfield_skill_points_left">Осталось: </label>
+                        <output class="class_output_field" name="outfield_skill_points_left" form="textarea" id="outfield_skill_points_left">0</output><br>
+                    </div>
+
+                    <div class="layer_skills_block">
+                        <table id="table_skills" style="width:100%">
+                            <tr>
+                                <th style="width:50%">Навык</th>
+                                <th style="width:25%">Пункты</th>
+                                <th style="width:25%">Мод.</th>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="class_layer_main" id="layer_inventory">
+            <div class="layer_inventory">
+                <div class="layer_inventory_block" id="block_inventory_top" name="block_inventory_top">
+                    Кредиты: <input type="text" id="inventory_credits" value="0" onchange="layers.inventory.resourses_block.Set_Credits(Number(event.target.value))"></input>
+                    УПО: <input type="text" id="inventory_UPB" value="0" onchange="layers.inventory.resourses_block.Set_UPB(Number(event.target.value))"></input><br>
+                    Текущий вес: <output class="class_output_field" name="outfield_weight_current" form="textarea" id="outfield_weight_current" onclick="chardata.inventory.weight.Show_Curr_Detail_Popup()">0</output><br>
+                    Вес до нагрузки: <output class="class_output_field" name="outfield_weight_encumbered" form="textarea" id="outfield_weight_encumbered" onclick="chardata.inventory.weight.Show_Encumbered_Detail_Popup()">5</output><br>
+                    Вес до перегрузки: <output class="class_output_field" name="outfield_weight_overburdened" form="textarea" id="outfield_weight_overburdened" onclick="chardata.inventory.weight.Show_Overburdened_Detail_Popup()">10</output><br>
+                </div>
+                <div class="layer_inventory_block" id="block_inventory_weapon" name="block_inventory_weapon">
+                    Оружие: <button onclick="layers.inventory.weapon_block.Open_Database()">+</button><br>
+                    <table class="table_inventory" id="table_inventory_weapons">
+                        <tr>
+                            <th>Название</th>
+                            <th>Мод. попадания</th>
+                            <th>Урон</th>
+                            <th>Дист.</th>
+                            <th>Расход</th>
+                            <th>Патроны</th>
+                            <th>Сопряжения</th>
+                            <th>Крит. Эффект</th>
+                            <th>Особые свойства</th>
+                            <th>Дополнительно</th>
+                            <th></th>
+                        </tr>
+                    </table>
+                </div>
+                <div class="layer_inventory_block" id="block_inventory_grenades" name="block_inventory_grenades">
+                    Гранаты: <button onclick="layers.inventory.grenade_block.Open_Database()">+</button><br>
+                    Модификатор броска: <output class="class_output_field" name="outfield_grenade_mod" form="textarea" id="outfield_grenade_mod" onclick="chardata.inventory.grenades.Show_Throw_Mod_Detail_Popup()">-4</output><br>
+                    <table class="table_inventory" id="table_inventory_grenades">
+                        <tr>
+                            <th>Название</th>
+                            <th>СЛ</th>
+                            <th>Вес (1 шт.)</th>
+                            <th>Кол-во</th>
+                        </tr>
+                    </table>
+                </div>
+                <div class="layer_inventory_block" id="block_inventory_armor" name="block_inventory_armor">
+                    Броня: <output class="class_output_field" name="outfield_armor_name" form="textarea" id="outfield_armor_name">Нет</output>
+                    <button onclick="layers.inventory.armor_block.Open_Database()">Изменить</button>
+                    <button onclick="layers.inventory.armor_block.Remove()">Удалить</button><br>
+                    <div>
+                        ЭКБ: <output class="class_output_field" name="outfield_armor_eac" form="textarea" id="outfield_armor_eac">0</output>
+                        ККБ: <output class="class_output_field" name="outfield_armor_kac" form="textarea" id="outfield_armor_kac">0</output>
+                        Макс. ЛВК: <output class="class_output_field" name="outfield_armor_max_agi" form="textarea" id="outfield_armor_max_agi">---</output>
+                        Штраф навыков: <output class="class_output_field" name="outfield_armor_penalty" form="textarea" id="outfield_armor_penalty">0</output>
+                        Cкорость: <output class="class_output_field" name="outfield_armor_speed" form="textarea" id="outfield_armor_speed">0</output><br>
+                        Дополнительно: <output class="class_output_field" name="outfield_armor_additional" form="textarea" id="outfield_armor_additional">---</output>
+                    </div>
+                    <div id="div_armor_power_attributes" style="display:none">
+                        Макс. Орудий: <output class="class_output_field" name="outfield_armor_max_weapon" form="textarea" id="outfield_armor_max_weapon">0</output>
+                        Ёмкость: <output class="class_output_field" name="outfield_armor_capacity" form="textarea" id="outfield_armor_capacity">0</output>
+                        Расход: <output class="class_output_field" name="outfield_armor_usage" form="textarea" id="outfield_armor_usage">0</output>
+                        Сила: <output class="class_output_field" name="outfield_armor_str" form="textarea" id="outfield_armor_str">0</output>
+                        Урон: <output class="class_output_field" name="outfield_armor_damage" form="textarea" id="outfield_armor_damage">0</output>
+                        Размер: <output class="class_output_field" name="outfield_armor_size" form="textarea" id="outfield_armor_size">0</output>
+                    </div>
+                    Улучшения брони (
+                    <output class="class_output_field" name="outfield_armor_upgrades_used" form="textarea" id="outfield_armor_upgrades_used">0</output>
+                    /
+                    <output class="class_output_field" name="outfield_armor_upgrades_max" form="textarea" id="outfield_armor_upgrades_max">0</output>
+                    ):
+                    <button onclick="layers.inventory.armor_block.upgrades.Open_Database()">+</button><br>
+                    <table class="table_inventory" id="table_inventory_armor_upgr">
+                        <tr>
+                            <th>Название</th>
+                            <th>Мест</th>
+                            <th>Вес</th>
+                        </tr>
+                    </table>
+                </div>
+                <div class="layer_inventory_block" id="block_inventory_augment" name="block_inventory_augment">
+                    Аугментации: <button onclick="layers.inventory.augment_block.Open_Database()">+</button><br>
+                    <table class="table_inventory" id="table_inventory_augments">
+                        <tr>
+                            <th>Название</th>
+                            <th>Часть тела</th>
+                        </tr>
+                    </table>
+                </div>
+                <div class="layer_inventory_block" id="block_inventory_equipment" name="table_inventory_equipment">
+                    Снаряжение: <button onclick="layers.inventory.equipment_block.Open_Database()">+</button><br>
+                    <table class="table_inventory" id="table_inventory_equipment">
+                        <tr>
+                            <th>Название</th>
+                            <th>Вес (1 шт.)</th>
+                            <th>Кол-во</th>
+                        </tr>
+                    </table>
+                </div>
+                <div class="layer_inventory_block" id="block_inventory_ammo" name="block_inventory_ammo">
+                    Боеприпасы: <button onclick="layers.inventory.ammo_block.Open_Database()">+</button><br>
+                    <table class="table_inventory" id="table_inventory_ammo">
+                        <tr>
+                            <th>Название</th>
+                            <th>Особое св-во</th>
+                            <th>Осталось</th>
+                        </tr>
+                    </table>
+                </div>
+                <div class="layer_inventory_block" id="block_inventory_other" name="block_inventory_other">
+                    Прочее: <button onclick="layers.inventory.other_items_block.Add_Row()">+</button><br>
+                    <table class="table_inventory" id="table_inventory_other">
+                        <tr>
+                            <th>Название</th>
+                            <th>Описание</th>
+                            <th>Вес (1 шт.)</th>
+                            <th>Кол-во</th>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="class_layer_main" id="layer_class">
+            <div class="class_block_class_details" id="block_class_details_mechanic">
+                Механик
+                <div class="class_block_class_subblock">
+                    Способности класса:
+                    <table class="class_table_class_abilities">
+                    </table>
+                </div>
+                <div class="class_block_class_subblock">
+                    Трюки механика:
+                    <table class="class_table_class_abilities">
+                    </table>
+                </div>
+                <div class="class_block_class_subblock">
+                    ИИ или альтернативная специализация:
+                </div>
+                <div class="class_block_class_subblock">
+                    Дрон:
+                </div>
+                <div class="class_block_class_subblock">
+                    Экзокортекс:
+                </div>
+                <div class="class_block_class_subblock">
+                    Способности архетипа:
+                    <table class="class_table_class_abilities">
+                    </table>
+                </div>
+            </div>
+            <div class="class_block_class_details" id="block_class_details_mystic">
+                Мистик
+                <div class="class_block_class_subblock">
+                    Способности класса:
+                    <table class="class_table_class_abilities">
+                    </table>
+                </div>
+                <div class="class_block_class_subblock">
+                    Дарование:
+                    <table class="class_table_class_abilities">
+                    </table>
+                </div>
+                <div class="class_block_class_subblock">
+                    Заклинания в день:
+                    <table class="class_table_spells_per_day">
+                    </table>
+                </div>
+                <div class="class_block_class_subblock">
+                    Известно заклинаний:
+                    <table class="class_table_spells_known">
+                    </table>
+                </div>
+                <div class="class_block_class_subblock">
+                    Заклинания:
+                </div>
+                <div class="class_block_class_subblock">
+                    Способности архетипа:
+                    <table class="class_table_class_abilities">
+                    </table>
+                </div>
+            </div>
+            <div class="class_block_class_details" id="block_class_details_operative">
+                Оперативник
+                <div class="class_block_class_subblock">
+                    Способности класса:
+                    <table class="class_table_class_abilities">
+                    </table>
+                </div>
+                <div class="class_block_class_subblock">
+                    Специализация:
+                    <table class="class_table_class_abilities">
+                    </table>
+                </div>
+                <div class="class_block_class_subblock">
+                    Оперативные уловки:
+                    <table class="class_table_class_abilities">
+                    </table>
+                </div>
+                <div class="class_block_class_subblock">
+                    Способности архетипа:
+                    <table class="class_table_class_abilities">
+                    </table>
+                </div>
+            </div>
+            <div class="class_block_class_details" id="block_class_details_envoy">
+                <div class="class_block_header">
+                    Посланник
+                </div>
+                <div class="class_block_body">
+                    <div class="class_block_class_subblock">
+                        <table id="table_class_abilities_envoy" class="class_table_class_abilities">
+                            <tr>
+                                <th></th>
+                                <th>Способности класса</th>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="class_block_class_subblock">
+                        <table id="table_class_expertise_skills" class="class_table_class_abilities">
+                            <tr>
+                                <th></th>
+                                <th>Мастерство в навыках</th>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="class_block_class_subblock">
+                        <table id="table_class_improvisations" class="class_table_class_abilities">
+                            <th></th>
+                            <th>Импровизации</th>
+                            <th></th>
+                        </table>
+                    </div>
+                    <div class="class_block_class_subblock">
+                        <table id="table_class_talents" class="class_table_class_abilities">
+                            <th></th>
+                            <th>Мастерские таланты</th>
+                            <th></th>
+                        </table>
+                    </div>
+                    <div class="class_block_class_subblock">
+                        Способности архетипа:<br>TBD
+                        <table class="class_table_class_abilities">
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="class_block_class_details" id="block_class_details_soldier">
+                Солдат
+                <div class="class_block_class_subblock">
+                    Способности класса:
+                    <table class="class_table_class_abilities">
+                    </table>
+                </div>
+                <div class="class_block_class_subblock">
+                    Основной боевой стиль:
+                    <table class="class_table_class_abilities">
+                    </table>
+                </div>
+                <div class="class_block_class_subblock">
+                    Вспомогательный боевой стиль:
+                    <table class="class_table_class_abilities">
+                    </table>
+                </div>
+                <div class="class_block_class_subblock">
+                    Военные хитрости:
+                    <table class="class_table_class_abilities">
+                    </table>
+                </div>
+                <div class="class_block_class_subblock">
+                    Боевые черты:
+                    <table class="class_table_class_abilities">
+                    </table>
+                </div>
+                <div class="class_block_class_subblock">
+                    Способности архетипа:
+                    <table class="class_table_class_abilities">
+                    </table>
+                </div>
+            </div>
+            <div class="class_block_class_details" id="block_class_details_solarion">
+                <div class="class_block_header">
+                    Солярион
+                </div>
+                <div class="class_block_body">
+                    <div class="class_block_class_subblock">
+                        <table id="table_class_abilities_solarion" class="class_table_class_abilities">
+                            <tr>
+                                <th></th>
+                                <th>Способности класса</th>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="class_block_class_subblock">
+                        <table id="table_solarion_adept_skills" class="class_table_class_abilities">
+                            <tr>
+                                <th>Классовые навыки</th>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="class_block_class_subblock">
+                        <table id="table_solarion_stellar_modes" class="class_table_class_abilities">
+                            <tr>
+                                <th>Звёздные режимы</th>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="class_block_class_subblock">
+                        <b>Звёздное воплощение</b><br>
+                        <output class="class_output_field" form="textarea" id="outfield_manifistation_name">Не выбрано</output>
+                        <button id="button_manifistation_select">+</button><br>
+                        <output form="textarea" id="outfield_manifistation_data"></output><br>
+                        <label id="label_manifistation_selector" for="selector_manifistation">Тут выбор:</label>
+                        <select id="selector_manifistation" name="selector_manifistation"></select><br>
+                        <button id="button_manifistation_active">Активировать</button>
+                    </div>
+                    <div class="class_block_class_subblock">
+                        <table id="table_solarion_zeniths_graviton" class="class_table_class_abilities">
+                            <th></th>
+                            <th>Гравитонные наивысшие откровения</th>
+                        </table>
+                        <table id="table_solarion_zeniths_photon" class="class_table_class_abilities">
+                            <th></th>
+                            <th>Фотонные наивысшие откровения</th>
+                        </table>
+                    </div>
+                    <div class="class_block_class_subblock">
+                        <table id="table_solarion_revelations" class="class_table_class_abilities">
+                            <th></th>
+                            <th>Звёздные откровения</th>
+                        </table>
+                    </div>
+                    <div class="class_block_class_subblock">
+                        Способности архетипа:<br>TBD
+                        <table class="class_table_class_abilities">
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="class_block_class_details" id="block_class_details_technomancer">
+                <div class="class_block_header">
+                    Техномант
+                </div>
+                <div class="class_block_body">
+                    <div class="class_block_class_subblock">
+                        <table id="table_class_abilities_technomancer" class="class_table_class_abilities">
+                            <tr>
+                                <th></th>
+                                <th>Способности класса</th>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="class_block_class_subblock">
+                        <table id="table_technomancer_hacks" class="class_table_class_abilities">
+                            <th></th>
+                            <th>Магические хаки</th>
+                        </table>
+                    </div>
+                    <div class="class_block_class_subblock">
+                        Архетип:
+                        <table class="class_table_class_abilities">
+                        </table>
+                    </div>
+                    <div class="class_block_class_subblock">
+                        Заклинания в день:
+                        <table class="class_table_spells_per_day">
+                        </table>
+                    </div>
+                    <div class="class_block_class_subblock">
+                        Известно заклинаний:
+                        <table class="class_table_spells_known">
+                        </table>
+                    </div>
+                    <div class="class_block_class_subblock">
+                        Заклинания:
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="class_layer_main" id="layer_abilities">
+            <div class="layer_abilities">
+                <div class="layer_abilities_block">
+                    Расовые способности:<br>
+                    <table id="table_abilities_race" style="width:100%">
+                    </table>
+                </div>
+                <div class="layer_abilities_block">
+                    Cпособности темы:<br>
+                    <table id="table_abilities_theme" style="width:100%">
+                        <tr>
+                            <th style="width:20%">Ур.</th>
+                            <th style="width:80%">Способность</th>
+                        </tr>
+                    </table>
+                </div>
+                <div class="layer_abilities_block">
+                    Черты:<br>
+                    <table id="table_abilities_feats" style="width:100%">
+                        <tr>
+                            <th style="width:20%">Ур.</th>
+                            <th style="width:60%">Способность</th>
+                            <th style="width:20%"> </th>
+                        </tr>
+                    </table>
+                </div>
+                <div class="layer_abilities_block">
+                    Прочие способности: <button onclick="layers.abilities.other.Open_Database()">+</button><br>
+                    <table id="table_abilities_other" style="width:100%">
+                    </table>
+                </div>
+                <div class="layer_abilities_block">
+                    Псевдозаклинания: <button onclick="layers.abilities.spell_likes.Open_Database()">+</button><br>
+                    <table id="table_spell_likes" style="width:100%">
+                    </table>
+                </div>
+                <div class="layer_abilities_block">
+                    Пользовательские способности: <button onclick="layers.abilities.custom_block.Add_Row()">+</button><br>
+                    <table id="table_abilities_custom" style="width:100%">
+                        <tr>
+                            <th>Название</th>
+                            <th>Описание</th>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="class_layer_main" id="layer_face">
+            Текущий слой: Лицо<br>
+
+            <button onclick="Test_Button1()">TestButton1</button>
+<!--
+            <input type="file" id="file_character_upload" value="Import" /><br />
+            <button id="import" onclick="upload_character()">Import</button>
+            <textarea id="result"></textarea>
+
+            <button onclick="Test_Button2()">TestButton2</button><br>
+            -->
+        </div>
+
+        <div class="class_layer_main" id="layer_custom">
+            <div class="class_layer_custom_main">
+                Добавить:
+                <select type="select" id="custom_main_category" onchange="layers.custom.Custom_Mod_Change_Category(event)"></select>
+            </div>
+            <div class="class_layer_custom_sub" id="sublayer_custom_stats">
+                <select id="custom_stats_type" style="display:none"></select>
+                <input type="text" id="custom_stats_id" placeholder="Название модификатора"></input>
+                <input type="text" id="custom_stats_value" placeholder="Значение"></input>
+                <button id="custom_stats_button" onclick="layers.custom.sublayer_stats.Add()">Добавить</button>
+            </div>
+            <div class="class_layer_custom_sub" id="sublayer_custom_bools">
+                <select id="custom_bools_type"></select>
+                <input type="text" id="custom_bools_id" placeholder="Название"></input>
+                <button id="custom_bools_button" onclick="layers.custom.sublayer_bools.Add()">Добавить</button>
+            </div>
+
+            <table id="table_custom_mods" style="width:100%">
+                <tr name="title">
+                    <th style="width:25%">Название</th>
+                    <th style="width:25%">Категория</th>
+                    <th style="width:25%">Тип</th>
+                    <th style="width:10%">Значение</th>
+                    <th style="width:15%"></th>
+                </tr>
+            </table>
+        </div>
+
+        <div class="bottom_layer">
+            <button class="tab_button" onclick="Set_Page(event, 'layer_maininfo')">Основное</button>
+            <button class="tab_button" onclick="Set_Page(event, 'layer_abiscores_skills')">Хар-ки и Навыки</button>
+            <button class="tab_button" onclick="Set_Page(event, 'layer_inventory')">Инвентарь</button>
+            <button class="tab_button" onclick="Set_Page(event, 'layer_class')">Класс</button>
+            <button class="tab_button" onclick="Set_Page(event, 'layer_abilities')">Способности</button>
+            <button class="tab_button" onclick="Set_Page(event, 'layer_face')">Лицо</button>
+            <button class="tab_button" onclick="Set_Page(event, 'layer_custom')">Custom</button>
+        </div>
+
+        <script src="js\chardata\const.js"></script>
+
+        <script src="databases\db_races.js"></script>
+        <script src="databases\db_themes.js"></script>
+        <script src="databases\db_classes.js"></script>
+        <script src="databases\db_weapons.js"></script>
+        <script src="databases\db_grenades.js"></script>
+        <script src="databases\db_armor.js"></script>
+        <script src="databases\db_armor_upgr.js"></script>
+        <script src="databases\db_augment.js"></script>
+        <script src="databases\db_items.js"></script>
+        <script src="databases\db_ammo.js"></script>
+        <script src="databases\db_abilities.js"></script>
+        <script src="databases\db_crystals.js"></script>
+        <script src="databases\db_spells.js"></script>
+
+        <script src="js\tools\html.js"></script>
+        <script src="js\tools\js_tools.js"></script>
+        <script src="js\tools\mod_map.js"></script>
+        <script src="js\tools\recalc_func_collection.js"></script>
+
+        <script src="js\layers\layer_abiscores.js"></script>
+        <script src="js\layers\layer_maininfo.js"></script>
+        <script src="js\layers\layer_inventory.js"></script>
+        <script src="js\layers\layer_custom_mod.js"></script>
+        <script src="js\layers\layer_skills.js"></script>
+        <script src="js\layers\layer_abilities.js"></script>
+        <script src="js\layers\layer_class.js"></script>
+        <script src="js\layers\layer_class\block_mechanic.js"></script>
+        <script src="js\layers\layer_class\block_mystic.js"></script>
+        <script src="js\layers\layer_class\block_envoy.js"></script>
+        <script src="js\layers\layer_class\block_operative.js"></script>
+        <script src="js\layers\layer_class\block_soldier.js"></script>
+        <script src="js\layers\layer_class\block_solarion.js"></script>
+        <script src="js\layers\layer_class\block_technomancer.js"></script>
+
+        <script src="js\layers\index.js"></script>
+        <script src="js\layers\popups.js"></script>
+
+        <script src="js\test.js"></script>
+        <script src="js\init.js"></script>
+
+        <script src="js\chardata\abilities.js"></script>
+        <script src="js\chardata\spells.js"></script>
+        <script src="js\chardata\abiscores.js"></script>
+        <script src="js\chardata\classes.js"></script>
+        <script src="js\chardata\skills.js"></script>
+        <script src="js\chardata\stats.js"></script>
+        <script src="js\chardata\inventory.js"></script>
+        <script src="js\chardata\proficiency.js"></script>
+        <script src="js\chardata\custom_mods.js"></script>
+        
+        <script src="js\chardata\classes\class_envoy.js"></script>
+        <script src="js\chardata\classes\class_mechanic.js"></script>
+        <script src="js\chardata\classes\class_mystic.js"></script>
+        <script src="js\chardata\classes\class_operative.js"></script>
+        <script src="js\chardata\classes\class_solarion.js"></script>
+        <script src="js\chardata\classes\class_soldier.js"></script>
+        <script src="js\chardata\classes\class_technomancer.js"></script>
+
+        <script src="js\chardata\chardata.js"></script>
+    </body>
+</html>

@@ -1,0 +1,31 @@
+.layer_inventory {
+    text-align: center;
+}
+
+.layer_inventory_block {
+    border: 1px solid #ccc;
+    width: 49%;
+    display: inline-block;
+    vertical-align: top;
+}
+
+#block_inventory_top {
+    width: 100%
+}
+
+#block_inventory_weapon {
+    width: 100%
+}
+
+.table_inventory {
+    display: none;
+}
+
+.table_inventory td, .table_inventory th {
+    border: 1px solid;
+}
+
+.layer_inventory input[type='text']{
+    width: 75px;
+    text-align: center;
+}

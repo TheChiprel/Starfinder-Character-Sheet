@@ -1,0 +1,104 @@
+html, body {
+    width: 800px;
+    height: 95%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+body {
+    min-height:100%;
+    background-color: lightgrey;
+    overflow: auto;
+    /* Smoothly transition the background color */
+    transition: background-color .5s;
+}
+
+.layer_popup {
+    display: none; /* Hidden by default */
+    position: static; /* Stay in place */
+    z-index: 1; /* Sit on top */
+}
+
+/ /* Style the tab */
+.bottom_layer,.top_layer{
+    overflow: hidden;
+    border: 1px solid #ccc;
+    background-color: #f1f1f1;
+}
+
+/* Style the buttons that are used to open the tab content */
+.bottom_layer button, .bottom_layer label {
+    background-color: inherit;
+    /*float: left;*/
+    border: none;
+    outline: none;
+    cursor: pointer;
+    padding: 14px 16px;
+    transition: 0.3s;
+    font-size: 15px;
+    font-family: "Times New Roman", Times, serif;
+}
+
+/* Change background color of buttons on hover */
+.bottom_layer button:hover, .bottom_layer label:hover {
+    background-color: #ddd;
+}
+
+/* Create an active/current tablink class */
+.bottom_layer button.active {
+    background-color: #ccc;
+}
+
+/* Style the buttons that are used to open the tab content */
+.top_layer button, .top_layer label {
+    background-color: inherit;
+    /*float: left;*/
+    border: none;
+    outline: none;
+    cursor: pointer;
+    padding: 14px 16px;
+    transition: 0.3s;
+    font-size: 15px;
+    font-family: "Times New Roman", Times, serif;
+}
+
+/* Change background color of buttons on hover */
+.top_layer button:hover, .top_layer label:hover {
+    background-color: #ddd;
+}
+
+.class_table_prof {
+    float: left;
+}
+
+/* Style the tab content */
+.class_layer_main {
+    display: none;
+    /*padding: 6px 12px;*/
+    border: 1px solid #ccc;
+    border-top: none;
+    animation: fadeEffect 1s; /* Fading effect takes 1 second */
+}
+
+.class_output_field {
+    background-color: white;
+    border: none;
+    outline: none;
+    cursor: help;
+    /*padding: 14px 16px;*/
+}
+
+/* Go from zero to full opacity */
+@keyframes fadeEffect {
+    from {opacity: 0;}
+    to {opacity: 1;}
+}
+
+table {
+    empty-cells: show;
+}
+
+input[type='number']{
+    width: 50px;
+    text-align: center;
+}

@@ -1,0 +1,10 @@
+.class_block_class_details {
+    text-align: center;
+    display: none;
+}
+
+.class_block_body {
+    text-align: center;
+    display: grid;
+    grid-template-columns: 33% 33% 33%;
+}

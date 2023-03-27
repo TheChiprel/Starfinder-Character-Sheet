@@ -1,0 +1,38 @@
+.layer_abilities {
+    text-align: center;
+    display: grid;
+    grid-template-columns: 30% 40% 40%;
+}
+
+.layer_abilities_block {
+    border: 1px solid #ccc;
+    display: block;
+}
+
+ /* Dropdown Button */
+/*.dropbtn {
+    background-color: #4CAF50;
+    color: white;
+    padding: 16px;
+    font-size: 16px;
+    border: none;
+}*/
+
+/* The container <div> - needed to position the dropdown content */
+.class_ddlist_classes {
+    position: relative;
+    display: inline-block;
+}
+
+/* Dropdown Content (Hidden by Default) */
+.class_ddlist_classes_content {
+    display: none;
+    position: absolute;
+    /*background-color: #f1f1f1;*/
+    /*min-width: 160px;*/
+    /*box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);*/
+    /*z-index: 1;*/
+}
+
+/* Show the dropdown menu on hover */
+.class_ddlist_classes:hover .class_ddlist_classes_content {display: block;}

@@ -1,0 +1,10 @@
+//private methods
+
+//public methods
+
+//private properties
+    var self = this;
+
+//public properties
+
+//additional initialization
