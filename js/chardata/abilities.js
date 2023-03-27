@@ -270,5 +270,6 @@ this.Get_SaveData_Obj = function(){
 //public properties
     this.feats = new Ability_Collection_t(10);
     this.other = new Ability_Collection_t();
+    this.spelllike = new Spell_Collection_t();
     this.custom = new Ability_Custom_Collection_t();
 }

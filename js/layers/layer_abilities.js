@@ -418,7 +418,7 @@ function Other_Abilities_Block(){
 function Spell_Likes_Abilities_Block(){
 //private methods
     var Get_Spell_Row_Num_By_Name = function(name){
-        for (let i = 0; i < m_table.rows.length; i++){
+        for (let i = 1; i < m_table.rows.length; i++){
             var row = m_table.rows[i];
             if(row.name == name){
                 return i;
@@ -429,8 +429,8 @@ function Spell_Likes_Abilities_Block(){
     }
 
     var Reset = function(){
-        while (m_table.rows.length > 0){
-            m_table.deleteRow(0);
+        while (m_table.rows.length > 1){
+            m_table.deleteRow(1);
         }
     }
 
@@ -468,31 +468,36 @@ function Spell_Likes_Abilities_Block(){
         row.name = row_name;
         
         var name_cell = row.insertCell(0);
-        var remove_cell = row.insertCell(1);
+        var daily_cell = row.insertCell(1);
+        var dc_cell = row.insertCell(2);
+        var remove_cell = row.insertCell(3);
         var onclick_func = self.Show_Descr.bind(null, row.name);
         
         name_cell.innerHTML = entry.name;
         name_cell.onclick = onclick_func;
         
-        //chardata.abilities.other.Add(row_name, entry);
+        chardata.abilities.spelllike.Add(row_name, entry);
         
         var remove_func = self.Remove.bind(null, row_name);
         var remove_button = HTML_Create_Button("X", remove_func);
         remove_cell.innerHTML = "";
         remove_cell.appendChild(remove_button);
+        
+        daily_cell.innerHTML = "TODO"; //TODO
+        dc_cell.innerHTML = "TODO"; //TODO
     }
     
     this.Remove = function(row_name){
         var row_num = Get_Spell_Row_Num_By_Name(row_name);
         if (row_num != null){
-            //chardata.abilities.other.Remove(row_num);
+            chardata.abilities.spelllike.Remove(row_num - 1);
             m_table.deleteRow(row_num);
         }//else TODO
     }
 
     this.Show_Descr = function(row_name){
         let row_num = Get_Spell_Row_Num_By_Name(row_name);
-        //chardata.abilities.other.Show_Detail_Popup(row_num); TODO
+        chardata.abilities.spelllike.Show_Detail_Popup(row_num - 1);
     }
 
     this.Open_Database = function(row){

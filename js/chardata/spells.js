@@ -129,18 +129,13 @@ function Get_Spell_Descr(entry){
 
     return ret;
 }
-/*
-function Ability_t(id, entry, is_active){
+
+function Spell_t(id, entry){
 //private methods
 
 //public methods
     this.Show_Descr = function(){
-        Popup_Descr.Call(self.entry.name, self.entry.descr);
-    }
-    
-    this.Set_Active_State = function(state){
-        //TODO
-        this.is_active = state;
+        Popup_Descr.Call(self.entry.name, Get_Spell_Descr(self.entry));
     }
 
 //private properties
@@ -149,35 +144,29 @@ function Ability_t(id, entry, is_active){
 //public properties
     this.id = id;
     this.entry = entry;
-    this.is_active = is_active;
+    this.lvl = null;
+    this.daily = null;
+    this.dc = null;
 
 //additional initialization
 }
 
-function Ability_Collection_t(default_size = undefined, default_active = true){
+function Spell_Collection_t(default_size = undefined){
 //private methods
 
 //public methods
-    this.Add = function(id, entry, is_active = undefined){
-        if (is_active != undefined){
-            m_arr.push(new Ability_t(id, entry, is_active));
-        }else{
-            m_arr.push(new Ability_t(id, entry, default_active));
-        }
+    this.Add = function(id, entry){
+        m_arr.push(new Spell_t(id, entry));
     }
 
-    this.Replace = function(row, id, entry, is_active = undefined){
+    this.Replace = function(row, id, entry){
         if (row >= m_arr.length){
-            console.error("Attempting to replace ability out of bounds");
+            console.error("Attempting to replace spell out of bounds");
             return;
         }
         //else NOTHING TO DO
 
-        if (is_active != undefined){
-            m_arr[row] = new Ability_t(id, entry, is_active);
-        }else{
-            m_arr[row] = new Ability_t(id, entry, default_active);
-        }
+        m_arr[row] = new Spell_t(id, entry);
     }
 
     this.Remove = function(row){
@@ -203,20 +192,6 @@ function Ability_Collection_t(default_size = undefined, default_active = true){
         
         return m_arr[row].entry.lvl;
     }
-    
-    this.Set_Active_State = function(row, state){
-        if (row >= m_arr.length){
-            console.error("Attempting to activate ability out of bounds");
-            return;
-        }
-        //else NOTHING TO DO
-        
-        if (m_arr[row] == null){
-            return;
-        }
-        
-        m_arr[row].Set_Active_State(state);
-    }
 
     this.Show_Detail_Popup = function(row){
         if (row >= m_arr.length){
@@ -229,7 +204,7 @@ function Ability_Collection_t(default_size = undefined, default_active = true){
             m_arr[row].Show_Descr();
         }
     }
-
+/*
     this.Get_SaveData_Obj = function(){
         var ret = new Array(0);
         m_arr.forEach(ability => {
@@ -241,12 +216,12 @@ function Ability_Collection_t(default_size = undefined, default_active = true){
         });
         return ret;
     }
+    */
 
 //private properties
     var self = this;
     var m_arr;
     var m_default_size = default_size;
-    var m_default_active = default_active;
 
 //public properties
 
@@ -257,76 +232,3 @@ function Ability_Collection_t(default_size = undefined, default_active = true){
         m_arr = new Array(0);
     }
 }
-
-function Ability_Custom_t(id, name, descr){
-//public methods
-    this.Get_SaveData_Obj = function(){
-        var ret = {
-            name: self.name,
-            descr: self.descr
-        }
-        return ret;
-    }
-
-//private properties
-    var self = this;
-
-//public properties
-    this.id = id;
-    this.name = name;
-    this.descr = descr;
-}
-
-function Ability_Custom_Collection_t(){
-//public methods
-    this.Add = function(id, name = "", descr = ""){
-        m_arr.push(new Ability_Custom_t(id, name, descr));
-    }
-
-    this.Remove = function(num){
-        m_arr.splice(num, 1);
-    }
-
-    this.Change_Name = function(num, value){
-        m_arr[num].name = value;
-    }
-
-    this.Change_Descr = function(num, value){
-        m_arr[num].descr = value;
-    }
-
-    this.Get_SaveData_Obj = function(){
-        var ret = new Array(0);
-        m_arr.forEach(item => {
-            ret.push(item.Get_SaveData_Obj());
-        });
-        return ret;
-    }
-
-//private properties
-    var self = this;
-    var m_arr = new Array(0);
-}
-
-function Chardata_Abilities_t(){
-//private methods
-
-//public methods
-this.Get_SaveData_Obj = function(){
-        var ret = {
-            feats: self.feats.Get_SaveData_Obj(),
-            other: self.other.Get_SaveData_Obj(),
-            custom: self.custom.Get_SaveData_Obj()
-        };
-        return ret;
-    }
-
-//private properties
-    var self = this;
-
-//public properties
-    this.feats = new Ability_Collection_t(10);
-    this.other = new Ability_Collection_t();
-    this.custom = new Ability_Custom_Collection_t();
-}
-*/
