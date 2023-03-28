@@ -8,3 +8,9 @@
     display: grid;
     grid-template-columns: 33% 33% 33%;
 }
+
+.class_block_spell_list {
+    text-align: center;
+    display: grid;
+    grid-template-columns: 25% 25% 25% 25%;
+}
