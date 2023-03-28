@@ -130,18 +130,30 @@ function Get_Spell_Descr(entry){
     return ret;
 }
 
-function Spell_t(id, entry){
+function Spell_t(id, entry, lvl = undefined, daily = undefined, dc = undefined){
 //private methods
-    var Set_Default_Values = function(){
-        let lvl = parseInt(self.entry.lvl);
-        if (lvl == NaN){
-            self.lvl = parseInt(self.entry[0]);
-        }else{
+    var Set_Default_Values = function(lvl, daily, dc){
+        if (lvl != undefined){
             self.lvl = lvl;
+        }else{
+            let temp_lvl = parseInt(self.entry.lvl);
+            if (temp_lvl == NaN){
+                self.lvl = parseInt(self.entry[0]);
+            } //else NOTHING TO DO
+            self.lvl = temp_lvl;
         }
         
-        self.daily = 1;
-        self.dc = 10 + self.lvl + chardata.stats.abiscores.modifiers.Get_Sum(ABISCORES.CHA);
+        if (daily != undefined){
+            self.daily = daily;
+        }else{
+            self.daily = 1;
+        }
+        
+        if (dc != undefined){
+            self.dc = dc;
+        }else{
+            self.dc = 10 + self.lvl + chardata.stats.abiscores.modifiers.Get_Sum(ABISCORES.CHA);
+        }
     }
 
 //public methods
@@ -151,6 +163,16 @@ function Spell_t(id, entry){
 
     this.Show_Descr = function(){
         Popup_Descr.Call(self.entry.name, Get_Spell_Descr(self.entry));
+    }
+    
+    this.Get_SaveData_Obj = function(){
+        var ret = {
+            name: self.entry.name,
+            lvl: self.lvl,
+            daily: self.daily,
+            dc: self.dc
+        }
+        return ret;
     }
 
 //private properties
@@ -164,25 +186,25 @@ function Spell_t(id, entry){
     this.dc;
 
 //additional initialization
-    Set_Default_Values();
+    Set_Default_Values(lvl, daily, dc);
 }
 
 function Spell_Collection_t(default_size = undefined){
 //private methods
 
 //public methods
-    this.Add = function(id, entry){
-        m_arr.push(new Spell_t(id, entry));
+    this.Add = function(id, entry, lvl = undefined, daily = undefined, dc = undefined){
+        m_arr.push(new Spell_t(id, entry, lvl, daily, dc));
     }
 
-    this.Replace = function(row, id, entry){
+    this.Replace = function(row, id, entry, lvl = undefined, daily = undefined, dc = undefined){
         if (row >= m_arr.length){
             console.error("Attempting to replace spell out of bounds");
             return;
         }
         //else NOTHING TO DO
 
-        m_arr[row] = new Spell_t(id, entry);
+        m_arr[row] = new Spell_t(id, entry, lvl, daily, dc);
     }
 
     this.Remove = function(row){
@@ -270,19 +292,18 @@ function Spell_Collection_t(default_size = undefined){
             m_arr[row].Show_Descr();
         }
     }
-/*
+
     this.Get_SaveData_Obj = function(){
         var ret = new Array(0);
-        m_arr.forEach(ability => {
-            if (ability == null){
+        m_arr.forEach(spell => {
+            if (spell == null){
                 ret.push(null);
             }else{
-                ret.push(ability.entry.name);
+                ret.push(spell.Get_SaveData_Obj());
             }
         });
         return ret;
     }
-    */
 
 //private properties
     var self = this;

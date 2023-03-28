@@ -259,6 +259,7 @@ this.Get_SaveData_Obj = function(){
         var ret = {
             feats: self.feats.Get_SaveData_Obj(),
             other: self.other.Get_SaveData_Obj(),
+            spell_like: self.spell_like.Get_SaveData_Obj(),
             custom: self.custom.Get_SaveData_Obj()
         };
         return ret;
@@ -270,6 +271,6 @@ this.Get_SaveData_Obj = function(){
 //public properties
     this.feats = new Ability_Collection_t(10);
     this.other = new Ability_Collection_t();
-    this.spelllike = new Spell_Collection_t();
+    this.spell_like = new Spell_Collection_t();
     this.custom = new Ability_Custom_Collection_t();
 }

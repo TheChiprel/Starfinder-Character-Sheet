@@ -434,7 +434,7 @@ function Spell_Likes_Abilities_Block(){
         }
     }
 
-    this.Add = function(num){
+    this.Add = function(num, lvl = undefined, daily = undefined, dc = undefined){
         var row;
         var entry = SPELLS_DATABASE[num];
 
@@ -477,7 +477,7 @@ function Spell_Likes_Abilities_Block(){
         name_cell.innerHTML = entry.name;
         name_cell.onclick = onclick_func;
         
-        chardata.abilities.spelllike.Add(row_name, entry);
+        chardata.abilities.spell_like.Add(row_name, entry, lvl, daily, dc);
         
         var remove_func = self.Remove.bind(null, row_name);
         var remove_button = HTML_Create_Button("X", remove_func);
@@ -492,7 +492,7 @@ function Spell_Likes_Abilities_Block(){
                 "layers.abilities.spell_likes.Set_Daily('" + row.name + "', Number(event.target.value))")
         );
         dc_cell.appendChild(HTML_Create_Input_Number(
-            chardata.abilities.spelllike.Get_DC(m_table.rows.length - 2),
+            chardata.abilities.spell_like.Get_DC(m_table.rows.length - 2),
             1,
             100,
             "layers.abilities.spell_likes.Set_DC('" + row.name + "', Number(event.target.value))")
@@ -502,7 +502,7 @@ function Spell_Likes_Abilities_Block(){
     this.Remove = function(row_name){
         var row_num = Get_Spell_Row_Num_By_Name(row_name);
         if (row_num != null){
-            chardata.abilities.spelllike.Remove(row_num - 1);
+            chardata.abilities.spell_like.Remove(row_num - 1);
             m_table.deleteRow(row_num);
         }//else TODO
     }
@@ -512,20 +512,20 @@ function Spell_Likes_Abilities_Block(){
     this.Set_DC = function(row_name, value){
         var row_num = Get_Spell_Row_Num_By_Name(row_name);
         if (row_num != null){
-            chardata.abilities.spelllike.Set_DC(row_num - 1, value);
+            chardata.abilities.spell_like.Set_DC(row_num - 1, value);
         }//else TODO
     }
     
     this.Set_Daily = function(row_name, value){
         var row_num = Get_Spell_Row_Num_By_Name(row_name);
         if (row_num != null){
-            chardata.abilities.spelllike.Set_Daily(row_num - 1, value);
+            chardata.abilities.spell_like.Set_Daily(row_num - 1, value);
         }//else TODO
     }
 
     this.Show_Descr = function(row_name){
         let row_num = Get_Spell_Row_Num_By_Name(row_name);
-        chardata.abilities.spelllike.Show_Detail_Popup(row_num - 1);
+        chardata.abilities.spell_like.Show_Detail_Popup(row_num - 1);
     }
 
     this.Open_Database = function(row){
@@ -589,8 +589,8 @@ function Spell_Likes_Abilities_Block(){
         obj.forEach(spell => {            
             for (let i = 0; i < SPELLS_DATABASE.length; i++){
                 let entry = SPELLS_DATABASE[i];
-                if (spell == entry.name){
-                    self.Add(i);
+                if (spell.name == entry.name){
+                    self.Add(i, spell.lvl, spell.daily, spell.dc);
                     break;
                 }
                 //else NOTHING TO DO
@@ -686,7 +686,7 @@ function Custom_Abilities_Block_t(){
                     break;
 
                 case 2:
-                    var remove_func = self.Remove_Row.bind(row.name);
+                    var remove_func = self.Remove_Row.bind(null, row.name);
                     var button_remove = HTML_Create_Button("X", remove_func);
                     cell.appendChild(button_remove);
                     break;
@@ -775,6 +775,7 @@ function Layer_Abilities_t(){
         
         self.feats.Load_From_Obj(obj.feats);
         self.other.Load_From_Obj(obj.other);
+        self.spell_likes.Load_From_Obj(obj.spell_like);
         self.custom_block.Load_From_Obj(obj.custom);
     }
 
