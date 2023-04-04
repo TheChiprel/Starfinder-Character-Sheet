@@ -15,7 +15,7 @@ function Spell_Database_GetList(
     max_lvl = undefined
 ){
     var ret = new Array(0);
-    if ((in_type == undefined) && (in_subtype == undefined) && (in_category == undefined)){
+    if ((in_class == undefined) && (min_lvl == undefined) && (max_lvl == undefined)){
         console.error("Extracting from database with no criteria set");
         return in_database;
     }
