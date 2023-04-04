@@ -1,3 +1,65 @@
+function Technomancer_Spells_t(){
+//constants
+const SPELLS_KNOWN = [
+    [ 1,  1,  1,  1,  2,  3], //0 lvl
+    [ 1,  1,  2,  3,  7, 11], //1 lvl
+    [ 4,  4,  5,  6, 10, 14], //2 lvl
+    [ 7,  7,  8,  9, 13, 17], //3 lvl
+    [10, 10, 11, 12, 16, 20], //4 lvl
+    [13, 13, 14, 15, 19    ], //5 lvl
+    [16, 16, 17, 18, 20    ]  //6 lvl
+];
+const TECHNOMANCER_SPELL_ID_PREFIX = "TECHNOMANCER_SPELL_";
+
+//private methods
+
+//public methods
+    this.Set = function(spell_lvl, row, entry){
+        //TODO: daily, dc?
+        m_arr[spell_lvl].Replace(
+            row,
+            (TECHNOMANCER_SPELL_ID_PREFIX + spell_lvl + "_" + row),
+            entry
+        );
+    }
+
+    this.Remove = function(spell_lvl, row){
+        m_arr[spell_lvl].Remove(row);
+    }
+
+    this.Show_Details = function(spell_lvl, row){
+        m_arr[spell_lvl].Show_Detail_Popup(row);
+    }
+    
+    this.Get_SaveData_Obj = function(){
+        var ret = new Array(m_arr.length);
+        for (let i = 0; i < m_arr.length; i++){
+            let spells = m_arr[i].Get_SaveData_Obj();
+            
+            ret[i] = new Array(0);
+            spells.forEach(cur_spell => {
+                if (cur_spell == null){
+                    ret[i].push(null);
+                }else{
+                    ret[i].push(cur_spell.name);
+                }
+            });
+        }
+        return ret;
+    }
+
+//private properties
+    var self = this;
+    var m_arr = new Array(SPELLS_KNOWN.length);
+
+//public properties
+
+//additional initialization
+    for (let i = 0; i < m_arr.length; i++){ //TODO: magic
+        m_arr[i] = new Spell_Collection_t(SPELLS_KNOWN[i].length);
+    }
+}
+
 function Class_Technomancer_t (){
 //constants
 const CLASS_ABILITY_LVLS = [1, 3, 3, 3, 6, 19, 20];
@@ -15,7 +77,8 @@ const HACKS_LVLS = [2, 5, 8, 11, 14, 17, 20];
     this.Get_SaveData_Obj = function(){
         var ret = {
             'lvl': self.lvl,
-            'hacks': self.adept_skills.Get_SaveData_Obj()
+            'hacks': self.hacks.Get_SaveData_Obj(),
+            'spells': self.spells.Get_SaveData_Obj()
         }
         return ret;
     }
@@ -27,6 +90,7 @@ const HACKS_LVLS = [2, 5, 8, 11, 14, 17, 20];
     this.lvl = 0;
     this.class_abilities = new Class_Ability_List_t(CLASS_ABILITY_LVLS, "technomancer_class_");
     this.hacks = new Class_Ability_List_t(HACKS_LVLS, "technomancer_hacks");
+    this.spells = new Technomancer_Spells_t();
 
 //additional initialization
 }

@@ -211,6 +211,7 @@ function Block_Technomancer_Hacks_t(class_data){
 //public methods
 function Block_Technomancer_Spells_t(class_data){
 //constants
+//TODO: remove, get from chardata
 const SPELLS_KNOWN = [
     [ 1,  1,  1,  1,  2,  3], //0 lvl
     [ 1,  1,  2,  3,  7, 11], //1 lvl
@@ -313,7 +314,7 @@ const SPELL_LIST_TABLE_ID = "table_spell_list_technomancer";
         var add_remove_button = HTML_Create_Button("X", remove_func);
         cell_add_remove_button.appendChild(add_remove_button);
 
-        //m_class_data.hacks.Set(row, entry); //TODO
+        m_class_data.spells.Set(spell_lvl, row, entry);
 
         m_database = null;
         Popup_Database.Close();
@@ -322,17 +323,16 @@ const SPELL_LIST_TABLE_ID = "table_spell_list_technomancer";
     this.Set_By_Entry_Num = function(spell_lvl, row, entry_num){
         self.Set(spell_lvl, row, m_database[entry_num]);
     }
-/*
-    this.Set_By_Name = function(row, name){
-        var entry = Get_Ability_Entry_By_Name(ABILITIES_DATABASE, name);
+
+    this.Set_By_Name = function(spell_lvl, row, name){
+        var entry = Get_Spell_Entry_By_Name(SPELLS_DATABASE, name);
         if (entry == null){
             console.error("Failed to find ability: '" + name + "'");
             return;
         }
         
-        self.Set(row, entry);
+        self.Set(spell_lvl, row, entry);
     }
-*/
 
     this.Remove = function(spell_lvl, row){
         let table_row = m_tables[spell_lvl].rows[row + 1]; // +1 with header
@@ -340,7 +340,7 @@ const SPELL_LIST_TABLE_ID = "table_spell_list_technomancer";
         let cell_add_remove_button = table_row.cells[2];
         var add_func = self.Open_Database.bind(null, spell_lvl, row);
 
-        //m_class_data.hacks.Remove(row); //TODO
+        m_class_data.spells.Remove(spell_lvl, row);
 
         cell_name.innerHTML = "---";
         cell_name.removeAttribute("onclick");
@@ -351,8 +351,8 @@ const SPELL_LIST_TABLE_ID = "table_spell_list_technomancer";
         cell_add_remove_button.appendChild(add_remove_button);
     }
 
-    this.Show_Details = function(row){
-        //m_class_data.hacks.Show_Details(row); //TODO
+    this.Show_Details = function(spell_lvl, row){
+        m_class_data.spells.Show_Details(spell_lvl, row);
     }
 
     this.Show_Info_Database = function(entry_num){
@@ -360,19 +360,21 @@ const SPELL_LIST_TABLE_ID = "table_spell_list_technomancer";
 
         Popup_Descr.Call(spell.name, Get_Spell_Descr(spell));
     }
-/*
+
     this.Load_From_Obj = function(obj){
         if (obj == undefined){
             return;
         }
 
-        for (let i = 0; i < obj.length; i++){
-            if (obj[i] != null){
-                self.Set_By_Name(i, obj[i]);
+        for (let spell_lvl = 0; spell_lvl < obj.length; spell_lvl++){
+            for (let row = 0; row < obj[spell_lvl].length; row++){
+                if (obj[spell_lvl][row] != null){
+                    self.Set_By_Name(spell_lvl, row, obj[spell_lvl][row]);
+                }
             }
         }
     }
-*/
+
 //private properties
     var self = this;
     var m_class_data = class_data;
@@ -407,11 +409,8 @@ function Block_Class_Technomancer_t(){
             return;
         }
         
-        m_adept_skills.Load_From_Obj(obj.adept_skills);
-        m_revelations.Load_From_Obj(obj.revelations);
-        m_zeniths_graviton.Load_From_Obj(obj.zeniths_graviton);
-        m_zeniths_photon.Load_From_Obj(obj.zeniths_photon);
-        m_manifistation.Load_From_Obj(obj.manifistation);
+        m_hacks.Load_From_Obj(obj.hacks);
+        m_spells.Load_From_Obj(obj.spells);
     }
 
 //private properties
