@@ -248,6 +248,7 @@ const SPELL_LIST_TABLE_ID = "table_spell_list_technomancer";
             }
             m_tables.push(cur_table);
         }
+        self.Set_Daily(new Array(SPELLS_KNOWN.length).fill(0));
     }
 
 //public methods
@@ -360,6 +361,20 @@ const SPELL_LIST_TABLE_ID = "table_spell_list_technomancer";
 
         Popup_Descr.Call(spell.name, Get_Spell_Descr(spell));
     }
+    
+    this.Set_Daily = function(daily_arr){
+        if (daily_arr.length == m_tables.length){
+            for (let i = 0; i < m_tables.length; i++){
+                if (daily_arr[i] === 0){
+                    m_tables[i].rows[0].cells[1].innerHTML = "Круг " + i + " (В день: -)";
+                }else{
+                    m_tables[i].rows[0].cells[1].innerHTML = "Круг " + i + " (В день: " + daily_arr[i] + ")";
+                }
+            }
+        }else{
+            console.error("Incorrect array given to set technomancer daily spells count.");
+        }
+    }
 
     this.Load_From_Obj = function(obj){
         if (obj == undefined){
@@ -410,7 +425,7 @@ function Block_Class_Technomancer_t(){
         }
         
         m_hacks.Load_From_Obj(obj.hacks);
-        m_spells.Load_From_Obj(obj.spells);
+        self.spells.Load_From_Obj(obj.spells);
     }
 
 //private properties
@@ -419,9 +434,9 @@ function Block_Class_Technomancer_t(){
     var m_class_data = chardata.classes.class_map.get(CLASSES.TECHNOMANCER).context;
     var m_class_abilities = new Block_Technomancer_Class_Abilities_t(m_class_data);
     var m_hacks = new Block_Technomancer_Hacks_t(m_class_data);
-    var m_spells = new Block_Technomancer_Spells_t(m_class_data);
 
 //public properties
+    this.spells = new Block_Technomancer_Spells_t(m_class_data);
 
 //additional initialization
     Init();

@@ -1,5 +1,7 @@
 function Technomancer_Spells_t(){
 //constants
+const RECALC_FUNC_ID = "TECHNOMANCER_SPELL_DAILY";
+
 const SPELLS_KNOWN = [
     [ 1,  1,  1,  1,  2,  3], //0 lvl
     [ 1,  1,  2,  3,  7, 11], //1 lvl
@@ -9,9 +11,53 @@ const SPELLS_KNOWN = [
     [13, 13, 14, 15, 19    ], //5 lvl
     [16, 16, 17, 18, 20    ]  //6 lvl
 ];
+
+const SPELLS_DAILY = [
+    "∞",                                                          //0 lvl
+    [2, 2, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5], //1 lvl
+    [0, 0, 0, 2, 2, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5], //2 lvl
+    [0, 0, 0, 0, 0, 0, 2, 2, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5], //3 lvl
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 3, 3, 4, 4, 4, 4, 5, 5, 5], //4 lvl
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 3, 3, 4, 4, 5, 5], //5 lvl
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 3, 4, 5]  //6 lvl
+];
+
+const SPELLS_DAILY_BY_INT = [
+    null,
+    [0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3], //1 lvl
+    [0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3], //2 lvl
+    [0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2], //3 lvl
+    [0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2], //4 lvl
+    [0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2], //5 lvl
+    [0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 2]  //6 lvl
+];
+
 const TECHNOMANCER_SPELL_ID_PREFIX = "TECHNOMANCER_SPELL_";
 
 //private methods
+    var Init = function(){
+        //initiating spell lists
+        for (let i = 0; i < m_arr.length; i++){
+            m_arr[i] = new Spell_Collection_t(SPELLS_KNOWN[i].length);
+        }
+    }
+    
+    var Update_Daily = function(){
+        let daily_arr = new Array(m_arr.length).fill(0);
+        if (m_class_lvl > 0){
+            let int_mod = Math.floor((chardata.stats.abiscores.values.Get_Sum(ABISCORES.INT) - 10) / 2);
+            daily_arr[0] = SPELLS_DAILY[0];
+            for (let i = 1; i < m_arr.length; i++){
+                if (int_mod < SPELLS_DAILY_BY_INT.length){
+                    daily_arr[i] = SPELLS_DAILY[i][m_class_lvl - 1] + SPELLS_DAILY_BY_INT[i][int_mod];
+                }else{
+                    daily_arr[i] = SPELLS_DAILY[i][m_class_lvl - 1] + SPELLS_DAILY_BY_INT[i][SPELLS_DAILY_BY_INT.length - 1];
+                }
+            }
+        }//else NOTHING TO DO
+        
+        layers.classes.Get_Block(CLASSES.TECHNOMANCER).spells.Set_Daily(daily_arr);
+    }
 
 //public methods
     this.Set = function(spell_lvl, row, entry){
@@ -29,6 +75,30 @@ const TECHNOMANCER_SPELL_ID_PREFIX = "TECHNOMANCER_SPELL_";
 
     this.Show_Details = function(spell_lvl, row){
         m_arr[spell_lvl].Show_Detail_Popup(row);
+    }
+    
+    this.Update_Lvl = function(lvl){
+        if (m_class_lvl == lvl){
+            return;
+        }
+        
+        if (m_class_lvl == 0){
+            //INT -> Technomancer Daily
+            chardata.stats.abiscores.values.AddRecalcFunc(
+                ABISCORES.INT,
+                new Recalc_Function_t (RECALC_FUNC_ID, self.Update_Int));
+        }else if (lvl == 0){
+            chardata.stats.abiscores.values.RemoveRecalcFunc(
+                ABISCORES.INT,
+                RECALC_FUNC_ID);
+        }//else NOTHING TO DO
+            
+        m_class_lvl = lvl;
+        Update_Daily();
+    }
+    
+    this.Update_Int = function(){
+        Update_Daily();
     }
     
     this.Get_SaveData_Obj = function(){
@@ -50,14 +120,13 @@ const TECHNOMANCER_SPELL_ID_PREFIX = "TECHNOMANCER_SPELL_";
 
 //private properties
     var self = this;
+    var m_class_lvl = 0;
     var m_arr = new Array(SPELLS_KNOWN.length);
 
 //public properties
 
 //additional initialization
-    for (let i = 0; i < m_arr.length; i++){ //TODO: magic
-        m_arr[i] = new Spell_Collection_t(SPELLS_KNOWN[i].length);
-    }
+    Init();
 }
 
 function Class_Technomancer_t (){
@@ -72,6 +141,7 @@ const HACKS_LVLS = [2, 5, 8, 11, 14, 17, 20];
         self.lvl = lvl;
         self.class_abilities.Update_Lvl(self.lvl);
         self.hacks.Update_Lvl(self.lvl);
+        self.spells.Update_Lvl(self.lvl);
     }
 
     this.Get_SaveData_Obj = function(){
