@@ -27,7 +27,7 @@ body {
 }
 
 /* Style the buttons that are used to open the tab content */
-.bottom_layer button, .bottom_layer label {
+.tab_selector button, .bottom_layer label {
     background-color: inherit;
     /*float: left;*/
     border: none;
@@ -40,12 +40,12 @@ body {
 }
 
 /* Change background color of buttons on hover */
-.bottom_layer button:hover, .bottom_layer label:hover {
+.tab_selector button:hover, .bottom_layer label:hover {
     background-color: #ddd;
 }
 
 /* Create an active/current tablink class */
-.bottom_layer button.active {
+.tab_selector button.active {
     background-color: #ccc;
 }
 

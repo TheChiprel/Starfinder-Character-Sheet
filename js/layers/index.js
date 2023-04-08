@@ -81,26 +81,6 @@ function Load_Character_From_File(event) {
     fr.readAsText(files.item(0));
 }
 
-function Set_Page(evt, layer_name){
-    var tabcontent, tablinks;
-
-    // Get all elements with class="tabcontent" and hide them
-    tabcontent = document.getElementsByClassName("class_layer_main");
-    for (let i = 0; i < tabcontent.length; i++) {
-        tabcontent[i].style.display = "none";
-    }
-
-    // Get all elements with class="tablinks" and remove the class "active"
-    tablinks = document.getElementsByClassName("tab_button");
-    for (let i = 0; i < tablinks.length; i++) {
-        tablinks[i].className = tablinks[i].className.replace(" active", "");
-    }
-
-    // Show the current tab, and add an "active" class to the button that opened the tab
-    document.getElementById(layer_name).style.display = "grid";
-    evt.currentTarget.className += " active";
-}
-
 function Layers_t (){
 //private methods
 
@@ -112,8 +92,31 @@ function Layers_t (){
         self.inventory = new Layer_Inventory_t();
         self.classes = new Layer_Classes_t();
         self.abilities = new Layer_Abilities_t();
-        self.face = null;
+        self.face = new Layer_Face_t();
         self.custom = new Layer_Custom_t();
+    }
+    
+
+    this.Set_Active_Page = function(evt, layer_name){
+        let tabcontent, tablinks;
+
+        // Get all elements with class="tabcontent" and hide them
+        tabcontent = document.getElementsByClassName("class_layer_main");
+        for (let i = 0; i < tabcontent.length; i++) {
+            tabcontent[i].style.display = "none";
+        }
+
+        // Get all elements with class="tablinks" and remove the class "active"
+        tablinks = document.getElementsByClassName("main_layer_button");
+        for (let i = 0; i < tablinks.length; i++) {
+            tablinks[i].className = tablinks[i].className.replace(" active", "");
+        }
+
+        // Show the current tab, and add an "active" class to the button that opened the tab
+        document.getElementById(layer_name).style.display = "grid";
+        if (evt != null){
+            evt.currentTarget.className += " active";
+        }
     }
 
 //private properties

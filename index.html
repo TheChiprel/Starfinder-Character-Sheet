@@ -14,7 +14,7 @@
         <link rel="stylesheet" type="text/css" href="css\popups.css">
     </head>
 
-    <body onload="Reset()">
+    <body onload="Init()">
         <div class="layer_popup" id="layer_popup_select">
             <div class="class_popup_header">
                 <output name="outfield_popup_select_name" form="textarea" id="outfield_popup_select_name"></output>
@@ -64,6 +64,52 @@
             <button onclick="Save_Character_To_File()">Сохранить</button>
             <input type="file" id="file_character_upload" value="Load from file" onchange="Load_Character_From_File()" accept=".json" style="display:none"/>
             <label class="pseudobutton" for="file_character_upload">Загрузить</label>
+        </div>
+
+        <div class="class_layer_main" id="layer_face">
+            <div class="tab_selector">
+                <button class="tab_button face_tab_button default_tab" onclick="layers.face.Set_Active_Block(event, 'sublayer_face_stats')">
+                    Цифры
+                </button>
+                <button class="tab_button face_tab_button" onclick="layers.face.Set_Active_Block(event, 'sublayer_face_inventory')">
+                    Инвентарь
+                </button>
+                <button class="tab_button face_tab_button" onclick="layers.face.Set_Active_Block(event, 'sublayer_face_abilities')">
+                    Способности
+                </button>
+                <button class="tab_button face_tab_button" onclick="layers.face.Set_Active_Block(event, 'sublayer_face_spells')">
+                    Заклинания
+                </button>
+            </div>
+        
+            <div class="class_sublayer_face" id = "sublayer_face_stats">
+                Stats: TBD
+            </div>
+            
+            <div class="class_sublayer_face" id = "sublayer_face_inventory">
+                Inventory: TBD
+            </div>
+            
+            <div class="class_sublayer_face" id = "sublayer_face_abilities">
+                Abilities: TBD
+            </div>
+            
+            <div class="class_sublayer_face" id = "sublayer_face_spells">
+                Spells: TBD
+            </div>
+            
+            <div class="class_sublayer_face" id = "sublayer_face_info">
+                Info: TBD
+            </div>
+<!--
+            <button onclick="Test_Button1()">TestButton1</button>
+
+            <input type="file" id="file_character_upload" value="Import" /><br />
+            <button id="import" onclick="upload_character()">Import</button>
+            <textarea id="result"></textarea>
+
+            <button onclick="Test_Button2()">TestButton2</button><br>
+-->
         </div>
 
         <div class="class_layer_main" id="layer_maininfo">
@@ -797,19 +843,6 @@
             </div>
         </div>
 
-        <div class="class_layer_main" id="layer_face">
-            Текущий слой: Лицо<br>
-
-            <button onclick="Test_Button1()">TestButton1</button>
-<!--
-            <input type="file" id="file_character_upload" value="Import" /><br />
-            <button id="import" onclick="upload_character()">Import</button>
-            <textarea id="result"></textarea>
-
-            <button onclick="Test_Button2()">TestButton2</button><br>
-            -->
-        </div>
-
         <div class="class_layer_main" id="layer_custom">
             <div class="class_layer_custom_main">
                 Добавить:
@@ -838,14 +871,14 @@
             </table>
         </div>
 
-        <div class="bottom_layer">
-            <button class="tab_button" onclick="Set_Page(event, 'layer_maininfo')">Основное</button>
-            <button class="tab_button" onclick="Set_Page(event, 'layer_abiscores_skills')">Хар-ки и Навыки</button>
-            <button class="tab_button" onclick="Set_Page(event, 'layer_inventory')">Инвентарь</button>
-            <button class="tab_button" onclick="Set_Page(event, 'layer_class')">Класс</button>
-            <button class="tab_button" onclick="Set_Page(event, 'layer_abilities')">Способности</button>
-            <button class="tab_button" onclick="Set_Page(event, 'layer_face')">Лицо</button>
-            <button class="tab_button" onclick="Set_Page(event, 'layer_custom')">Custom</button>
+        <div class="tab_selector">
+            <button class="tab_button main_layer_button" onclick="layers.Set_Active_Page(event, 'layer_face')">Лицо</button>
+            <button class="tab_button main_layer_button default_tab" onclick="layers.Set_Active_Page(event, 'layer_maininfo')">Основное</button>
+            <button class="tab_button main_layer_button" onclick="layers.Set_Active_Page(event, 'layer_abiscores_skills')">Хар-ки и Навыки</button>
+            <button class="tab_button main_layer_button" onclick="layers.Set_Active_Page(event, 'layer_inventory')">Инвентарь</button>
+            <button class="tab_button main_layer_button" onclick="layers.Set_Active_Page(event, 'layer_class')">Класс</button>
+            <button class="tab_button main_layer_button" onclick="layers.Set_Active_Page(event, 'layer_abilities')">Способности</button>
+            <button class="tab_button main_layer_button" onclick="layers.Set_Active_Page(event, 'layer_custom')">Custom</button>
         </div>
 
         <script src="js\chardata\const.js"></script>
@@ -869,6 +902,7 @@
         <script src="js\tools\mod_map.js"></script>
         <script src="js\tools\recalc_func_collection.js"></script>
 
+        <script src="js\layers\layer_face.js"></script>
         <script src="js\layers\layer_abiscores.js"></script>
         <script src="js\layers\layer_maininfo.js"></script>
         <script src="js\layers\layer_inventory.js"></script>
