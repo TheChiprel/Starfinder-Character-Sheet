@@ -42,10 +42,11 @@ const TECHNOMANCER_SPELL_ID_PREFIX = "TECHNOMANCER_SPELL_";
         }
     }
     
-    var Update_Daily = function(){
+    var Update_Daily_And_DC = function(){
         let daily_arr = new Array(m_arr.length).fill(0);
+        let base_dc = 10;
         if (m_class_lvl > 0){
-            let int_mod = Math.floor((chardata.stats.abiscores.values.Get_Sum(ABISCORES.INT) - 10) / 2);
+            let int_mod = (chardata.stats.abiscores.modifiers.Get_Sum(ABISCORES.INT));
             daily_arr[0] = SPELLS_DAILY[0];
             for (let i = 1; i < m_arr.length; i++){
                 if (int_mod < SPELLS_DAILY_BY_INT.length){
@@ -54,9 +55,10 @@ const TECHNOMANCER_SPELL_ID_PREFIX = "TECHNOMANCER_SPELL_";
                     daily_arr[i] = SPELLS_DAILY[i][m_class_lvl - 1] + SPELLS_DAILY_BY_INT[i][SPELLS_DAILY_BY_INT.length - 1];
                 }
             }
+            base_dc += int_mod;
         }//else NOTHING TO DO
         
-        layers.classes.Get_Block(CLASSES.TECHNOMANCER).spells.Set_Daily(daily_arr);
+        layers.classes.Get_Block(CLASSES.TECHNOMANCER).spells.Set_Daily_And_DC(daily_arr, base_dc);
     }
 
 //public methods
@@ -84,21 +86,21 @@ const TECHNOMANCER_SPELL_ID_PREFIX = "TECHNOMANCER_SPELL_";
         
         if (m_class_lvl == 0){
             //INT -> Technomancer Daily
-            chardata.stats.abiscores.values.AddRecalcFunc(
+            chardata.stats.abiscores.modifiers.AddRecalcFunc(
                 ABISCORES.INT,
                 new Recalc_Function_t (RECALC_FUNC_ID, self.Update_Int));
         }else if (lvl == 0){
-            chardata.stats.abiscores.values.RemoveRecalcFunc(
+            chardata.stats.abiscores.modifiers.RemoveRecalcFunc(
                 ABISCORES.INT,
                 RECALC_FUNC_ID);
         }//else NOTHING TO DO
             
         m_class_lvl = lvl;
-        Update_Daily();
+        Update_Daily_And_DC();
     }
     
     this.Update_Int = function(){
-        Update_Daily();
+        Update_Daily_And_DC();
     }
     
     this.Get_SaveData_Obj = function(){

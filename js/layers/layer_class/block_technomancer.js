@@ -248,7 +248,7 @@ const SPELL_LIST_TABLE_ID = "table_spell_list_technomancer";
             }
             m_tables.push(cur_table);
         }
-        self.Set_Daily(new Array(SPELLS_KNOWN.length).fill(0));
+        self.Set_Daily_And_DC(new Array(SPELLS_KNOWN.length).fill(0));
     }
 
 //public methods
@@ -362,13 +362,19 @@ const SPELL_LIST_TABLE_ID = "table_spell_list_technomancer";
         Popup_Descr.Call(spell.name, Get_Spell_Descr(spell));
     }
     
-    this.Set_Daily = function(daily_arr){
+    this.Set_Daily_And_DC = function(daily_arr, base_dc){
         if (daily_arr.length == m_tables.length){
             for (let i = 0; i < m_tables.length; i++){
                 if (daily_arr[i] === 0){
-                    m_tables[i].rows[0].cells[1].innerHTML = "Круг " + i + " (В день: -)";
+                    m_tables[i].rows[0].cells[1].innerHTML = 
+                        "Круг " + i + 
+                        "<br/>В день: -<br/>СЛ: -";
                 }else{
-                    m_tables[i].rows[0].cells[1].innerHTML = "Круг " + i + " (В день: " + daily_arr[i] + ")";
+                    let dc = base_dc + i;
+                    m_tables[i].rows[0].cells[1].innerHTML = 
+                        "Круг " + i + 
+                        "<br/>В день: " + daily_arr[i] + 
+                        "<br/>СЛ: " + dc;
                 }
             }
         }else{
