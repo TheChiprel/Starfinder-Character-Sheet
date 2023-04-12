@@ -1,0 +1,5 @@
+.class_sublayer_face {
+    text-align: center;
+    display: grid;
+    grid-template-columns: 25% 25% 25% 25%;
+}
