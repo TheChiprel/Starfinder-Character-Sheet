@@ -170,9 +170,18 @@ const TALENTS_LVLS = [3, 7, 11, 15, 19];
 
 //public properties
     this.lvl = 0;
-    this.class_abilities = new Class_Ability_List_t(CLASS_ABILITY_LVLS, "envoy_class_");
-    this.improvs = new Class_Ability_List_t(IMPROV_LVLS, "envoy_improv_");
-    this.talents = new Class_Ability_List_t(TALENTS_LVLS, "envoy_talent_");
+    this.class_abilities = new Class_Ability_List_t(
+        "Классовые способности (Посланник)",
+        CLASS_ABILITY_LVLS,
+        "envoy_class_");
+    this.improvs = new Class_Ability_List_t(
+        "Импровизации Посланника",
+        IMPROV_LVLS,
+        "envoy_improv_");
+    this.talents = new Class_Ability_List_t(
+        "Мастерские таланты",
+        TALENTS_LVLS,
+        "envoy_talent_");
     this.exp_skills = new Exp_Skills_Collection_t();
 
 //additional initialization

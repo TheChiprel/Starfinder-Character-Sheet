@@ -539,12 +539,27 @@ const ADEPT_SKILL_COUNT = 2;
 
 //public properties
     this.lvl = 0;
-    this.class_abilities = new Class_Ability_List_t(CLASS_ABILITY_LVLS, "solarion_class_");
-    this.stellar_modes = new Class_Ability_List_t(STELLAR_MODES_LVLS, "solarion_stellar_mode_");
+    this.class_abilities = new Class_Ability_List_t(
+        "Классовые способности (Солярион)",
+        CLASS_ABILITY_LVLS,
+        "solarion_class_");
+    this.stellar_modes = new Class_Ability_List_t(
+        "Звёздные режимы",
+        STELLAR_MODES_LVLS,
+        "solarion_stellar_mode_");
     this.adept_skills = new Adapt_Skills_Collection_t();
-    this.revelations = new Class_Ability_List_t(REVELATIONS_LVLS, "solarion_revelation_");
-    this.zeniths_graviton = new Class_Ability_List_t(ZENITHS_LVLS, "solarion_zeniths_graviton_");
-    this.zeniths_photon = new Class_Ability_List_t(ZENITHS_LVLS, "solarion_zeniths_photon_");
+    this.revelations = new Class_Ability_List_t(
+        "Звёздные откровения",
+        REVELATIONS_LVLS,
+        "solarion_revelation_");
+    this.zeniths_graviton = new Class_Ability_List_t(
+        "Высшие откровения (Гравитонные)",
+        ZENITHS_LVLS,
+        "solarion_zeniths_graviton_");
+    this.zeniths_photon = new Class_Ability_List_t(
+        "Высшие откровения (Фотонные)",
+        ZENITHS_LVLS,
+        "solarion_zeniths_photon_");
     this.manifistation = new Manifistation_t();
 
 //additional initialization

@@ -19,7 +19,7 @@ function Class_Mystic_t (){
 
 //private properties
     var self = this;
-    //var m_class_abilities = new Ability_Collection_t(CLASS_ABILITY_COUNT);
+    //var m_class_abilities = new Ability_Collection_t("Классовые способности (Мистик)", CLASS_ABILITY_COUNT);
 
 //public properties
     this.lvl = 0;

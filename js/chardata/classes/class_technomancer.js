@@ -160,8 +160,14 @@ const HACKS_LVLS = [2, 5, 8, 11, 14, 17, 20];
 
 //public properties
     this.lvl = 0;
-    this.class_abilities = new Class_Ability_List_t(CLASS_ABILITY_LVLS, "technomancer_class_");
-    this.hacks = new Class_Ability_List_t(HACKS_LVLS, "technomancer_hacks");
+    this.class_abilities = new Class_Ability_List_t(
+        "Классовые способности (Техномант)",
+        CLASS_ABILITY_LVLS,
+        "technomancer_class_");
+    this.hacks = new Class_Ability_List_t(
+        "Магические хаки",
+        HACKS_LVLS,
+        "technomancer_hacks");
     this.spells = new Technomancer_Spells_t();
 
 //additional initialization

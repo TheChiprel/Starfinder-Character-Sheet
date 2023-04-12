@@ -1,3 +1,70 @@
+function Face_Data_Container_t(table_elem){
+//private methods
+
+//public methods
+
+//private properties
+    var self = this;
+    var m_table_elem = elem;
+    var m_groups = new Map();
+
+//public properties
+
+//additional initialization
+}
+
+function Block_Face_Stats_t(){
+//private methods
+
+//public methods
+
+//private properties
+    var self = this;
+
+//public properties
+
+//additional initialization
+}
+
+function Block_Face_Inventory_t(){
+//private methods
+
+//public methods
+
+//private properties
+    var self = this;
+
+//public properties
+
+//additional initialization
+}
+
+function Block_Face_Abilities_t(){
+//private methods
+
+//public methods
+
+//private properties
+    var self = this;
+
+//public properties
+
+//additional initialization
+}
+
+function Block_Face_Spells_t(){
+//private methods
+
+//public methods
+
+//private properties
+    var self = this;
+
+//public properties
+
+//additional initialization
+}
+
 function Layer_Face_t(){
 //public methods
     this.Load_From_Obj = function(obj){
