@@ -72,7 +72,7 @@ const THEME_ABILITIES_LVLS = [1, 6, 12, 18];
             var onclick_func = self.Show_Descr.bind(null, i);
 
             if (cur_ability != null){
-                let row = m_table.insertRow(m_table.rows.length)
+                let row = m_table.insertRow(m_table.rows.length);
                 let lvl_cell = row.insertCell(0);
                 let abi_cell = row.insertCell(1);
                 lvl_cell.innerHTML = THEME_ABILITIES_LVLS[i];

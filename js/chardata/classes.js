@@ -1,4 +1,4 @@
-function Class_Ability_List_t (list_name, lvl_list, id_prefix){
+function Class_Ability_List_t (id, list_name, lvl_list, id_prefix){
 //constants
 
 //private methods
@@ -42,7 +42,13 @@ function Class_Ability_List_t (list_name, lvl_list, id_prefix){
     var self = this;
     var m_id_prefix = id_prefix;
     var m_lvl_list = lvl_list;
-    var m_abilities = new Ability_Collection_t(list_name, m_lvl_list.length, false);
+    //TODO: remove id, use id_prefix?
+    var m_abilities = new Ability_Collection_t(
+        id,
+        list_name,
+        m_lvl_list.length,
+        false
+    );
 
 //public properties
 

@@ -98,10 +98,26 @@ function Ability_t(id, entry, is_active){
 }
 
 function Ability_Collection_t(
+    id,
     collection_name = "???",
     default_size = undefined,
     default_active = true){
 //private methods
+//TODO on change only
+    var Update = function(){
+        if (m_update_func != null){
+            m_update_func();
+        }
+    }
+
+    var Init = function(){
+        if (m_default_size != undefined){
+            m_arr = new Array(m_default_size).fill(null);
+        }else{
+            m_arr = new Array(0);
+        }
+        m_update_func = combined_collections.abilities.Add(m_id, self);
+    }
 
 //public methods
     this.Add = function(id, entry, is_active = undefined){
@@ -110,6 +126,7 @@ function Ability_Collection_t(
         }else{
             m_arr.push(new Ability_t(id, entry, default_active));
         }
+        Update();
     }
 
     this.Replace = function(row, id, entry, is_active = undefined){
@@ -124,6 +141,7 @@ function Ability_Collection_t(
         }else{
             m_arr[row] = new Ability_t(id, entry, default_active);
         }
+        Update();
     }
 
     this.Remove = function(row){
@@ -142,6 +160,24 @@ function Ability_Collection_t(
     
     this.Rename_Collection = function(new_name){
         m_collection_name = new_name;
+        Update();
+    }
+    
+    this.Get_Ability_List = function(){
+        let abi_list = new Array(0);
+        
+        m_arr.forEach(ability => {
+            if ((ability != null) && (ability.is_active)){
+                abi_list.push(ability.entry.name);
+            }
+        });
+        
+        if (abi_list.length == 0){
+            return null;
+        }
+        
+        abi_list.unshift(m_collection_name);
+        return abi_list;
     }
     
     this.Get_Lvl = function(row){
@@ -166,6 +202,7 @@ function Ability_Collection_t(
         }
         
         m_arr[row].Set_Active_State(state);
+        Update();
     }
 
     this.Show_Detail_Popup = function(row){
@@ -195,6 +232,8 @@ function Ability_Collection_t(
 //private properties
     var self = this;
     var m_arr;
+    var m_id = id;
+    var m_update_func = null;
     var m_default_size = default_size;
     var m_default_active = default_active;
     var m_collection_name = collection_name;
@@ -202,11 +241,7 @@ function Ability_Collection_t(
 //public properties
 
 //additional initialization
-    if (m_default_size != undefined){
-        m_arr = new Array(m_default_size).fill(null);
-    }else{
-        m_arr = new Array(0);
-    }
+    Init();
 }
 
 function Ability_Custom_t(id, name, descr){
@@ -277,8 +312,8 @@ this.Get_SaveData_Obj = function(){
     var self = this;
 
 //public properties
-    this.feats = new Ability_Collection_t("Черты", 10);
-    this.other = new Ability_Collection_t("Прочие способности");
+    this.feats = new Ability_Collection_t("abi_feats", "Черты", 10);
+    this.other = new Ability_Collection_t("abi_other", "Прочие способности");
     this.spell_like = new Spell_Collection_t();
     this.custom = new Ability_Custom_Collection_t();
 }

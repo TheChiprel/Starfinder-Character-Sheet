@@ -15,7 +15,7 @@
         <link rel="stylesheet" type="text/css" href="css\popups.css">
     </head>
 
-    <body onload="Init()">
+    <body onload="CS_Init()">
         <div class="layer_popup" id="layer_popup_select">
             <div class="class_popup_header">
                 <output name="outfield_popup_select_name" form="textarea" id="outfield_popup_select_name"></output>
@@ -181,7 +181,9 @@
             </div>
             
             <div class="class_sublayer_face" id = "sublayer_face_abilities">
-                Abilities: TBD
+                <table id="table_face_abilities">
+                
+                </table>
             </div>
             
             <div class="class_sublayer_face" id = "sublayer_face_spells">
@@ -191,9 +193,9 @@
             <div class="class_sublayer_face" id = "sublayer_face_info">
                 Info: TBD
             </div>
-<!--
-            <button onclick="Test_Button1()">TestButton1</button>
 
+            <button onclick="Test_Button1()">TestButton1</button>
+<!--
             <input type="file" id="file_character_upload" value="Import" /><br />
             <button id="import" onclick="upload_character()">Import</button>
             <textarea id="result"></textarea>
@@ -991,6 +993,7 @@
         <script src="js\tools\js_tools.js"></script>
         <script src="js\tools\mod_map.js"></script>
         <script src="js\tools\recalc_func_collection.js"></script>
+        <script src="js\tools\combined_collections.js"></script>
 
         <script src="js\layers\layer_face.js"></script>
         <script src="js\layers\layer_abiscores.js"></script>

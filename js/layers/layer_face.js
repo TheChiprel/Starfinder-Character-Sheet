@@ -41,15 +41,45 @@ function Block_Face_Inventory_t(){
 
 function Block_Face_Abilities_t(){
 //private methods
+    var Clear_Table = function(){
+        while (m_table.rows.length > 0){
+            m_table.deleteRow(0);
+        }
+    }
+    
+    var Init = function(){
+        Clear_Table();
+    }
 
 //public methods
+    this.Update = function(){
+        let list = new Array(0);
+        let abi_map = combined_collections.abilities.Get_Map()
+        abi_map.forEach((collection, key) => {
+            //TODO: check active count before
+            let abilities = collection.Get_Ability_List();
+            if (abilities != null){
+                list = list.concat(abilities);
+            }
+        });
+        
+        Clear_Table();
+        list.forEach(str => {
+            let row = m_table.insertRow(m_table.rows.length);
+            let cell = row.insertCell(0);
+            cell.innerHTML = str;
+        });
+    }
 
 //private properties
     var self = this;
+    var m_map = new Map();
+    var m_table = document.getElementById("table_face_abilities");
 
 //public properties
 
 //additional initialization
+    Init();
 }
 
 function Block_Face_Spells_t(){
@@ -101,8 +131,8 @@ function Layer_Face_t(){
     var self = this;
 
 //public properties
-    this.block_Stats = null;
-    this.block_Inventory = null;
-    this.block_Abilities = null;
-    this.block_Spells = null;
+    this.block_stats = null;
+    this.block_inventory = null;
+    this.block_abilities = new Block_Face_Abilities_t();
+    this.block_spells = null;
 }

@@ -39,6 +39,10 @@ function Chardata_t(){
 
 //public methods
     this.Reset = function(){
+        m_data_collections = new Map();
+        m_data_collections.set("abilities", new Map());
+        m_data_collections.set("spells", new Map());
+        
         self.name = "";
         self.race = null;
         self.theme = null;
@@ -52,6 +56,7 @@ function Chardata_t(){
 
 //private properties
     var self = this;
+    var m_all_ability;
 
 //public properties
     this.name;

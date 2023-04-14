@@ -161,10 +161,12 @@ const HACKS_LVLS = [2, 5, 8, 11, 14, 17, 20];
 //public properties
     this.lvl = 0;
     this.class_abilities = new Class_Ability_List_t(
+        "abi_class_technomancer",
         "Классовые способности (Техномант)",
         CLASS_ABILITY_LVLS,
         "technomancer_class_");
     this.hacks = new Class_Ability_List_t(
+        "abi_class_technomancer_hacks",
         "Магические хаки",
         HACKS_LVLS,
         "technomancer_hacks");
