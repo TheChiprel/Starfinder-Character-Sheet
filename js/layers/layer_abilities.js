@@ -67,7 +67,7 @@ const THEME_ABILITIES_LVLS = [1, 6, 12, 18];
                 abi_cell.innerHTML = abilities_arr[i];
                 abi_cell.onclick = onclick_func;
 
-                m_arr.push(new Ability_t(cur_ability.name, cur_ability));
+                m_arr.push(new Ability_t(cur_ability.name, null, cur_ability));
             }else{
                 console.error("Theme ability '" + abilities_arr[i] + "' was not found!")
             }

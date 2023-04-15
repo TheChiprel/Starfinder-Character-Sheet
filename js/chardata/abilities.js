@@ -1,6 +1,26 @@
+function Split_Ability_Name_Suffix(name){
+    const regex = / \(.+\)/;
+    let clear_name = name;
+    let suffix = regex.exec(name);
+    
+    if (suffix != null){
+        suffix = suffix[0];
+        clear_name = name.replace(suffix, "");
+        suffix = suffix.replace(" (", "");
+        suffix = suffix.replace(")", "");
+    }
+    
+    return [clear_name, suffix];
+}
+
 function Get_Ability_Entry_By_Name(in_database, name){
-    //TODO: ignore data in ()
+    //const regex = / \(.+\)/;
+    //let name_to_search = name.replace(regex, "");
+     
     for (let i = 0; i < in_database.length; i++){
+        //if (in_database[i].name == name_to_search){
+        //    return in_database[i];
+        //}
         if (in_database[i].name == name){
             return in_database[i];
         }
@@ -74,7 +94,7 @@ function Ability_Database_GetList(in_database, in_type = undefined, in_subtype =
     return ret;
 }
 
-function Ability_t(id, entry, is_active){
+function Ability_t(id, entry, name_suffix = null, is_active){
 //private methods
 
 //public methods
@@ -87,12 +107,16 @@ function Ability_t(id, entry, is_active){
         this.is_active = state;
     }
 
+    this.Change_Name_Suffix = function(name_suffix){
+        this.name_suffix = name_suffix;
+    }
 //private properties
     var self = this;
 
 //public properties
     this.id = id;
     this.entry = entry;
+    this.name_suffix = name_suffix;
     this.is_active = is_active;
 
 //additional initialization
@@ -122,16 +146,16 @@ function Ability_Collection_t(
     }
 
 //public methods
-    this.Add = function(id, entry, is_active = undefined){
+    this.Add = function(id, entry, name_suffix = null, is_active = undefined){
         if (is_active != undefined){
-            m_arr.push(new Ability_t(id, entry, is_active));
+            m_arr.push(new Ability_t(id, entry, name_suffix, is_active));
         }else{
-            m_arr.push(new Ability_t(id, entry, default_active));
+            m_arr.push(new Ability_t(id, entry, name_suffix, default_active));
         }
         Update();
     }
 
-    this.Replace = function(row, id, entry, is_active = undefined){
+    this.Replace = function(row, id, entry, name_suffix = null, is_active = undefined){
         if (row >= m_arr.length){
             console.error("Attempting to replace ability out of bounds");
             return;
@@ -139,9 +163,9 @@ function Ability_Collection_t(
         //else NOTHING TO DO
 
         if (is_active != undefined){
-            m_arr[row] = new Ability_t(id, entry, is_active);
+            m_arr[row] = new Ability_t(id, entry, name_suffix, is_active);
         }else{
-            m_arr[row] = new Ability_t(id, entry, default_active);
+            m_arr[row] = new Ability_t(id, entry, name_suffix, default_active);
         }
         Update();
     }
@@ -182,8 +206,12 @@ function Ability_Collection_t(
         
         m_arr.forEach(ability => {
             if ((ability != null) && (ability.is_active)){
+                let str = ability.entry.name;
+                if (ability.name_suffix != null){
+                    str += " (" + ability.name_suffix + ")"
+                }
                 abi_list.push({
-                    name: ability.entry.name,
+                    name: str,
                     descr_func: ability.Show_Descr
                 });
             }
@@ -283,9 +311,10 @@ function Ability_Racial_Collection_t(){
         m_collection.Rename_Collection(
             name_prefix + " (" + race_name + ")");
         for (let row = 0; row < abi_arr.length; row++){
-            let entry = Get_Ability_Entry_By_Name(ABILITIES_DATABASE, abi_arr[row]);
-            m_collection.Add("abi_racial" + row, entry);
-            layers.abilities.race.Add_Ability(entry.name);
+            let [abi_name, abi_suffix] = Split_Ability_Name_Suffix(abi_arr[row]);
+            let entry = Get_Ability_Entry_By_Name(ABILITIES_DATABASE, abi_name);
+            m_collection.Add("abi_racial" + row, entry, abi_suffix);
+            layers.abilities.race.Add_Ability(abi_arr[row]);
         }
     }
     

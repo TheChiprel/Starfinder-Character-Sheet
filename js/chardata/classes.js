@@ -5,7 +5,7 @@ function Class_Ability_List_t (id, list_name, lvl_list, id_prefix){
 
 //public methods
     this.Set = function(row, entry){
-        m_abilities.Replace(row, m_id_prefix + row, entry);
+        m_abilities.Replace(row, m_id_prefix + row, entry); //TODO: suffix?
     }
     
     this.Remove = function(row, entry){
