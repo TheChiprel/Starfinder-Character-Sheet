@@ -168,7 +168,10 @@ function Ability_Collection_t(
         
         m_arr.forEach(ability => {
             if ((ability != null) && (ability.is_active)){
-                abi_list.push(ability.entry.name);
+                abi_list.push({
+                    name: ability.entry.name,
+                    descr_func: ability.Show_Descr
+                });
             }
         });
         
@@ -176,7 +179,10 @@ function Ability_Collection_t(
             return null;
         }
         
-        abi_list.unshift(m_collection_name);
+        abi_list.unshift({
+                    name: m_collection_name,
+                    descr_func: null
+                });
         return abi_list;
     }
     

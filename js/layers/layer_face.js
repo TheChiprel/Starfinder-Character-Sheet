@@ -53,21 +53,27 @@ function Block_Face_Abilities_t(){
 
 //public methods
     this.Update = function(){
-        let list = new Array(0);
-        let abi_map = combined_collections.abilities.Get_Map()
+        let abi_map = combined_collections.abilities.Get_Map();
+        Clear_Table();
         abi_map.forEach((collection, key) => {
             //TODO: check active count before
             let abilities = collection.Get_Ability_List();
             if (abilities != null){
-                list = list.concat(abilities);
+                for (let i = 0; i < abilities.length; i++){
+                    let row = m_table.insertRow(m_table.rows.length);
+                    var cell;
+                    if (i == 0){
+                        cell = document.createElement('th');
+                        row.appendChild(cell);
+                    }else{
+                        cell = row.insertCell(0);
+                    }
+                    cell.innerHTML = abilities[i].name;
+                    if (abilities[i].descr_func != null){
+                        cell.onclick = abilities[i].descr_func;
+                    }
+                }
             }
-        });
-        
-        Clear_Table();
-        list.forEach(str => {
-            let row = m_table.insertRow(m_table.rows.length);
-            let cell = row.insertCell(0);
-            cell.innerHTML = str;
         });
     }
 
