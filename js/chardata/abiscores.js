@@ -337,7 +337,7 @@ function Abiscore_Value_Collection_t(){
             }
         });
 
-        if (!found){
+        if (!found && (abiscore != null)){
             console.warn("Attempting to set theme modifier to unknown ability score:" + abiscore);
         }
         //else NOTHING TO DO

@@ -181,7 +181,7 @@ function Layer_MainInfo_t(){
     this.Set_Theme = function(theme_name, update_field = false){
         let outfield_theme = document.getElementById("selector_theme");
         let new_theme_value = theme_name;
-        let theme_abiscore = 'none';
+        let theme_abiscore = null;
 
         if ((new_theme_value == "---") || (new_theme_value == null)){
             chardata.theme = null;
