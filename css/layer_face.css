@@ -1,5 +1,9 @@
-.class_sublayer_face {
+#sublayer_face_stats {
     text-align: center;
     display: grid;
     grid-template-columns: 25% 25% 25% 25%;
+}
+
+#table_face_abilities {
+    text-align: center;
 }

@@ -49,6 +49,7 @@ function Block_Face_Abilities_t(){
     
     var Init = function(){
         Clear_Table();
+        m_table.insertRow(m_table.rows.length).insertCell(0).innerHTML = "У вашего персонажа нет способностей";
         combined_collections.abilities.Set_Update_Function(self.Update);
     }
 
@@ -74,8 +75,12 @@ function Block_Face_Abilities_t(){
                         cell.onclick = abilities[i].descr_func;
                     }
                 }
+                m_table.insertRow(m_table.rows.length).insertCell(0).innerHTML = "&nbsp;";
             }
         });
+        if (m_table.rows.length == 0){
+            m_table.insertRow(m_table.rows.length).insertCell(0).innerHTML = "У вашего персонажа нет способностей";
+        }
     }
 
 //private properties
