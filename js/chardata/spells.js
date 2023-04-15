@@ -130,31 +130,8 @@ function Get_Spell_Descr(entry){
     return ret;
 }
 
-function Spell_t(id, entry, lvl = undefined, daily = undefined, dc = undefined){
+function Spell_t(id, entry, lvl = null, daily = null, dc = null){
 //private methods
-    var Set_Default_Values = function(lvl, daily, dc){
-        if (lvl != undefined){
-            self.lvl = lvl;
-        }else{
-            let temp_lvl = parseInt(self.entry.lvl);
-            if (temp_lvl == NaN){
-                self.lvl = parseInt(self.entry[0]);
-            } //else NOTHING TO DO
-            self.lvl = temp_lvl;
-        }
-        
-        if (daily != undefined){
-            self.daily = daily;
-        }else{
-            self.daily = 1;
-        }
-        
-        if (dc != undefined){
-            self.dc = dc;
-        }else{
-            self.dc = 10 + self.lvl + chardata.stats.abiscores.modifiers.Get_Sum(ABISCORES.CHA);
-        }
-    }
 
 //public methods
     this.Set_DC = function(new_value){
@@ -181,23 +158,44 @@ function Spell_t(id, entry, lvl = undefined, daily = undefined, dc = undefined){
 //public properties
     this.id = id;
     this.entry = entry;
-    this.lvl;
-    this.daily;
-    this.dc;
+    this.lvl = lvl;
+    this.daily = daily;
+    this.dc = dc;
 
 //additional initialization
-    Set_Default_Values(lvl, daily, dc);
 }
 
-function Spell_Collection_t(default_size = undefined){
+function Spell_Collection_t(
+    id,
+    collection_name = "???",
+    default_size = undefined,
+    default_active = true
+){
 //private methods
-
-//public methods
-    this.Add = function(id, entry, lvl = undefined, daily = undefined, dc = undefined){
-        m_arr.push(new Spell_t(id, entry, lvl, daily, dc));
+//TODO on change only
+//TODO add do_update option to functions
+    var Update = function(){
+        if (m_update_func != null){
+            m_update_func();
+        }
     }
 
-    this.Replace = function(row, id, entry, lvl = undefined, daily = undefined, dc = undefined){
+    var Init = function(id){
+        if (m_default_size != undefined){
+            m_arr = new Array(m_default_size).fill(null);
+        }else{
+            m_arr = new Array(0);
+        }
+        m_update_func = combined_collections.spells.Add(id, self);
+    }
+
+//public methods
+    this.Add = function(id, entry, lvl = null, daily = null, dc = null){
+        m_arr.push(new Spell_t(id, entry, lvl, daily, dc));
+        Update();
+    }
+
+    this.Replace = function(row, id, entry, lvl = null, daily = null, dc = null){
         if (row >= m_arr.length){
             console.error("Attempting to replace spell out of bounds");
             return;
@@ -205,6 +203,7 @@ function Spell_Collection_t(default_size = undefined){
         //else NOTHING TO DO
 
         m_arr[row] = new Spell_t(id, entry, lvl, daily, dc);
+        Update();
     }
 
     this.Remove = function(row){
@@ -219,6 +218,41 @@ function Spell_Collection_t(default_size = undefined){
         }else{
             m_arr.splice(row, 1);
         }
+        Update();
+    }
+    
+    this.Rename_Collection = function(new_name){
+        m_collection_name = new_name;
+        Update();
+    }
+    
+    this.Get_Spell_List = function(){
+        let abi_list = new Array(0);
+        
+        m_arr.forEach(spell => {
+            if ((spell != null) && /*(spell.is_active) &&*/ (spell.entry.name != "")){
+                let str = spell.entry.name;
+                
+                abi_list.push({
+                    name: str,
+                    descr_func: spell.Show_Descr,
+                    dc: spell.dc,
+                    daily: spell.daily
+                });
+            }
+        });
+        
+        if (abi_list.length == 0){
+            return null;
+        }
+        
+        abi_list.unshift({
+                    name: m_collection_name,
+                    descr_func: null,
+                    dc: null,
+                    daily: null
+                });
+        return abi_list;
     }
     
     this.Get_Lvl = function(row){
@@ -239,6 +273,7 @@ function Spell_Collection_t(default_size = undefined){
         //else NOTHING TO DO
         
         m_arr[row].Set_Lvl(value);
+        Update();
     }
     
     this.Get_Daily = function(row){
@@ -259,6 +294,7 @@ function Spell_Collection_t(default_size = undefined){
         //else NOTHING TO DO
         
         m_arr[row].daily = value;
+        Update();
     }
     
     this.Get_DC = function(row){
@@ -279,6 +315,7 @@ function Spell_Collection_t(default_size = undefined){
         //else NOTHING TO DO
         
         m_arr[row].dc = value;
+        Update();
     }
 
     this.Show_Detail_Popup = function(row){
@@ -308,14 +345,13 @@ function Spell_Collection_t(default_size = undefined){
 //private properties
     var self = this;
     var m_arr;
+    var m_update_func = null;
     var m_default_size = default_size;
+    var m_default_active = default_active;
+    var m_collection_name = collection_name;
 
 //public properties
 
 //additional initialization
-    if (m_default_size != undefined){
-        m_arr = new Array(m_default_size).fill(null);
-    }else{
-        m_arr = new Array(0);
-    }
+    Init(id);
 }

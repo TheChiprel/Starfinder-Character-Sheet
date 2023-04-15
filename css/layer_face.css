@@ -4,6 +4,12 @@
     grid-template-columns: 25% 25% 25% 25%;
 }
 
+#sublayer_face_abilities {
+    text-align: center;
+    display: grid;
+    grid-template-columns: 50% 50%;
+}
+
 #table_face_abilities {
     text-align: center;
 }

@@ -96,15 +96,79 @@ function Block_Face_Abilities_t(){
 
 function Block_Face_Spells_t(){
 //private methods
+    var Clear_Table = function(){
+        while (m_table.rows.length > 0){
+            m_table.deleteRow(0);
+        }
+    }
+    
+    var Init = function(){
+        Clear_Table();
+        m_table.insertRow(m_table.rows.length).insertCell(0).innerHTML = "У вашего персонажа нет заклинаний";
+        combined_collections.spells.Set_Update_Function(self.Update);
+    }
+    
+    var Gather_Spell_String = function(spell_name, daily, dc){
+        let str = spell_name;
+        if ((daily != null) || (dc != null)){
+            let substr = "";
+            str += " (";
+            if (daily != null){
+                substr += "В день: " + daily;
+            }
+            
+            if (dc != null){
+                if (substr != ""){
+                    substr += "; ";
+                }
+                substr += "СЛ: " + dc;
+            }
+            str += substr + ")";
+        }
+        return str;
+    }
 
 //public methods
+    this.Update = function(){
+        let abi_map = combined_collections.spells.Get_Map();
+        Clear_Table();
+        abi_map.forEach((collection, key) => {
+            //TODO: check active count before
+            let spells = collection.Get_Spell_List();
+            if (spells != null){
+                for (let i = 0; i < spells.length; i++){
+                    let row = m_table.insertRow(m_table.rows.length);
+                    var cell;
+                    if (i == 0){
+                        cell = document.createElement('th');
+                        row.appendChild(cell);
+                        cell.innerHTML = spells[i].name;
+                    }else{
+                        cell = row.insertCell(0);
+                        cell.innerHTML = Gather_Spell_String(spells[i].name, spells[i].daily, spells[i].dc);
+                    }
+                    
+                    if (spells[i].descr_func != null){
+                        cell.onclick = spells[i].descr_func;
+                    }
+                }
+                m_table.insertRow(m_table.rows.length).insertCell(0).innerHTML = "&nbsp;";
+            }
+        });
+        if (m_table.rows.length == 0){
+            m_table.insertRow(m_table.rows.length).insertCell(0).innerHTML = "У вашего персонажа нет заклинаний";
+        }
+    }
 
 //private properties
     var self = this;
+    var m_map = new Map();
+    var m_table = document.getElementById("table_face_spells");
 
 //public properties
 
 //additional initialization
+    Init();
 }
 
 function Layer_Face_t(){
@@ -146,5 +210,5 @@ function Layer_Face_t(){
     this.block_stats = null;
     this.block_inventory = null;
     this.block_abilities = new Block_Face_Abilities_t();
-    this.block_spells = null;
+    this.block_spells = new Block_Face_Spells_t();
 }

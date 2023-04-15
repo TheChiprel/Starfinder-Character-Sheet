@@ -76,10 +76,7 @@
                     Инвентарь
                 </button>
                 <button class="tab_button face_tab_button" onclick="layers.face.Set_Active_Block(event, 'sublayer_face_abilities')">
-                    Способности
-                </button>
-                <button class="tab_button face_tab_button" onclick="layers.face.Set_Active_Block(event, 'sublayer_face_spells')">
-                    Заклинания
+                    Способности и заклинания
                 </button>
             </div>
         
@@ -181,13 +178,16 @@
             </div>
             
             <div class="class_sublayer_face" id = "sublayer_face_abilities">
-                <table id="table_face_abilities">
-                
-                </table>
-            </div>
-            
-            <div class="class_sublayer_face" id = "sublayer_face_spells">
-                Spells: TBD
+                <div>
+                    <table id="table_face_abilities">
+                    
+                    </table>
+                </div>
+                <div>
+                    <table id="table_face_spells">
+                    
+                    </table>
+                </div>
             </div>
             
             <div class="class_sublayer_face" id = "sublayer_face_info">

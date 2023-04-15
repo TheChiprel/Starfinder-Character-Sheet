@@ -126,7 +126,8 @@ function Ability_Collection_t(
     id,
     collection_name = "???",
     default_size = undefined,
-    default_active = true){
+    default_active = true
+){
 //private methods
 //TODO on change only
 //TODO add do_update option to functions
@@ -136,13 +137,13 @@ function Ability_Collection_t(
         }
     }
 
-    var Init = function(){
+    var Init = function(id){
         if (m_default_size != undefined){
             m_arr = new Array(m_default_size).fill(null);
         }else{
             m_arr = new Array(0);
         }
-        m_update_func = combined_collections.abilities.Add(m_id, self);
+        m_update_func = combined_collections.abilities.Add(id, self);
     }
 
 //public methods
@@ -305,7 +306,6 @@ function Ability_Collection_t(
 //private properties
     var self = this;
     var m_arr;
-    var m_id = id;
     var m_update_func = null;
     var m_default_size = default_size;
     var m_default_active = default_active;
@@ -314,7 +314,7 @@ function Ability_Collection_t(
 //public properties
 
 //additional initialization
-    Init();
+    Init(id);
 }
 
 function Leveled_Ability_List_t (id, list_name, lvl_list, id_prefix){
@@ -547,6 +547,6 @@ this.Get_SaveData_Obj = function(){
     this.theme = new Ability_Theme_Collection_t();
     this.feats = new Ability_Collection_t("abi_feats", "Черты", 10);
     this.other = new Ability_Collection_t("abi_other", "Прочие способности");
-    this.spell_like = new Spell_Collection_t();
+    this.spell_like = new Spell_Collection_t("spells_spelllike", "Псевдозаклинания");
     this.custom = new Ability_Custom_Collection_t();
 }

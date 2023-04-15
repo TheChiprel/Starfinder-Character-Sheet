@@ -389,6 +389,23 @@ function Other_Abilities_Block(){
 
 function Spell_Likes_Abilities_Block(){
 //private methods
+    var Get_Default_Values = function(entry){
+        var res = {
+            lvl: 0,
+            daily: 1,
+            dc: 10 + chardata.stats.abiscores.modifiers.Get_Sum(ABISCORES.CHA)
+        };
+        
+        let temp_lvl = parseInt(entry.lvl);
+        if (temp_lvl == NaN){
+            temp_lvl = parseInt(entry.lvl[0]);
+        } //else NOTHING TO DO
+        res.lvl = temp_lvl;
+        res.dc += temp_lvl;
+        
+        return res;
+    }
+
     var Get_Spell_Row_Num_By_Name = function(name){
         for (let i = 1; i < m_table.rows.length; i++){
             var row = m_table.rows[i];
@@ -449,7 +466,9 @@ function Spell_Likes_Abilities_Block(){
         name_cell.innerHTML = entry.name;
         name_cell.onclick = onclick_func;
         
-        chardata.abilities.spell_like.Add(row_name, entry, lvl, daily, dc);
+        var defaults = Get_Default_Values(entry);
+        
+        chardata.abilities.spell_like.Add(row_name, entry, defaults.lvl, defaults.daily, defaults.dc);
         
         var remove_func = self.Remove.bind(null, row_name);
         var remove_button = HTML_Create_Button("X", remove_func);
@@ -464,7 +483,7 @@ function Spell_Likes_Abilities_Block(){
                 "layers.abilities.spell_likes.Set_Daily('" + row.name + "', Number(event.target.value))")
         );
         dc_cell.appendChild(HTML_Create_Input_Number(
-            chardata.abilities.spell_like.Get_DC(m_table.rows.length - 2),
+            defaults.dc,
             1,
             100,
             "layers.abilities.spell_likes.Set_DC('" + row.name + "', Number(event.target.value))")

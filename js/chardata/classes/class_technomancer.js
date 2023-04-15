@@ -38,8 +38,20 @@ const TECHNOMANCER_SPELL_ID_PREFIX = "TECHNOMANCER_SPELL_";
     var Init = function(){
         //initiating spell lists
         for (let i = 0; i < m_arr.length; i++){
-            m_arr[i] = new Spell_Collection_t(SPELLS_KNOWN[i].length);
+            m_arr[i] = new Spell_Collection_t(
+            "spells_technomancer_" + i,
+            Get_Spell_Level_String(i),
+            SPELLS_KNOWN[i].length,
+            false);
         }
+    }
+    
+    var Get_Spell_Level_String = function(spell_lvl, daily = null, dc = null){
+        let str = "Заклинания Техноманта " + spell_lvl + " круга";
+        if ((daily != null) && (dc != null)){
+            str += " (В день: " + daily + " , СЛ: " + dc + ")";
+        }
+        return str;
     }
     
     var Update_Daily_And_DC = function(){
