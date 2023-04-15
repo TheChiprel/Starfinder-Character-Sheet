@@ -11,18 +11,24 @@ function Combined_Collection_t(){
         return null;
     }
     
+    this.Set_Update_Function = function(update_func){
+        m_update_func = update_func;
+    }
+    
     this.Get_Map = function(){
         return m_map;
     }
     
     this.Update = function(){
-        //TODO: replace with recalc function collection
-        //layers.face.block_abilities.Update();
+        if (m_update_func != null){
+            m_update_func();
+        }
     }
 
 //private properties
     var self = this;
     var m_map = new Map();
+    var m_update_func = null;
 
 //public properties
 

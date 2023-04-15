@@ -49,6 +49,7 @@ function Block_Face_Abilities_t(){
     
     var Init = function(){
         Clear_Table();
+        combined_collections.abilities.Set_Update_Function(self.Update);
     }
 
 //public methods
