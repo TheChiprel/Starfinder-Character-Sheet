@@ -201,11 +201,21 @@ function Ability_Collection_t(
         Update();
     }
     
+    this.Set_Ability_Name = function(row, value){
+        m_arr[row].entry.name = value;
+        Update();
+    }
+    
+    this.Set_Ability_Descr = function(row, value){
+        m_arr[row].entry.descr = value;
+        Update();
+    }
+    
     this.Get_Ability_List = function(){
         let abi_list = new Array(0);
         
         m_arr.forEach(ability => {
-            if ((ability != null) && (ability.is_active)){
+            if ((ability != null) && (ability.is_active) && (ability.entry.name != "")){
                 let str = ability.entry.name;
                 if (ability.name_suffix != null){
                     str += " (" + ability.name_suffix + ")"
@@ -272,6 +282,21 @@ function Ability_Collection_t(
                 ret.push(null);
             }else{
                 ret.push(ability.entry.name);
+            }
+        });
+        return ret;
+    }
+    
+    this.Get_SaveData_Obj_Custom = function(){
+        var ret = new Array(0);
+        m_arr.forEach(ability => {
+            if (ability == null){
+                ret.push(null);
+            }else{
+                ret.push({
+                    name: ability.entry.name,
+                    descr: ability.entry.descr
+                });
             }
         });
         return ret;
@@ -464,32 +489,40 @@ function Ability_Custom_t(id, name, descr){
 function Ability_Custom_Collection_t(){
 //public methods
     this.Add = function(id, name = "", descr = ""){
-        m_arr.push(new Ability_Custom_t(id, name, descr));
+        var pseudo_entry = {
+            name: name,
+            descr: descr,
+            lvl: null,
+            type: "Пользовательская",
+            subtype: null,
+            category: null,
+            requirement: null,
+            source: null
+        }
+        m_collection.Add(id, pseudo_entry);
     }
 
     this.Remove = function(num){
-        m_arr.splice(num, 1);
+        m_collection.Remove(num);
     }
 
     this.Change_Name = function(num, value){
-        m_arr[num].name = value;
+        m_collection.Set_Ability_Name(num, value);
     }
 
     this.Change_Descr = function(num, value){
-        m_arr[num].descr = value;
+        m_collection.Set_Ability_Descr(num, value);
     }
 
     this.Get_SaveData_Obj = function(){
-        var ret = new Array(0);
-        m_arr.forEach(item => {
-            ret.push(item.Get_SaveData_Obj());
-        });
-        return ret;
+        return m_collection.Get_SaveData_Obj_Custom();
     }
 
 //private properties
     var self = this;
-    var m_arr = new Array(0);
+    var m_collection = new Ability_Collection_t(
+        "abi_custom",
+        collection_name = "Пользовательские способности");
 }
 
 function Chardata_Abilities_t(){

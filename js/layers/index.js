@@ -73,7 +73,6 @@ function Load_Character_From_File(event) {
         let text = e.target.result;
         let data = JSON.parse(text);
 
-        chardata.Reset();
         Reset();
         InSaveFile(data);
     }
