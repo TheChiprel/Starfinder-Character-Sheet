@@ -1,4 +1,5 @@
 function Get_Ability_Entry_By_Name(in_database, name){
+    //TODO: ignore data in ()
     for (let i = 0; i < in_database.length; i++){
         if (in_database[i].name == name){
             return in_database[i];
@@ -104,6 +105,7 @@ function Ability_Collection_t(
     default_active = true){
 //private methods
 //TODO on change only
+//TODO add do_update option to functions
     var Update = function(){
         if (m_update_func != null){
             m_update_func();
@@ -156,6 +158,18 @@ function Ability_Collection_t(
         }else{
             m_arr.splice(row, 1);
         }
+        Update();
+    }
+    
+    this.Clear = function(){
+        for (let row = (m_arr.length - 1); row >= 0; row--){
+            if ((m_default_size != undefined) && (row < m_default_size)){
+                m_arr[row] = null;
+            }else{
+                m_arr.splice(row, 1);
+            }
+        }
+        Update();
     }
     
     this.Rename_Collection = function(new_name){
@@ -250,6 +264,44 @@ function Ability_Collection_t(
     Init();
 }
 
+function Ability_Racial_Collection_t(){
+//constants
+    const name_prefix = "Расовые способности";
+    
+//private methods
+
+//public methods
+    this.Set_Abilities = function(race_name, abi_arr){
+        m_collection.Clear();
+        layers.abilities.race.Clear_Abilities();
+        
+        if (race_name == null){
+            m_collection.Rename_Collection(name_prefix);
+            return;
+        }
+        
+        m_collection.Rename_Collection(
+            name_prefix + " (" + race_name + ")");
+        for (let row = 0; row < abi_arr.length; row++){
+            let entry = Get_Ability_Entry_By_Name(ABILITIES_DATABASE, abi_arr[row]);
+            m_collection.Add("abi_racial" + row, entry);
+            layers.abilities.race.Add_Ability(entry.name);
+        }
+    }
+    
+    this.Show_Detail_Popup = function(row){
+        m_collection.Show_Detail_Popup(row);
+    }
+
+//private properties
+    var self = this;
+    var m_collection = new Ability_Collection_t("abi_race", name_prefix);
+
+//public properties
+
+//additional initialization
+}
+
 function Ability_Custom_t(id, name, descr){
 //public methods
     this.Get_SaveData_Obj = function(){
@@ -318,6 +370,7 @@ this.Get_SaveData_Obj = function(){
     var self = this;
 
 //public properties
+    this.race = new Ability_Racial_Collection_t();
     this.feats = new Ability_Collection_t("abi_feats", "Черты", 10);
     this.other = new Ability_Collection_t("abi_other", "Прочие способности");
     this.spell_like = new Spell_Collection_t();

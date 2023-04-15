@@ -161,7 +161,7 @@ function Layer_MainInfo_t(){
                     new_race_stats = cur_race_entry.abiscores;
                     new_race_base_speed = cur_race_entry.speed;
                     is_abiscore_any = cur_race_entry.plus2;
-                    layers.abilities.race.Set_Abilities(cur_race_entry.abilities);
+                    chardata.abilities.race.Set_Abilities(cur_race_entry.name, cur_race_entry.abilities);
                     if (update_field){
                         outfield_race.value = new_race_value;
                     }

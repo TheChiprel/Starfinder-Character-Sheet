@@ -16,41 +16,28 @@ function Race_Abilities_Block_t(){
 //private methods
 
 //public methods
-    this.Set_Abilities = function(abilities_arr){
-        self.Clear_Abilities();
+    this.Add_Ability = function(name){
+        let curr_row = m_table.rows.length;
+        var onclick_func = self.Show_Detail_Popup.bind(null, curr_row);
 
-        for (let i = 0; i < abilities_arr.length; i++){
-            let cur_ability = Find_Ability_By_Name(abilities_arr[i]);
-            
-            var onclick_func = self.Show_Descr.bind(null, i);
-
-            if (cur_ability != null){
-                m_arr.push(new Ability_t(cur_ability.name, cur_ability));
-
-                let cell = m_table.insertRow(m_table.rows.length).insertCell(0);
-                cell.innerHTML = abilities_arr[i];
-                cell.onclick = onclick_func;
-            }else{
-                console.error("Race ability '" + abilities_arr[i] + "' was not found!")
-            }
-        }
+        let cell = m_table.insertRow(curr_row).insertCell(0);
+        cell.innerHTML = name;
+        cell.onclick = onclick_func;
     }
 
-    this.Show_Descr = function(row){
-        Popup_Descr.Call(m_arr[row].entry.name, m_arr[row].entry.descr);
+    this.Show_Detail_Popup = function(row){
+        chardata.abilities.race.Show_Detail_Popup(row);
     }
 
     this.Clear_Abilities = function(){
         while (m_table.rows.length > 0){
             m_table.deleteRow(0);
         }
-        m_arr = new Array(0);
     }
 
 //private properties
     var self = this;
     var m_table = document.getElementById('table_abilities_race');
-    var m_arr;
 
 //public properties
 
