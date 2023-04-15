@@ -1080,6 +1080,9 @@ function Init_Callbacks_Level(){
 
     chardata.lvl.arr_recalc_functions.Add(
         new Recalc_Function_t ('Resolve', chardata.stats.rp.Recalc));
+        
+    chardata.lvl.arr_recalc_functions.Add(
+        new Recalc_Function_t ('Theme Abilities', chardata.abilities.theme.Update_Lvl));
 }
 
 function Init_Callbacks_Attacks(){

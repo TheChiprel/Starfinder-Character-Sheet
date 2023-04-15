@@ -539,28 +539,28 @@ const ADEPT_SKILL_COUNT = 2;
 
 //public properties
     this.lvl = 0;
-    this.class_abilities = new Class_Ability_List_t(
+    this.class_abilities = new Leveled_Ability_List_t(
         "abi_class_solarion",
         "Классовые способности (Солярион)",
         CLASS_ABILITY_LVLS,
         "solarion_class_");
-    this.stellar_modes = new Class_Ability_List_t(
+    this.stellar_modes = new Leveled_Ability_List_t(
         "abi_class_solarion_modes",
         "Звёздные режимы",
         STELLAR_MODES_LVLS,
         "solarion_stellar_mode_");
     this.adept_skills = new Adapt_Skills_Collection_t();
-    this.revelations = new Class_Ability_List_t(
+    this.revelations = new Leveled_Ability_List_t(
         "abi_class_solarion_revelations",
         "Звёздные откровения",
         REVELATIONS_LVLS,
         "solarion_revelation_");
-    this.zeniths_graviton = new Class_Ability_List_t(
+    this.zeniths_graviton = new Leveled_Ability_List_t(
         "abi_class_solarion_zeniths_grav",
         "Высшие откровения (Гравитонные)",
         ZENITHS_LVLS,
         "solarion_zeniths_graviton_");
-    this.zeniths_photon = new Class_Ability_List_t(
+    this.zeniths_photon = new Leveled_Ability_List_t(
         "abi_class_solarion_zeniths_photon",
         "Высшие откровения (Фотонные)",
         ZENITHS_LVLS,

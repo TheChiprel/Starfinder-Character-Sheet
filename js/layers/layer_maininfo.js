@@ -146,7 +146,7 @@ function Layer_MainInfo_t(){
             out_type.value = "---";
             chardata.race = null;
             new_race_value = null;
-            layers.abilities.race.Clear_Abilities();
+
             if (update_field){
                 outfield_race.value = "---";
             }
@@ -185,7 +185,7 @@ function Layer_MainInfo_t(){
 
         if ((new_theme_value == "---") || (new_theme_value == null)){
             chardata.theme = null;
-            layers.abilities.theme.Clear_Abilities();
+            
             if (update_field){
                 outfield_theme.value = "---";
             }
@@ -196,7 +196,7 @@ function Layer_MainInfo_t(){
                 if (cur_theme_entry.name == new_theme_value){
                     chardata.theme = cur_theme_entry;
                     theme_abiscore = cur_theme_entry.abiscore;
-                    layers.abilities.theme.Set_Abilities(cur_theme_entry.abilities);
+                    chardata.abilities.theme.Set_Abilities(cur_theme_entry.name, cur_theme_entry.abilities);
                     if (update_field){
                         outfield_theme.value = new_theme_value;
                     }
@@ -208,8 +208,6 @@ function Layer_MainInfo_t(){
         }
 
         chardata.stats.abiscores.values.SetThemeValue(theme_abiscore);
-
-        /* todo: add abilities */
     }
 
     this.Add_New_Class = function(class_name, lvl = 1){

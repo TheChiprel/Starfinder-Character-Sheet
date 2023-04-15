@@ -46,12 +46,12 @@ function Chardata_t(){
         self.name = "";
         self.race = null;
         self.theme = null;
+        self.abilities = new Chardata_Abilities_t();
         self.classes = new Class_Collection_t();
         self.lvl = new Level_t(document.getElementById('outfield_level'));
         self.stats = new Stats_t();
         self.skills = new Skills_t();
         self.inventory = new Inventory_t();
-        self.abilities = new Chardata_Abilities_t();
     }
 
 //private properties

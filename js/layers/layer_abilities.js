@@ -46,49 +46,34 @@ function Race_Abilities_Block_t(){
 }
 
 function Theme_Abilities_Block_t(){
-const THEME_ABILITIES_LVLS = [1, 6, 12, 18];
-
 //private methods
 
 //public methods
-    this.Set_Abilities = function(abilities_arr){
-        self.Clear_Abilities();
+    this.Add_Ability = function(row, lvl, ability){
+        var onclick_func = self.Show_Detail_Popup.bind(null, row);
 
-        for (let i = 0; i < abilities_arr.length; i++){
-            let cur_ability = Find_Ability_By_Name(abilities_arr[i]);
-            var onclick_func = self.Show_Descr.bind(null, i);
+        let table_row = m_table.insertRow(m_table.rows.length);
+        let lvl_cell = table_row.insertCell(0);
+        let abi_cell = table_row.insertCell(1);
+        lvl_cell.innerHTML = lvl;
 
-            if (cur_ability != null){
-                let row = m_table.insertRow(m_table.rows.length);
-                let lvl_cell = row.insertCell(0);
-                let abi_cell = row.insertCell(1);
-                lvl_cell.innerHTML = THEME_ABILITIES_LVLS[i];
-
-                abi_cell.innerHTML = abilities_arr[i];
-                abi_cell.onclick = onclick_func;
-
-                m_arr.push(new Ability_t(cur_ability.name, null, cur_ability));
-            }else{
-                console.error("Theme ability '" + abilities_arr[i] + "' was not found!")
-            }
-        }
+        abi_cell.innerHTML = ability;
+        abi_cell.onclick = onclick_func;
     }
 
-    this.Show_Descr = function(row){
-        Popup_Descr.Call(m_arr[row].entry.name, m_arr[row].entry.descr);
+    this.Show_Detail_Popup = function(row){
+        chardata.abilities.theme.Show_Detail_Popup(row);
     }
 
     this.Clear_Abilities = function(){
         while (m_table.rows.length > 1){
             m_table.deleteRow(1);
         }
-        m_arr = new Array(0);
     }
 
 //private properties
     var self = this;
     var m_table = document.getElementById('table_abilities_theme');
-    var m_arr;
 
 //public properties
 

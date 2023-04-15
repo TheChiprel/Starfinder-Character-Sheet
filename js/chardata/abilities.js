@@ -292,9 +292,76 @@ function Ability_Collection_t(
     Init();
 }
 
+function Leveled_Ability_List_t (id, list_name, lvl_list, id_prefix){
+//constants
+
+//private methods
+
+//public methods
+    this.Set = function(row, entry, name_suffix = null){
+        //TODO: add safety check
+        let is_active = (cur_lvl >= m_lvl_list[row]);
+        m_abilities.Replace(row, m_id_prefix + row, entry, name_suffix, is_active);
+    }
+    
+    this.Remove = function(row){
+        //TODO: add safety check
+        m_abilities.Remove(row, m_id_prefix + row);
+    }
+    
+    this.Clear = function(){
+        m_abilities.Clear();
+    }
+    
+    this.Show_Details = function(row){
+        //TODO: add safety check
+        m_abilities.Show_Detail_Popup(row);
+    }
+    
+    this.Rename_List = function(new_name){
+        m_abilities.Rename_Collection(new_name);
+    }
+    
+    this.Update_Lvl = function(lvl){
+        for (let i = 0; i < m_lvl_list.length; i++){
+            if (m_abilities == null){
+                continue;
+            }
+            
+            m_abilities.Set_Active_State(i, m_lvl_list[i] <= lvl);
+        }
+        cur_lvl = lvl;
+    }
+    
+    this.Get_Lvl_List = function(){
+        return m_lvl_list;
+    }
+    
+    this.Get_SaveData_Obj = function(){
+        return m_abilities.Get_SaveData_Obj();
+    }
+
+//private properties
+    var self = this;
+    var cur_lvl = 0;
+    var m_id_prefix = id_prefix;
+    var m_lvl_list = lvl_list;
+    //TODO: remove id, use id_prefix?
+    var m_abilities = new Ability_Collection_t(
+        id,
+        list_name,
+        m_lvl_list.length,
+        false
+    );
+
+//public properties
+
+//additional initialization
+}
+
 function Ability_Racial_Collection_t(){
 //constants
-    const name_prefix = "Расовые способности";
+    const NAME_PREFIX = "Расовые способности";
     
 //private methods
 
@@ -304,12 +371,12 @@ function Ability_Racial_Collection_t(){
         layers.abilities.race.Clear_Abilities();
         
         if (race_name == null){
-            m_collection.Rename_Collection(name_prefix);
+            m_collection.Rename_Collection(NAME_PREFIX);
             return;
         }
         
         m_collection.Rename_Collection(
-            name_prefix + " (" + race_name + ")");
+            NAME_PREFIX + " (" + race_name + ")");
         for (let row = 0; row < abi_arr.length; row++){
             let [abi_name, abi_suffix] = Split_Ability_Name_Suffix(abi_arr[row]);
             let entry = Get_Ability_Entry_By_Name(ABILITIES_DATABASE, abi_name);
@@ -324,7 +391,51 @@ function Ability_Racial_Collection_t(){
 
 //private properties
     var self = this;
-    var m_collection = new Ability_Collection_t("abi_race", name_prefix);
+    var m_collection = new Ability_Collection_t("abi_race", NAME_PREFIX);
+
+//public properties
+
+//additional initialization
+}
+
+function Ability_Theme_Collection_t(){
+//constants
+    const NAME_PREFIX = "Cпособности темы";
+    const THEME_ABILITIES_LVLS = [1, 6, 12, 18];
+    
+//private methods
+
+//public methods
+    this.Set_Abilities = function(theme_name, abi_arr){
+        m_collection.Clear();
+        layers.abilities.theme.Clear_Abilities();
+        
+        if (theme_name == null){
+            m_collection.Rename_List(NAME_PREFIX);
+            return;
+        }
+        
+        m_collection.Rename_List(
+            NAME_PREFIX + " (" + theme_name + ")");
+        for (let row = 0; row < abi_arr.length; row++){
+            let [abi_name, abi_suffix] = Split_Ability_Name_Suffix(abi_arr[row]);
+            let entry = Get_Ability_Entry_By_Name(ABILITIES_DATABASE, abi_name);
+            m_collection.Set(row, entry, abi_suffix);
+            layers.abilities.theme.Add_Ability(row, THEME_ABILITIES_LVLS[row], abi_arr[row]);
+        }
+    }
+    
+    this.Show_Detail_Popup = function(row){
+        m_collection.Show_Details(row);
+    }
+    
+    this.Update_Lvl = function(){
+        m_collection.Update_Lvl(chardata.lvl.sum);
+    }
+
+//private properties
+    var self = this;
+    var m_collection = new Leveled_Ability_List_t("abi_theme", NAME_PREFIX, THEME_ABILITIES_LVLS, "theme_");
 
 //public properties
 
@@ -400,6 +511,7 @@ this.Get_SaveData_Obj = function(){
 
 //public properties
     this.race = new Ability_Racial_Collection_t();
+    this.theme = new Ability_Theme_Collection_t();
     this.feats = new Ability_Collection_t("abi_feats", "Черты", 10);
     this.other = new Ability_Collection_t("abi_other", "Прочие способности");
     this.spell_like = new Spell_Collection_t();
