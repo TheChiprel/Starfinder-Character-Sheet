@@ -70,6 +70,10 @@ const TECHNOMANCER_SPELL_ID_PREFIX = "TECHNOMANCER_SPELL_";
             base_dc += int_mod;
         }//else NOTHING TO DO
         
+        for (let i = 0; i < m_arr.length; i++){
+            m_arr[i].Rename_Collection(Get_Spell_Level_String(i, daily_arr[i], base_dc + i));
+        }
+        
         layers.classes.Get_Block(CLASSES.TECHNOMANCER).spells.Set_Daily_And_DC(daily_arr, base_dc);
     }
 
