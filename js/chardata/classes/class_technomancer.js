@@ -54,6 +54,14 @@ const TECHNOMANCER_SPELL_ID_PREFIX = "TECHNOMANCER_SPELL_";
         return str;
     }
     
+    var Update_Spell_Active_State = function(){
+        for (let spell_lvl = 0; spell_lvl < SPELLS_KNOWN.length; spell_lvl++){
+            for (let i = 0; i < SPELLS_KNOWN[i].length; i++){
+                m_arr[spell_lvl].Set_Active_State(i, (m_class_lvl >= SPELLS_KNOWN[spell_lvl][i]));
+            }
+        }
+    }
+    
     var Update_Daily_And_DC = function(){
         let daily_arr = new Array(m_arr.length).fill(0);
         let base_dc = 10;
@@ -79,11 +87,11 @@ const TECHNOMANCER_SPELL_ID_PREFIX = "TECHNOMANCER_SPELL_";
 
 //public methods
     this.Set = function(spell_lvl, row, entry){
-        //TODO: daily, dc?
         m_arr[spell_lvl].Replace(
             row,
             (TECHNOMANCER_SPELL_ID_PREFIX + spell_lvl + "_" + row),
-            entry
+            entry,
+            (m_class_lvl >= SPELLS_KNOWN[spell_lvl][row])
         );
     }
 
@@ -113,6 +121,7 @@ const TECHNOMANCER_SPELL_ID_PREFIX = "TECHNOMANCER_SPELL_";
             
         m_class_lvl = lvl;
         Update_Daily_And_DC();
+        Update_Spell_Active_State();
     }
     
     this.Update_Int = function(){

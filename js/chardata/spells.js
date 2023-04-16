@@ -130,7 +130,7 @@ function Get_Spell_Descr(entry){
     return ret;
 }
 
-function Spell_t(id, entry, lvl = null, daily = null, dc = null){
+function Spell_t(id, entry, is_active, lvl = null, daily = null, dc = null){
 //private methods
 
 //public methods
@@ -140,6 +140,11 @@ function Spell_t(id, entry, lvl = null, daily = null, dc = null){
 
     this.Show_Descr = function(){
         Popup_Descr.Call(self.entry.name, Get_Spell_Descr(self.entry));
+    }
+    
+    this.Set_Active_State = function(state){
+        //TODO
+        this.is_active = state;
     }
     
     this.Get_SaveData_Obj = function(){
@@ -161,6 +166,7 @@ function Spell_t(id, entry, lvl = null, daily = null, dc = null){
     this.lvl = lvl;
     this.daily = daily;
     this.dc = dc;
+    this.is_active = is_active;
 
 //additional initialization
 }
@@ -190,19 +196,29 @@ function Spell_Collection_t(
     }
 
 //public methods
-    this.Add = function(id, entry, lvl = null, daily = null, dc = null){
-        m_arr.push(new Spell_t(id, entry, lvl, daily, dc));
+    this.Add = function(id, entry, is_active = undefined, lvl = null, daily = null, dc = null){
+        if (is_active != undefined){
+            m_arr.push(new Spell_t(id, entry, is_active, lvl, daily, dc));
+        }else{
+            m_arr.push(new Spell_t(id, entry, default_active, lvl, daily, dc));
+        }
         Update();
     }
 
-    this.Replace = function(row, id, entry, lvl = null, daily = null, dc = null){
+    this.Replace = function(row, id, entry, is_active = undefined, lvl = null, daily = null, dc = null){
         if (row >= m_arr.length){
             console.error("Attempting to replace spell out of bounds");
             return;
         }
         //else NOTHING TO DO
+        
+        if (is_active != undefined){
+            m_arr[row] = new Spell_t(id, entry, is_active, lvl, daily, dc);
+        }else{
+            m_arr[row] = new Spell_t(id, entry, default_active, lvl, daily, dc);
+        }
 
-        m_arr[row] = new Spell_t(id, entry, lvl, daily, dc);
+        
         Update();
     }
 
@@ -230,7 +246,7 @@ function Spell_Collection_t(
         let abi_list = new Array(0);
         
         m_arr.forEach(spell => {
-            if ((spell != null) && /*(spell.is_active) &&*/ (spell.entry.name != "")){
+            if ((spell != null) && (spell.is_active) && (spell.entry.name != "")){
                 let str = spell.entry.name;
                 
                 abi_list.push({
@@ -253,6 +269,21 @@ function Spell_Collection_t(
                     daily: null
                 });
         return abi_list;
+    }
+    
+    this.Set_Active_State = function(row, state){
+        if (row >= m_arr.length){
+            console.error("Attempting to activate ability out of bounds");
+            return;
+        }
+        //else NOTHING TO DO
+        
+        if (m_arr[row] == null){
+            return;
+        }
+        
+        m_arr[row].Set_Active_State(state);
+        Update();
     }
     
     this.Get_Lvl = function(row){

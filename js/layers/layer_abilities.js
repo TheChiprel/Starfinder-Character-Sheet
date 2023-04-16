@@ -468,7 +468,7 @@ function Spell_Likes_Abilities_Block(){
         
         var defaults = Get_Default_Values(entry);
         
-        chardata.abilities.spell_like.Add(row_name, entry, defaults.lvl, defaults.daily, defaults.dc);
+        chardata.abilities.spell_like.Add(row_name, entry, true, defaults.lvl, defaults.daily, defaults.dc);
         
         var remove_func = self.Remove.bind(null, row_name);
         var remove_button = HTML_Create_Button("X", remove_func);
