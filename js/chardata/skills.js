@@ -212,6 +212,16 @@ function Skills_t (){
     }
 
 //public methods
+    this.Get_Sum = function(skill_name){
+        let skill_obj = Find_Skill_By_Name(skill_name);
+        if (skill_obj != null){
+            return skill_obj.sum;
+        }else{
+            console.warn("Attempting to get value of unknown skill: " + skill_name);
+            return 0;
+        }
+    }
+
     this.Set_Skill_Points = function(skill_name, value){
         let skill_obj = Find_Skill_By_Name(skill_name);
         if (skill_obj != null){
@@ -250,6 +260,15 @@ function Skills_t (){
         }else{
             console.warn("Attempting to set modifier to unknown skill: " + skill_name);
             return null;
+        }
+    }
+    
+    this.AddRecalcFunc = function(skill_name, func){
+        let skill_obj = Find_Skill_By_Name(skill_name);
+        if (skill_obj != null){
+            skill_obj.arr_recalc_functions.Add(func);
+        }else{
+            console.warn("Attempting to add recalc func to unknown skill: " + skill_name);
         }
     }
 
@@ -324,4 +343,17 @@ function Skills_t (){
         (document.getElementById('outfield_skill_points_spent')),
         (document.getElementById('outfield_skill_points_left'))
     );
+}
+
+function Init_Callbacks_Skills(){
+    //skills -> face
+    Object.values(SKILLS).forEach(skill => {
+        chardata.skills.AddRecalcFunc(
+            skill,
+            new Recalc_Function_t (
+                'face_outfield',
+                layers.face.block_stats.skills.Update.bind(null, skill)
+            )
+        );
+    });
 }

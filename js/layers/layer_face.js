@@ -35,8 +35,10 @@ function Block_Face_Abiscores_t(){
         let abiscores_arr = Object.values(ABISCORES);
         
         for (let i = 0; i < abiscores_arr.length; i++){
-            m_outputs_value[i].value = chardata.stats.abiscores.values.Get_Sum(abiscore);
-            return;
+            if (abiscore == abiscores_arr[i]){
+                m_outputs_value[i].value = chardata.stats.abiscores.values.Get_Sum(abiscore);
+                return;
+            }
         }
     }
     
@@ -44,8 +46,10 @@ function Block_Face_Abiscores_t(){
         let abiscores_arr = Object.values(ABISCORES);
         
         for (let i = 0; i < abiscores_arr.length; i++){
-            m_outputs_mods[i].value = GetModifierStr(chardata.stats.abiscores.modifiers.Get_Sum(abiscore));
-            return;
+            if (abiscore == abiscores_arr[i]){
+                m_outputs_mods[i].value = GetModifierStr(chardata.stats.abiscores.modifiers.Get_Sum(abiscore));
+                return;
+            }
         }
     }
 
@@ -54,6 +58,55 @@ function Block_Face_Abiscores_t(){
     var m_table = document.getElementById("table_face_abiscores");
     var m_outputs_value;
     var m_outputs_mods;
+
+//public properties
+
+//additional initialization
+    Init();
+}
+
+function Block_Face_Skills_t(){
+//private methods
+    var Init = function(){
+        let skills_arr = Object.values(SKILLS);
+        m_outputs = new Array(0);
+        
+        while (m_table.rows.length > 0){
+            m_table.deleteRow(0);
+        }
+        
+        for (let i = 0; i < skills_arr.length; i++){
+            var row = m_table.insertRow(m_table.rows.length);
+            
+            var cell_name = document.createElement('th');
+            cell_name.innerHTML = skills_arr[i];
+            row.appendChild(cell_name);
+
+            let cell_mod = row.insertCell(1);
+            let cell_mod_function = chardata.skills.Show_Detail_Popup.bind(null, skills_arr[i]);
+            var cell_mod_output = HTML_Create_Output(0, cell_mod_function, undefined, "class_output_field");
+            
+            cell_mod.appendChild(cell_mod_output);
+            m_outputs.push(cell_mod_output);
+        }
+    }
+
+//public methods
+    this.Update = function(skill){
+        let skills_arr = Object.values(SKILLS);
+        
+        for (let i = 0; i < skills_arr.length; i++){
+            if (skill == skills_arr[i]){
+                m_outputs[i].value = GetModifierStr(chardata.skills.Get_Sum(skill));
+                return;
+            }
+        }
+    }
+
+//private properties
+    var self = this;
+    var m_table = document.getElementById("table_face_skills");
+    var m_outputs;
 
 //public properties
 
@@ -72,6 +125,7 @@ function Block_Face_Stats_t(){
 
 //public properties
     this.abiscores = new Block_Face_Abiscores_t();
+    this.skills = new Block_Face_Skills_t();
 
 //additional initialization
 }

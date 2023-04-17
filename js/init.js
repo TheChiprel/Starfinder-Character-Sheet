@@ -1,6 +1,7 @@
 //TODO: move to chardata
 function Init_Callbacks(){
     Init_Callbacks_Stats();
+    Init_Callbacks_Skills();
     Init_Callbacks_Classes();
     Init_Callbacks_Proficiency();
 }
@@ -8,7 +9,7 @@ function Init_Callbacks(){
 function CS_Init(){
     Reset();
     let tabs = document.getElementsByClassName("default_tab");
-    for(let i = 0; i < tabs.length;i++){
+    for(let i = 0; i < tabs.length; i++){
         tabs[i].dispatchEvent(
             new MouseEvent("click", {
                 view: window,
