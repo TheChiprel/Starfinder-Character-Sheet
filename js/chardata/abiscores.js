@@ -652,12 +652,29 @@ function Abiscore_t (){
 
 function Init_Callbacks_Abiscores(){
     //abiscore value -> abiscore modifiers
+    //abiscore values and modifiers -> face
     Object.values(ABISCORES).forEach(abiscore => {
         chardata.stats.abiscores.values.AddRecalcFunc(
             abiscore,
             new Recalc_Function_t (
                 'abiscore_modifier',
                 chardata.stats.abiscores.modifiers.GetRecalcFunc(abiscore)
+            )
+        );
+        
+        chardata.stats.abiscores.values.AddRecalcFunc(
+            abiscore,
+            new Recalc_Function_t (
+                'face_outfield',
+                layers.face.block_stats.abiscores.Update_Value.bind(null, abiscore)
+            )
+        );
+        
+        chardata.stats.abiscores.modifiers.AddRecalcFunc(
+            abiscore,
+            new Recalc_Function_t (
+                'face_outfield',
+                layers.face.block_stats.abiscores.Update_Modifier.bind(null, abiscore)
             )
         );
     });

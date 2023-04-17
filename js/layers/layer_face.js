@@ -1,16 +1,64 @@
-function Face_Data_Container_t(table_elem){
+function Block_Face_Abiscores_t(){
 //private methods
+    var Init = function(){
+        let abiscores_arr = Object.values(ABISCORES);
+        m_outputs_value = new Array(0);
+        m_outputs_mods = new Array(0);
+        
+        while (m_table.rows.length > 1){
+            m_table.deleteRow(1);
+        }
+        
+        for (let i = 0; i < abiscores_arr.length; i++){
+            var row = m_table.insertRow(m_table.rows.length);
+            
+            var cell_name = document.createElement('th');
+            cell_name.innerHTML = abiscores_arr[i];
+            row.appendChild(cell_name);
+            let cell_value = row.insertCell(1);
+            let cell_value_function = chardata.stats.abiscores.values.Show_Detail_Popup.bind(null, abiscores_arr[i]);
+            var cell_value_output = HTML_Create_Output(10, cell_value_function, undefined, "class_output_field");
+            let cell_mod = row.insertCell(2);
+            let cell_mod_function = chardata.stats.abiscores.modifiers.Show_Detail_Popup.bind(null, abiscores_arr[i]);
+            var cell_mod_output = HTML_Create_Output(0, cell_mod_function, undefined, "class_output_field");
+            
+            cell_value.appendChild(cell_value_output);
+            m_outputs_value.push(cell_value_output);
+            
+            cell_mod.appendChild(cell_mod_output);
+            m_outputs_mods.push(cell_mod_output);
+        }
+    }
 
 //public methods
+    this.Update_Value = function(abiscore){
+        let abiscores_arr = Object.values(ABISCORES);
+        
+        for (let i = 0; i < abiscores_arr.length; i++){
+            m_outputs_value[i].value = chardata.stats.abiscores.values.Get_Sum(abiscore);
+            return;
+        }
+    }
+    
+    this.Update_Modifier = function(abiscore){
+        let abiscores_arr = Object.values(ABISCORES);
+        
+        for (let i = 0; i < abiscores_arr.length; i++){
+            m_outputs_mods[i].value = GetModifierStr(chardata.stats.abiscores.modifiers.Get_Sum(abiscore));
+            return;
+        }
+    }
 
 //private properties
     var self = this;
-    var m_table_elem = elem;
-    var m_groups = new Map();
+    var m_table = document.getElementById("table_face_abiscores");
+    var m_outputs_value;
+    var m_outputs_mods;
 
 //public properties
 
 //additional initialization
+    Init();
 }
 
 function Block_Face_Stats_t(){
@@ -20,8 +68,10 @@ function Block_Face_Stats_t(){
 
 //private properties
     var self = this;
+    
 
 //public properties
+    this.abiscores = new Block_Face_Abiscores_t();
 
 //additional initialization
 }
@@ -207,7 +257,7 @@ function Layer_Face_t(){
     var self = this;
 
 //public properties
-    this.block_stats = null;
+    this.block_stats = new Block_Face_Stats_t();
     this.block_inventory = null;
     this.block_abilities = new Block_Face_Abilities_t();
     this.block_spells = new Block_Face_Spells_t();

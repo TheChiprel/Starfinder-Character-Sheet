@@ -5,7 +5,7 @@ function HTML_Create_BR(){
 function HTML_Create_Output(value, onclick_elem = undefined, id = undefined, class_elem = undefined){
     var ret_elem = document.createElement("output");
         ret_elem.classList.add = 'class_output_field';
-        ret_elem.value = 0;
+        ret_elem.value = value;
 
     if (onclick_elem != undefined){
         if ((typeof onclick_elem) == "function"){
