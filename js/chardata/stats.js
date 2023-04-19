@@ -1,14 +1,31 @@
-function Initative_t (out_field) {
+function Initative_t () {
 //constants
     const BASIC_MOD_ID_T = Object.freeze(
         {
             "AGI": 'AGI',
         }
     );
+    const OUTFIELD_CLASS_NAME = "class_output_initiative";
 
 //private methods
+    var Init = function(){
+        let elems = document.getElementsByClassName(OUTFIELD_CLASS_NAME);
+        for (let i = 0; i < elems.length; i++){
+            elems[i].onclick = self.Show_Detail_Popup;
+        }
+        
+        Set_Field_Values();
+        self.modifier_map.Add(
+            BASIC_MOD_ID_T.AGI,
+            new Modifier_t(0, ABISCORES.AGI));
+    }
+
     var Set_Field_Values = function(){
-        m_out_field.value = GetModifierStr(self.sum);
+        let str = GetModifierStr(self.sum);
+        let elems = document.getElementsByClassName(OUTFIELD_CLASS_NAME);
+        for (let i = 0; i < elems.length; i++){
+            elems[i].value = str;
+        }
     }
 
     var Update_Mod_Map = function(){
@@ -37,7 +54,6 @@ function Initative_t (out_field) {
     }
 
 //private properties
-    var m_out_field = out_field;
     var self = this;
 
 //public properties
@@ -45,13 +61,10 @@ function Initative_t (out_field) {
     this.modifier_map = new Modifier_Map_t(this.Recalc);
 
 //additional initialization
-    Set_Field_Values();
-    this.modifier_map.Add(
-        BASIC_MOD_ID_T.AGI,
-        new Modifier_t(0, ABISCORES.AGI));
+    Init();
 }
 
-function Health_t (out_field) {
+function Health_t () {
 //constants
     const CLASS_ID_PREFIX = "CLASS_";
     const CLASS_MAIN_STR = "Класс";
@@ -60,10 +73,32 @@ function Health_t (out_field) {
             "RACE": 'RACE',
         }
     );
+    const OUTFIELD_CLASS_NAME = "class_output_max_hp";
 
 //private methods
+    var Init = function(){
+        let elems = document.getElementsByClassName(OUTFIELD_CLASS_NAME);
+        for (let i = 0; i < elems.length; i++){
+            elems[i].onclick = self.Show_Detail_Popup;
+        }
+        
+        Set_Field_Values();
+        self.modifier_map.Add(
+            BASIC_MOD_ID_T.RACE,
+            new Modifier_t(0, "Раса", "Нет"));
+
+        CLASS_DATABASE.forEach(class_item => {
+            self.modifier_map.Add(
+                CLASS_ID_PREFIX + class_item.name,
+                new Modifier_t(0, CLASS_MAIN_STR, class_item.name));
+        });
+    }
+
     var Set_Field_Values = function(){
-        m_out_field.value = self.sum;
+        let elems = document.getElementsByClassName(OUTFIELD_CLASS_NAME);
+        for (let i = 0; i < elems.length; i++){
+            elems[i].value = self.sum;
+        }
     }
 
     var Update_Mod_Map = function(){
@@ -107,7 +142,6 @@ function Health_t (out_field) {
     }
 
 //private properties
-    var m_out_field = out_field;
     var self = this;
 
 //public properties
@@ -115,20 +149,10 @@ function Health_t (out_field) {
     this.modifier_map = new Modifier_Map_t(this.Recalc);
 
 //additional initialization
-    Set_Field_Values();
-    this.modifier_map.Add(
-        BASIC_MOD_ID_T.RACE,
-        new Modifier_t(0, "Раса", "Нет"));
-
-    CLASS_DATABASE.forEach(class_item => {
-        this.modifier_map.Add(
-            CLASS_ID_PREFIX + class_item.name,
-            new Modifier_t(0, CLASS_MAIN_STR, class_item.name));
-    });
-
+    Init();
 }
 
-function Stamina_t (out_field) {
+function Stamina_t () {
 //constants
     const CLASS_ID_PREFIX = "CLASS_";
     const CLASS_MAIN_STR = "Класс";
@@ -137,10 +161,32 @@ function Stamina_t (out_field) {
         "CON": 'CON',
     }
 );
+    const OUTFIELD_CLASS_NAME = "class_output_max_sp";
 
 //private methods
+    var Init = function(){
+        let elems = document.getElementsByClassName(OUTFIELD_CLASS_NAME);
+        for (let i = 0; i < elems.length; i++){
+            elems[i].onclick = self.Show_Detail_Popup;
+        }
+        
+        Set_Field_Values();
+        self.modifier_map.Add(
+            BASIC_MOD_ID_T.CON,
+            new Modifier_t(0, ABISCORES.CON));
+
+        CLASS_DATABASE.forEach(class_item => {
+            self.modifier_map.Add(
+                CLASS_ID_PREFIX + class_item.name,
+                new Modifier_t(0, CLASS_MAIN_STR, class_item.name));
+        });
+    }
+
     var Set_Field_Values = function(){
-        m_out_field.value = self.sum;
+        let elems = document.getElementsByClassName(OUTFIELD_CLASS_NAME);
+        for (let i = 0; i < elems.length; i++){
+            elems[i].value = self.sum;
+        }
     }
 
 //private methods
@@ -176,7 +222,6 @@ function Stamina_t (out_field) {
     }
 
 //private properties
-    var m_out_field = out_field;
     var self = this;
 
 //public properties
@@ -184,19 +229,10 @@ function Stamina_t (out_field) {
     this.modifier_map = new Modifier_Map_t(this.Recalc);
 
 //additional initialization
-    Set_Field_Values();
-    this.modifier_map.Add(
-        BASIC_MOD_ID_T.CON,
-        new Modifier_t(0, ABISCORES.CON));
-
-    CLASS_DATABASE.forEach(class_item => {
-        this.modifier_map.Add(
-            CLASS_ID_PREFIX + class_item.name,
-            new Modifier_t(0, CLASS_MAIN_STR, class_item.name));
-    });
+    Init();
 }
 
-function Resolve_t (out_field) {
+function Resolve_t () {
 //constants
     const STRING_NEED_CLASS = "Нельзя посчитать ПР, пока не добавлен хотя бы один класс.";
     const BASIC_MOD_ID_T = Object.freeze(
@@ -206,13 +242,30 @@ function Resolve_t (out_field) {
             "MIN_VALUE": 'MIN_VALUE'
         }
     );
+    const OUTFIELD_CLASS_NAME = "class_output_max_rp";
 
 //private methods
+    var Init = function(){
+        let elems = document.getElementsByClassName(OUTFIELD_CLASS_NAME);
+        for (let i = 0; i < elems.length; i++){
+            elems[i].onclick = self.Show_Detail_Popup;
+        }
+        Set_Field_Values();
+        self.modifier_map.Add(
+            BASIC_MOD_ID_T.KEY_ABISCORE,
+            new Modifier_t(0, "Ключевая хар-ка", "Нет"));
+        self.modifier_map.Add(
+            BASIC_MOD_ID_T.LVL,
+            new Modifier_t(0, "Уровень", "/2"));
+        self.modifier_map.Add(
+            BASIC_MOD_ID_T.MIN_VALUE,
+            new Modifier_t(1, "Минимальное значение", null, MODIFIER_TYPES_T.MIN_VALUE));
+    }
+    
     var Set_Field_Values = function(){
-        if (is_Calculated){
-            m_out_field.value = self.sum;
-        }else{
-            m_out_field.value = "(Не выбран класс)";
+        let elems = document.getElementsByClassName(OUTFIELD_CLASS_NAME);
+        for (let i = 0; i < elems.length; i++){
+            elems[i].value = self.sum;
         }
     }
 
@@ -274,7 +327,6 @@ function Resolve_t (out_field) {
     }
 
 //private properties
-    var m_out_field = out_field;
     var is_Calculated = false;
     var self = this;
 
@@ -283,19 +335,10 @@ function Resolve_t (out_field) {
     this.modifier_map = new Modifier_Map_t(this.Recalc);
 
 //additional initialization
-    Set_Field_Values();
-    this.modifier_map.Add(
-        BASIC_MOD_ID_T.KEY_ABISCORE,
-        new Modifier_t(0, "Ключевая хар-ка", "Нет"));
-    this.modifier_map.Add(
-        BASIC_MOD_ID_T.LVL,
-        new Modifier_t(0, "Уровень", "/2"));
-    this.modifier_map.Add(
-        BASIC_MOD_ID_T.MIN_VALUE,
-        new Modifier_t(1, "Минимальное значение", null, MODIFIER_TYPES_T.MIN_VALUE));
+    Init();
 }
 
-function Level_t (out_field){
+function Level_t (){
 //constants
     const CLASS_ID_PREFIX = "CLASS_";
     const CLASS_MAIN_STR = "Класс";
@@ -330,7 +373,7 @@ function Level_t (out_field){
     }
 
 //private properties
-    var m_out_field = out_field;
+    var m_out_field = document.getElementById('outfield_level');
     var self = this;
 
 //public properties
@@ -403,18 +446,39 @@ function BAB_t (out_field){
     });
 }
 
-function Attack_Type_t (name, abiscore, out_field){
+function Attack_Type_t (name, abiscore, out_field_class){
 //constants
     const BASIC_MOD_ID_T = Object.freeze(
-    {
-        "BAB": 'BAB',
-        "ABISCORE": 'ABISCORE'
-    }
-);
+        {
+            "BAB": 'BAB',
+            "ABISCORE": 'ABISCORE'
+        }
+    );
+    const OUTFIELD_CLASS_NAME = out_field_class;
 
 //private methods
+    var Init = function(){
+        let elems = document.getElementsByClassName(OUTFIELD_CLASS_NAME);
+        for (let i = 0; i < elems.length; i++){
+            elems[i].onclick = self.Show_Detail_Popup;
+        }
+        
+        Set_Field_Values();
+
+        self.modifier_map.Add(
+            BASIC_MOD_ID_T.ABISCORE,
+            new Modifier_t(0, m_abiscore));
+        self.modifier_map.Add(
+            BASIC_MOD_ID_T.BAB,
+            new Modifier_t(0, "БМА"));
+    }
+    
     var Set_Field_Values = function(){
-        m_out_field.value = GetModifierStr(self.sum);
+        let str = GetModifierStr(self.sum);
+        let elems = document.getElementsByClassName(OUTFIELD_CLASS_NAME);
+        for (let i = 0; i < elems.length; i++){
+            elems[i].value = str;
+        }
     }
 
     var Update_Mod_Map = function(){
@@ -446,7 +510,6 @@ function Attack_Type_t (name, abiscore, out_field){
 
 //private properties
     var self = this;
-    var m_out_field = out_field;
     var m_abiscore = abiscore;
     var m_name = name;
 
@@ -456,14 +519,7 @@ function Attack_Type_t (name, abiscore, out_field){
     this.arr_recalc_functions = new Recalc_Function_Collection_t();
 
 //additional initialization
-    Set_Field_Values();
-
-    this.modifier_map.Add(
-        BASIC_MOD_ID_T.ABISCORE,
-        new Modifier_t(0, m_abiscore));
-    this.modifier_map.Add(
-        BASIC_MOD_ID_T.BAB,
-        new Modifier_t(0, "БМА"));
+    Init();
 }
 
 function Attacks_t (){
@@ -520,26 +576,52 @@ function Attacks_t (){
 
 //public properties
     this.bab = new BAB_t(document.getElementById('outfield_attack_bab'));
-    this.melee = new Attack_Type_t (WEAPON_MODIFIER.MELEE, ABISCORES.STR, document.getElementById('outfield_attack_melee'));
-    this.operative = new Attack_Type_t (WEAPON_MODIFIER.OPERATIVE, ABISCORES.AGI, document.getElementById('outfield_attack_oper'));
-    this.ranged = new Attack_Type_t (WEAPON_MODIFIER.RANGED, ABISCORES.AGI, document.getElementById('outfield_attack_ranged'));
-    this.thrown = new Attack_Type_t (WEAPON_MODIFIER.THROWN, ABISCORES.STR, document.getElementById('outfield_attack_thrown'));
+    this.melee = new Attack_Type_t (WEAPON_MODIFIER.MELEE, ABISCORES.STR, "class_output_attack_melee");
+    this.operative = new Attack_Type_t (WEAPON_MODIFIER.OPERATIVE, ABISCORES.AGI, "class_output_attack_operative");
+    this.ranged = new Attack_Type_t (WEAPON_MODIFIER.RANGED, ABISCORES.AGI, "class_output_attack_ranged");
+    this.thrown = new Attack_Type_t (WEAPON_MODIFIER.THROWN, ABISCORES.STR, "class_output_attack_thrown");
 }
 
-function AC_t (name, out_field){
+function AC_t (name, out_field_class){
 //constants
-const BASIC_MOD_ID_T = Object.freeze(
-    {
-        "BASE_VALUE": 'BASE_VALUE',
-        "AGI": 'AGI',
-        "ARMOR": 'ARMOR',
-        "ARMOR_PROF": 'ARMOR_PROF'
-    }
-);
+    const BASIC_MOD_ID_T = Object.freeze(
+        {
+            "BASE_VALUE": 'BASE_VALUE',
+            "AGI": 'AGI',
+            "ARMOR": 'ARMOR',
+            "ARMOR_PROF": 'ARMOR_PROF'
+        }
+    );
+    const OUTFIELD_CLASS_NAME = out_field_class;
 
 //private methods
+    var Init = function(){
+        let elems = document.getElementsByClassName(OUTFIELD_CLASS_NAME);
+        for (let i = 0; i < elems.length; i++){
+            elems[i].onclick = self.Show_Detail_Popup;
+        }
+        
+        Set_Field_Values();
+
+        self.modifier_map.Add(
+            BASIC_MOD_ID_T.BASE_VALUE,
+            new Modifier_t(10, "Начальное значение"));
+        self.modifier_map.Add(
+            BASIC_MOD_ID_T.AGI,
+            new Modifier_t(0, ABISCORES.AGI));
+        self.modifier_map.Add(
+            BASIC_MOD_ID_T.ARMOR,
+            new Modifier_t(0, "Броня", "Нет"));
+        self.modifier_map.Add(
+            BASIC_MOD_ID_T.ARMOR_PROF,
+            new Modifier_t(0, "Отсутствие ношения брони", ARMOR_TYPES.NONE));
+    }
+    
     var Set_Field_Values = function(){
-        m_out_field.value = self.sum;
+        let elems = document.getElementsByClassName(OUTFIELD_CLASS_NAME);
+        for (let i = 0; i < elems.length; i++){
+            elems[i].value = self.sum;
+        }
     }
 
     var Update_Mod_Map = function(){
@@ -609,7 +691,6 @@ const BASIC_MOD_ID_T = Object.freeze(
 
 //private properties
     var self = this;
-    var m_out_field = out_field;
     var m_name = name;
 
 //public properties
@@ -618,34 +699,41 @@ const BASIC_MOD_ID_T = Object.freeze(
     this.modifier_map = new Modifier_Map_t(this.Recalc);
 
 //additional initialization
-    Set_Field_Values();
-
-    this.modifier_map.Add(
-        BASIC_MOD_ID_T.BASE_VALUE,
-        new Modifier_t(10, "Начальное значение"));
-    this.modifier_map.Add(
-        BASIC_MOD_ID_T.AGI,
-        new Modifier_t(0, ABISCORES.AGI));
-    this.modifier_map.Add(
-        BASIC_MOD_ID_T.ARMOR,
-        new Modifier_t(0, "Броня", "Нет"));
-    this.modifier_map.Add(
-        BASIC_MOD_ID_T.ARMOR_PROF,
-        new Modifier_t(0, "Отсутствие ношения брони", ARMOR_TYPES.NONE));
+    Init();
 }
 
-function Against_Maneuver_t (out_field){
+function Against_Maneuver_t (){
 //constants
-const BASIC_MOD_ID_T = Object.freeze(
-    {
-        "AGAINST_MANEUVER": 'AGAINST_MANEUVER',
-        "KAC": 'KAC'
-    }
-);
+    const BASIC_MOD_ID_T = Object.freeze(
+        {
+            "AGAINST_MANEUVER": 'AGAINST_MANEUVER',
+            "KAC": 'KAC'
+        }
+    );
+    const OUTFIELD_CLASS_NAME = "class_output_defense_maneuver";
 
 //private methods
+    var Init = function(){
+        let elems = document.getElementsByClassName(OUTFIELD_CLASS_NAME);
+        for (let i = 0; i < elems.length; i++){
+            elems[i].onclick = self.Show_Detail_Popup;
+        }
+        
+        Set_Field_Values();
+
+        self.modifier_map.Add(
+            BASIC_MOD_ID_T.KAC,
+            new Modifier_t(10, "ККБ"));
+        self.modifier_map.Add(
+            BASIC_MOD_ID_T.AGAINST_MANEUVER,
+            new Modifier_t(8, "Бонус против манёвров"));
+    }
+    
     var Set_Field_Values = function(){
-        m_out_field.value = self.sum;
+        let elems = document.getElementsByClassName(OUTFIELD_CLASS_NAME);
+        for (let i = 0; i < elems.length; i++){
+            elems[i].value = self.sum;
+        }
     }
 
     var Update_Mod_Map = function(){
@@ -672,7 +760,6 @@ const BASIC_MOD_ID_T = Object.freeze(
     }
 
 //private properties
-    var m_out_field = out_field;
     /* var m_mod_map = new Map(); */
     var self = this;
 
@@ -683,14 +770,7 @@ const BASIC_MOD_ID_T = Object.freeze(
     this.modifier_map = new Modifier_Map_t(this.Recalc);
 
 //additional initialization
-    Set_Field_Values();
-
-    this.modifier_map.Add(
-        BASIC_MOD_ID_T.KAC,
-        new Modifier_t(10, "ККБ"));
-    this.modifier_map.Add(
-        BASIC_MOD_ID_T.AGAINST_MANEUVER,
-        new Modifier_t(8, "Бонус против манёвров"));
+    Init();
 }
 
 function Armor_Limit_Agi(){
@@ -737,8 +817,10 @@ const BASIC_MOD_ID_T = Object.freeze(
         new Modifier_t(Infinity, "Броня"));
 }
 
-function Resistance_Collection_t()
-{
+function Resistance_Collection_t(){
+//constants
+    const OUTFIELD_CLASS_NAME = "class_output_defense_resistance";
+
 //private methods
     var Get_Mod_Map = function(type, do_generate){
         if (!m_map.has(type)){
@@ -771,7 +853,10 @@ function Resistance_Collection_t()
             out_string = "Нет"
         }
         
-        m_outfield.value = out_string;
+        let elems = document.getElementsByClassName(OUTFIELD_CLASS_NAME);
+        for (let i = 0; i < elems.length; i++){
+            elems[i].value = out_string;
+        }
     }
 
 //public methods
@@ -831,9 +916,9 @@ function Defense_t(){
         }
     };
 
-    this.eac = new AC_t("ЭКБ", document.getElementById('outfield_defense_eac'));
-    this.kac = new AC_t("ККБ", document.getElementById('outfield_defense_kac'));
-    this.against_maneuver = new Against_Maneuver_t (document.getElementById('outfield_defense_maneuver'));
+    this.eac = new AC_t("ЭКБ", "class_output_defense_eac");
+    this.kac = new AC_t("ККБ", "class_output_defense_kac");
+    this.against_maneuver = new Against_Maneuver_t ();
     this.armor_limit_agi = new Armor_Limit_Agi();
     this.resistance = new Resistance_Collection_t();
     this.dr = 0;//TODO
@@ -967,7 +1052,7 @@ function Speeds_t (){
     this.climb = new Speed_Type_t("Лазание", document.getElementById('outfield_mspeed_climb'));
 }
 
-function Save_Type_t (name, prefix, abiscore, out_field){
+function Save_Type_t (name, prefix, abiscore, out_field_class){
 //constants
     const CLASS_ID_PREFIX = "CLASS_";
     const CLASS_MAIN_STR = "Класс";
@@ -976,10 +1061,33 @@ function Save_Type_t (name, prefix, abiscore, out_field){
             "ABISCORE": 'ABISCORE'
         }
     );
+    const OUTFIELD_CLASS_NAME = out_field_class;
 
 //private methods
+    var Init = function(){
+        let elems = document.getElementsByClassName(OUTFIELD_CLASS_NAME);
+        for (let i = 0; i < elems.length; i++){
+            elems[i].onclick = self.Show_Detail_Popup;
+        }
+        
+            Set_Field_Values();
+
+        self.modifier_map.Add(
+            BASIC_MOD_ID_T.ABISCORE,
+            new Modifier_t(0, m_abiscore));
+        CLASS_DATABASE.forEach(class_item => {
+            self.modifier_map.Add(
+                CLASS_ID_PREFIX + class_item.name,
+                new Modifier_t(0, CLASS_MAIN_STR, class_item.name));
+        });
+    }
+    
     var Set_Field_Values = function(){
-        m_out_field.value = GetModifierStr(self.sum);
+        let str = GetModifierStr(self.sum);
+        let elems = document.getElementsByClassName(OUTFIELD_CLASS_NAME);
+        for (let i = 0; i < elems.length; i++){
+            elems[i].value = str;
+        }
     }
 
     var Update_Mod_Map = function(){
@@ -1017,7 +1125,6 @@ function Save_Type_t (name, prefix, abiscore, out_field){
     }
 
 //private properties
-    var m_out_field = out_field;
     var m_abiscore = abiscore;
     var m_prefix = prefix;
     var m_name = name;
@@ -1029,16 +1136,7 @@ function Save_Type_t (name, prefix, abiscore, out_field){
     this.modifier_map = new Modifier_Map_t(this.Recalc);
 
 //additional initialization
-    Set_Field_Values();
-
-    this.modifier_map.Add(
-        BASIC_MOD_ID_T.ABISCORE,
-        new Modifier_t(0, m_abiscore));
-    CLASS_DATABASE.forEach(class_item => {
-        this.modifier_map.Add(
-            CLASS_ID_PREFIX + class_item.name,
-            new Modifier_t(0, CLASS_MAIN_STR, class_item.name));
-    });
+    Init();
 }
 
 function Saves_t (){
@@ -1066,9 +1164,9 @@ function Saves_t (){
     var self = this;
 
 //public properties
-    this.fortitude = new Save_Type_t("Стойкость", 'fort', ABISCORES.CON, document.getElementById('outfield_save_fort'));
-    this.reflex = new Save_Type_t("Реакция", 'refl', ABISCORES.AGI, document.getElementById('outfield_save_refl'));
-    this.will = new Save_Type_t("Воля", 'will', ABISCORES.WIS, document.getElementById('outfield_save_will'));
+    this.fortitude = new Save_Type_t("Стойкость", 'fort', ABISCORES.CON, "class_output_save_fort");
+    this.reflex = new Save_Type_t("Реакция", 'refl', ABISCORES.AGI, "class_output_save_refl");
+    this.will = new Save_Type_t("Воля", 'will', ABISCORES.WIS, "class_output_save_will");
 }
 
 

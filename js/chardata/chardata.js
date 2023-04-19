@@ -1,10 +1,10 @@
 function Stats_t(){
 //public properties
     this.abiscores = new Abiscore_t();
-    this.initiative = new Initative_t(document.getElementById('outfield_initiative'));
-    this.hp = new Health_t(document.getElementById('outfield_max_hp'));
-    this.sp = new Stamina_t(document.getElementById('outfield_max_sp'));
-    this.rp = new Resolve_t(document.getElementById('outfield_max_rp'));
+    this.initiative = new Initative_t();
+    this.hp = new Health_t();
+    this.sp = new Stamina_t();
+    this.rp = new Resolve_t();
     this.saves = new Saves_t();
     this.attacks = new Attacks_t();
     this.defense = new Defense_t();
@@ -48,7 +48,7 @@ function Chardata_t(){
         self.theme = null;
         self.abilities = new Chardata_Abilities_t();
         self.classes = new Class_Collection_t();
-        self.lvl = new Level_t(document.getElementById('outfield_level'));
+        self.lvl = new Level_t();
         self.stats = new Stats_t();
         self.skills = new Skills_t();
         self.inventory = new Inventory_t();
