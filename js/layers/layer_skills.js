@@ -32,7 +32,7 @@ function Layer_Skills_t(){
                 0,
                 onchange_func,
                 'out_field_skill_' + skill_name,
-                'class_output_field');
+                'class_output_field class_output_skill_' + skill_name);
             cell_mod.appendChild(output_field);
 
             chardata.skills.arr[i].Set_Outfield(output_field);

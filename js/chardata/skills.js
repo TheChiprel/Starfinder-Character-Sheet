@@ -1,17 +1,22 @@
 function Skill_Data_t (name, abiscore, is_learn_req, has_armor_penalty){
 //constants
-const BASIC_MOD_ID_T = Object.freeze(
-    {
-        "POINTS": 'POINTS',
-        "CLASS": 'CLASS',
-        "ABISCORE": 'ABISCORE',
-        "ARMOR_PENALTY": 'ARMOR_PENALTY'
-    }
-);
+    const BASIC_MOD_ID_T = Object.freeze(
+        {
+            "POINTS": 'POINTS',
+            "CLASS": 'CLASS',
+            "ABISCORE": 'ABISCORE',
+            "ARMOR_PENALTY": 'ARMOR_PENALTY'
+        }
+    );
+    
+    const OUTFIELD_CLASS_NAME_PREFIX = "class_output_skill_";
 
 //private methods
     var Set_Field_Values = function(){
-        m_out_field.value = GetModifierStr(self.sum);
+        let elems = document.getElementsByClassName(OUTFIELD_CLASS_NAME_PREFIX + self.name);
+        for (let i = 0; i < elems.length; i++){
+            elems[i].value = GetModifierStr(self.sum);
+        }
     }
 
     var Update_Mod_Map = function(){
@@ -343,17 +348,4 @@ function Skills_t (){
         (document.getElementById('outfield_skill_points_spent')),
         (document.getElementById('outfield_skill_points_left'))
     );
-}
-
-function Init_Callbacks_Skills(){
-    //skills -> face
-    Object.values(SKILLS).forEach(skill => {
-        chardata.skills.AddRecalcFunc(
-            skill,
-            new Recalc_Function_t (
-                'face_outfield',
-                layers.face.block_stats.skills.Update.bind(null, skill)
-            )
-        );
-    });
 }

@@ -1,7 +1,6 @@
 //TODO: move to chardata
 function Init_Callbacks(){
     Init_Callbacks_Stats();
-    Init_Callbacks_Skills();
     Init_Callbacks_Classes();
     Init_Callbacks_Proficiency();
 }

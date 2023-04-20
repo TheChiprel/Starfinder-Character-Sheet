@@ -84,7 +84,7 @@ function Block_Face_Skills_t(){
 
             let cell_mod = row.insertCell(1);
             let cell_mod_function = chardata.skills.Show_Detail_Popup.bind(null, skills_arr[i]);
-            var cell_mod_output = HTML_Create_Output(0, cell_mod_function, undefined, "class_output_field");
+            var cell_mod_output = HTML_Create_Output(0, cell_mod_function, undefined, "class_output_field class_output_skill_" + skills_arr[i]);
             
             cell_mod.appendChild(cell_mod_output);
             m_outputs.push(cell_mod_output);
@@ -92,16 +92,6 @@ function Block_Face_Skills_t(){
     }
 
 //public methods
-    this.Update = function(skill){
-        let skills_arr = Object.values(SKILLS);
-        
-        for (let i = 0; i < skills_arr.length; i++){
-            if (skill == skills_arr[i]){
-                m_outputs[i].value = GetModifierStr(chardata.skills.Get_Sum(skill));
-                return;
-            }
-        }
-    }
 
 //private properties
     var self = this;
