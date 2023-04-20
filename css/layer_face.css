@@ -13,3 +13,16 @@
 #table_face_abilities {
     text-align: center;
 }
+
+.class_face_stats_column > div {
+    border: 1px solid #ccc;
+}
+
+.class_face_stats_column table {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#table_face_skills th{
+    text-align: end;
+}

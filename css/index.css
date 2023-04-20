@@ -85,7 +85,8 @@ body {
     border: none;
     outline: none;
     cursor: help;
-    /*padding: 14px 16px;*/
+    padding-left: 3px;
+    padding-right: 3px;
 }
 
 /* Go from zero to full opacity */

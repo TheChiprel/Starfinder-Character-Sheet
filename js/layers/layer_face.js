@@ -27,7 +27,6 @@ function Block_Face_Abiscores_t(){
 
 //public methods
 
-
 //private properties
     var self = this;
     var m_table = document.getElementById("table_face_abiscores");

@@ -81,27 +81,27 @@
             </div>
         
             <div class="class_sublayer_face" id = "sublayer_face_stats">
-                <div>
+                <div class="class_face_stats_column">
                     <div>
-                        Инициатива: <output class="class_output_field class_output_initiative" form="textarea">0</output><br>
+                        Инициатива:<br/><output class="class_output_field class_output_initiative" form="textarea">0</output>
                     </div>
                     <div>
-                        Временные ПЗ: <input type="number" id="infield_face_temp_hp" value="0" min="0"/>
+                        Временные ПЗ:<br/><input type="number" id="infield_face_temp_hp" value="0" min="0"/>
                     </div>
                     <div>
-                        ПЖ:
+                        ПЖ:<br/>
                         <input type="number" id="infield_face_curr_sp" value="0" min="0" max="0"/>
                         /
                         <output class="class_output_field class_output_max_sp">0</output>
                     </div>
                     <div>
-                        ПЗ:
+                        ПЗ:<br/>
                         <input type="number" id="infield_face_curr_hp" value="0" min="0" max="0"/>
                         /
                         <output class="class_output_field class_output_max_hp" form="textarea">0</output>
                     </div>
                     <div>
-                        ПР:
+                        ПР:<br/>
                         <input type="number" id="infield_face_curr_rp" value="0" min="0" max="0"/>
                         /
                         <output class="class_output_field class_output_max_rp">0</output>
@@ -112,13 +112,13 @@
                             <tr>
                                 <th></th>
                                 <th>Знач.</th>
-                                <th>Мод.</th>
+                                <th>Модиф.</th>
                             </tr>
                         </table>
                     </div>
                 </div>
                 
-                <div>
+                <div class="class_face_stats_column">
                     <div>
                         Навыки:
                         <table id = "table_face_skills">
@@ -126,7 +126,15 @@
                     </div>
                 </div>
 
-                <div>
+                <div class="class_face_stats_column">
+                    <div>
+                        Скорости:<br/>
+                        Наземная: <output class="class_output_field class_output_mspeed_land" form="textarea">Нет</output><br/>
+                        Полёт: <output class="class_output_field class_output_mspeed_flight" form="textarea">Нет</output><br/>
+                        Рытьё: <output class="class_output_field class_output_mspeed_burrow" form="textarea">Нет</output><br/>
+                        Плавание: <output class="class_output_field class_output_mspeed_swim" form="textarea">Нет</output><br/>
+                        Лазание: <output class="class_output_field class_output_mspeed_climb" form="textarea">Нет</output><br/>
+                    </div>
                     <div>
                         Атака:<br/>
                         Ближний бой: <output class="class_output_field class_output_attack_melee" form="textarea">0</output><br/>
@@ -288,18 +296,18 @@
             <div class="layer_maininfo_block">
                 Скорости:<br>
                 <label for="outfield_mspeed_land">Наземная: </label>
-                <output class="class_output_field" name="outfield_mspeed_land" form="textarea" id="outfield_mspeed_land" onclick="chardata.stats.speeds.land.Show_Detail_Popup()">Нет</output><br>
+                <output class="class_output_field class_output_mspeed_land" name="outfield_mspeed_land" form="textarea" id="outfield_mspeed_land" onclick="chardata.stats.speeds.land.Show_Detail_Popup()">Нет</output><br>
 
                 <label for="outfield_mspeed_flight">Полёт: </label>
-                <output class="class_output_field" name="outfield_mspeed_flight" form="textarea" id="outfield_mspeed_flight" onclick="chardata.stats.speeds.flight.Show_Detail_Popup()">Нет</output><br>
+                <output class="class_output_field class_output_mspeed_flight" name="outfield_mspeed_flight" form="textarea" id="outfield_mspeed_flight" onclick="chardata.stats.speeds.flight.Show_Detail_Popup()">Нет</output><br>
 
                 <label for="outfield_mspeed_burrow">Рытьё: </label>
-                <output class="class_output_field" name="outfield_mspeed_burrow" form="textarea" id="outfield_mspeed_burrow" onclick="chardata.stats.speeds.burrow.Show_Detail_Popup()">Нет</output><br>
+                <output class="class_output_field class_output_mspeed_burrow" name="outfield_mspeed_burrow" form="textarea" id="outfield_mspeed_burrow" onclick="chardata.stats.speeds.burrow.Show_Detail_Popup()">Нет</output><br>
 
                 <label for="outfield_mspeed_swim">Плавание:</label>
-                <output class="class_output_field" name="outfield_mspeed_swim" form="textarea" id="outfield_mspeed_swim" onclick="chardata.stats.speeds.swim.Show_Detail_Popup()">Нет</output><br>
+                <output class="class_output_field class_output_mspeed_swim" name="outfield_mspeed_swim" form="textarea" id="outfield_mspeed_swim" onclick="chardata.stats.speeds.swim.Show_Detail_Popup()">Нет</output><br>
 
-                <label for="outfield_mspeed_climb">Лазание:</label>
+                <label for="outfield_mspeed_climb class_output_mspeed_climb">Лазание:</label>
                 <output class="class_output_field" name="outfield_mspeed_climb" form="textarea" id="outfield_mspeed_climb" onclick="chardata.stats.speeds.climb.Show_Detail_Popup()">Нет</output><br>
             </div>
 

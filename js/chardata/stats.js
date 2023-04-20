@@ -926,21 +926,26 @@ function Defense_t(){
     var self = this;
 }
 
-function Speed_Type_t (name, out_field){
+function Speed_Type_t (name, out_field_class){
 //constants
-const BASIC_MOD_ID_T = Object.freeze(
-    {
-        "BASE_VALUE": 'BASE_VALUE',
-        "ARMOR_PENALTY": 'ARMOR_PENALTY'
-    }
-);
+    const BASIC_MOD_ID_T = Object.freeze(
+        {
+            "BASE_VALUE": 'BASE_VALUE',
+            "ARMOR_PENALTY": 'ARMOR_PENALTY'
+        }
+    );
+    const OUTFIELD_CLASS_NAME = out_field_class;
 
 //private methods
     var Set_Field_Values = function(){
-        if (self.sum <= 0){
-            m_out_field.value = "Нет";
-        }else{
-            m_out_field.value = self.sum;
+        let elems = document.getElementsByClassName(OUTFIELD_CLASS_NAME);
+        let str = "Нет";
+        if (self.sum > 0){
+            str = self.sum;
+        }
+
+        for (let i = 0; i < elems.length; i++){
+            elems[i].value = str;
         }
     }
 
@@ -985,13 +990,10 @@ const BASIC_MOD_ID_T = Object.freeze(
 //private properties
     var self = this;
     var m_name = name;
-    var m_out_field = out_field;
-    /* var m_mod_map = new Map(); */
 
 //public properties
     this.sum = 0;
     this.base_value = 0;
-    /* this.other_mod = new Other_Mod_Collection_t(this.Recalc); */
     this.modifier_map = new Modifier_Map_t(this.Recalc);
     this.arr_recalc_functions = new Recalc_Function_Collection_t();
 
@@ -1045,11 +1047,11 @@ function Speeds_t (){
     var self = this;
 
 //public properties
-    this.land = new Speed_Type_t("Наземная", document.getElementById('outfield_mspeed_land'));
-    this.flight = new Speed_Type_t("Полёт", document.getElementById('outfield_mspeed_flight'));
-    this.burrow = new Speed_Type_t("Рытьё", document.getElementById('outfield_mspeed_burrow'));
-    this.swim = new Speed_Type_t("Плавание", document.getElementById('outfield_mspeed_swim'));
-    this.climb = new Speed_Type_t("Лазание", document.getElementById('outfield_mspeed_climb'));
+    this.land = new Speed_Type_t("Наземная", "class_output_mspeed_land");
+    this.flight = new Speed_Type_t("Полёт", "class_output_mspeed_flight");
+    this.burrow = new Speed_Type_t("Рытьё", "class_output_mspeed_burrow");
+    this.swim = new Speed_Type_t("Плавание", "class_output_mspeed_swim");
+    this.climb = new Speed_Type_t("Лазание", "class_output_mspeed_climb");
 }
 
 function Save_Type_t (name, prefix, abiscore, out_field_class){
