@@ -10,6 +10,16 @@
     grid-template-columns: 50% 50%;
 }
 
+#sublayer_face_inventory{
+    text-align: center;
+    display: grid;
+    grid-template-columns: 50% 50%;
+}
+
+#table_face_weapons{
+    text-align: left;
+}
+
 #table_face_abilities {
     text-align: center;
 }
