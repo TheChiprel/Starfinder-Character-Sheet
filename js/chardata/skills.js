@@ -9,11 +9,11 @@ function Skill_Data_t (name, abiscore, is_learn_req, has_armor_penalty){
         }
     );
     
-    const OUTFIELD_CLASS_NAME_PREFIX = "class_output_skill_";
+    const OUTFIELD_CLASS_NAME = "class_output_skill_" + name;
 
 //private methods
     var Set_Field_Values = function(){
-        let elems = document.getElementsByClassName(OUTFIELD_CLASS_NAME_PREFIX + self.name);
+        let elems = document.getElementsByClassName(OUTFIELD_CLASS_NAME);
         for (let i = 0; i < elems.length; i++){
             elems[i].value = GetModifierStr(self.sum);
         }

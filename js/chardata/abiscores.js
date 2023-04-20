@@ -1,15 +1,19 @@
 //TODO: get rid of name here and in values?
 function Abiscore_Mod_Data_t(name, outfield){
 //constants
-const BASIC_MOD_MOD_ID_T = Object.freeze(
-    {
-        "ABISCORE_VALUE": 'ABISCORE_VALUE',
-    }
-);
+    const BASIC_MOD_MOD_ID_T = Object.freeze(
+        {
+            "ABISCORE_VALUE": 'ABISCORE_VALUE',
+        }
+    );
+    const OUTFIELD_CLASS_NAME = "class_output_abiscore_mod_" + name;
 
 //private methods
     var Set_Field_Value = function(){
-        m_outfield.value = GetModifierStr(self.sum);
+        let elems = document.getElementsByClassName(OUTFIELD_CLASS_NAME);
+        for (let i = 0; i < elems.length; i++){
+            elems[i].value = GetModifierStr(self.sum);
+        }
     }
 
     var Update_Mod_Map = function(){
@@ -56,22 +60,26 @@ const BASIC_MOD_MOD_ID_T = Object.freeze(
 
 function Abiscore_Value_Data_t (name, outfield){
 //constants
-const BASIC_VALUE_MOD_ID_T = Object.freeze(
-    {
-        "BASE_VALUE": 'BASE_VALUE',
-        "POINTS": 'POINTS',
-        "RACE": 'RACE',
-        "THEME": 'DIVIDER',
-        "BOOST_LVL_5": 'BOOST_LVL_5',
-        "BOOST_LVL_10": 'BOOST_LVL_10',
-        "BOOST_LVL_15": 'BOOST_LVL_15',
-        "BOOST_LVL_20": 'BOOST_LVL_20',
-    }
-);
+    const BASIC_VALUE_MOD_ID_T = Object.freeze(
+        {
+            "BASE_VALUE": 'BASE_VALUE',
+            "POINTS": 'POINTS',
+            "RACE": 'RACE',
+            "THEME": 'DIVIDER',
+            "BOOST_LVL_5": 'BOOST_LVL_5',
+            "BOOST_LVL_10": 'BOOST_LVL_10',
+            "BOOST_LVL_15": 'BOOST_LVL_15',
+            "BOOST_LVL_20": 'BOOST_LVL_20',
+        }
+    );
+    const OUTFIELD_CLASS_NAME = "class_output_abiscore_value_" + name;
 
 //private methods
     var Set_Field_Value = function(){
-        m_value_output_field.value = self.sum;
+        let elems = document.getElementsByClassName(OUTFIELD_CLASS_NAME);
+        for (let i = 0; i < elems.length; i++){
+            elems[i].value = self.sum;
+        }
     }
 
     var Update_Mod_Map = function(){
@@ -661,7 +669,7 @@ function Init_Callbacks_Abiscores(){
                 chardata.stats.abiscores.modifiers.GetRecalcFunc(abiscore)
             )
         );
-        
+        /*
         chardata.stats.abiscores.values.AddRecalcFunc(
             abiscore,
             new Recalc_Function_t (
@@ -677,6 +685,7 @@ function Init_Callbacks_Abiscores(){
                 layers.face.block_stats.abiscores.Update_Modifier.bind(null, abiscore)
             )
         );
+        */
     });
 
     //AGI -> initiative

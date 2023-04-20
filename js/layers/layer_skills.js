@@ -36,8 +36,8 @@ function Layer_Skills_t(){
             cell_mod.appendChild(output_field);
 
             chardata.skills.arr[i].Set_Outfield(output_field);
+        }
     }
-}
 
 //public methods
     this.Set_Skill_Points = function(skill_name, value, update_outfield = false){

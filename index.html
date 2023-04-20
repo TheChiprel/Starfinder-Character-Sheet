@@ -328,65 +328,11 @@
 
                     <div class="layer_abiscores_block">
                         Значения и модификаторы характеристик:
-                        <table style="width:100%">
+                        <table id ="table_abiscores" style="width:100%">
                             <tr>
                                 <th>Хар-ка</th>
                                 <th>Значение</th>
                                 <th>Мод.</th>
-                            </tr>
-                            <tr>
-                                <td>СИЛ</td>
-                                <td>
-                                  <button class="class_button_abiscore_decrement" onclick="chardata.stats.abiscores.values.ChangeBaseValue(ABISCORES.STR, -1)">-</button>
-                                  <output class="class_output_field" name="outfield_abiscore_value_str" form="textarea" id="outfield_abiscore_value_str" onclick="chardata.stats.abiscores.values.Show_Detail_Popup(ABISCORES.STR)">10</output>
-                                  <button class="class_button_abiscore_increment" onclick="chardata.stats.abiscores.values.ChangeBaseValue(ABISCORES.STR, 1)">+</button>
-                                </td>
-                                <td><output class="class_output_field" name="outfield_abiscore_mod_str" form="textarea" id="outfield_abiscore_mod_str" onclick="chardata.stats.abiscores.modifiers.Show_Detail_Popup(ABISCORES.STR)">0</output><br></td>
-                            </tr>
-                            <tr>
-                                <td>ЛВК</td>
-                                <td>
-                                  <button class="class_button_abiscore_decrement" onclick="chardata.stats.abiscores.values.ChangeBaseValue(ABISCORES.AGI, -1)">-</button>
-                                  <output class="class_output_field" name="outfield_abiscore_value_agi" form="textarea" id="outfield_abiscore_value_agi" onclick="chardata.stats.abiscores.values.Show_Detail_Popup(ABISCORES.AGI)">10</output>
-                                  <button class="class_button_abiscore_increment" onclick="chardata.stats.abiscores.values.ChangeBaseValue(ABISCORES.AGI, 1)">+</button>
-                                </td>
-                                <td><output class="class_output_field" name="outfield_abiscore_mod_agi" form="textarea" id="outfield_abiscore_mod_agi" onclick="chardata.stats.abiscores.modifiers.Show_Detail_Popup(ABISCORES.AGI)">0</output><br></td>
-                            </tr>
-                            <tr>
-                                <td>ВЫН</td>
-                                <td>
-                                  <button class="class_button_abiscore_decrement" onclick="chardata.stats.abiscores.values.ChangeBaseValue(ABISCORES.CON, -1)">-</button>
-                                  <output class="class_output_field" name="outfield_abiscore_value_con" form="textarea" id="outfield_abiscore_value_con" onclick="chardata.stats.abiscores.values.Show_Detail_Popup(ABISCORES.CON)">10</output>
-                                  <button class="class_button_abiscore_increment" onclick="chardata.stats.abiscores.values.ChangeBaseValue(ABISCORES.CON, 1)">+</button>
-                                </td>
-                                <td><output class="class_output_field" name="outfield_abiscore_mod_con" form="textarea" id="outfield_abiscore_mod_con" onclick="chardata.stats.abiscores.modifiers.Show_Detail_Popup(ABISCORES.CON)">0</output><br></td>
-                            </tr>
-                            <tr>
-                                <td>ИНТ</td>
-                                <td>
-                                  <button class="class_button_abiscore_decrement" onclick="chardata.stats.abiscores.values.ChangeBaseValue(ABISCORES.INT, -1)">-</button>
-                                  <output class="class_output_field" name="outfield_abiscore_value_int" form="textarea" id="outfield_abiscore_value_int" onclick="chardata.stats.abiscores.values.Show_Detail_Popup(ABISCORES.INT)">10</output>
-                                  <button class="class_button_abiscore_increment" onclick="chardata.stats.abiscores.values.ChangeBaseValue(ABISCORES.INT, 1)">+</button>
-                                </td>
-                                <td><output class="class_output_field" name="outfield_abiscore_mod_int" form="textarea" id="outfield_abiscore_mod_int" onclick="chardata.stats.abiscores.modifiers.Show_Detail_Popup(ABISCORES.INT)">0</output><br></td>
-                            </tr>
-                            <tr>
-                                <td>МДР</td>
-                                <td>
-                                  <button class="class_button_abiscore_decrement" onclick="chardata.stats.abiscores.values.ChangeBaseValue(ABISCORES.WIS, -1)">-</button>
-                                  <output class="class_output_field" name="outfield_abiscore_value_wis" form="textarea" id="outfield_abiscore_value_wis" onclick="chardata.stats.abiscores.values.Show_Detail_Popup(ABISCORES.WIS)">10</output>
-                                  <button class="class_button_abiscore_increment" onclick="chardata.stats.abiscores.values.ChangeBaseValue(ABISCORES.WIS, 1)">+</button>
-                                </td>
-                                <td><output class="class_output_field" name="outfield_abiscore_mod_wis" form="textarea" id="outfield_abiscore_mod_wis" onclick="chardata.stats.abiscores.modifiers.Show_Detail_Popup(ABISCORES.WIS)">0</output><br></td>
-                            </tr>
-                            <tr>
-                            <td>ХАР</td>
-                                <td>
-                                  <button class="class_button_abiscore_decrement" onclick="chardata.stats.abiscores.values.ChangeBaseValue(ABISCORES.CHA, -1)">-</button>
-                                  <output class="class_output_field" name="outfield_abiscore_value_cha" form="textarea" id="outfield_abiscore_value_cha" onclick="chardata.stats.abiscores.values.Show_Detail_Popup(ABISCORES.CHA)">10</output>
-                                  <button class="class_button_abiscore_increment" onclick="chardata.stats.abiscores.values.ChangeBaseValue(ABISCORES.CHA, 1)">+</button>
-                                </td>
-                                <td><output class="class_output_field" name="outfield_abiscore_mod_cha" form="textarea" id="outfield_abiscore_mod_cha" onclick="chardata.stats.abiscores.modifiers.Show_Detail_Popup(ABISCORES.CHA)">0</output><br></td>
                             </tr>
                         </table>
                     </div>

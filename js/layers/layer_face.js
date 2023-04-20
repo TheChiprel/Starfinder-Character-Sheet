@@ -2,8 +2,6 @@ function Block_Face_Abiscores_t(){
 //private methods
     var Init = function(){
         let abiscores_arr = Object.values(ABISCORES);
-        m_outputs_value = new Array(0);
-        m_outputs_mods = new Array(0);
         
         while (m_table.rows.length > 1){
             m_table.deleteRow(1);
@@ -17,47 +15,22 @@ function Block_Face_Abiscores_t(){
             row.appendChild(cell_name);
             let cell_value = row.insertCell(1);
             let cell_value_function = chardata.stats.abiscores.values.Show_Detail_Popup.bind(null, abiscores_arr[i]);
-            var cell_value_output = HTML_Create_Output(10, cell_value_function, undefined, "class_output_field");
+            var cell_value_output = HTML_Create_Output(10, cell_value_function, undefined, "class_output_field class_output_abiscore_value_" + abiscores_arr[i]);
             let cell_mod = row.insertCell(2);
             let cell_mod_function = chardata.stats.abiscores.modifiers.Show_Detail_Popup.bind(null, abiscores_arr[i]);
-            var cell_mod_output = HTML_Create_Output(0, cell_mod_function, undefined, "class_output_field");
+            var cell_mod_output = HTML_Create_Output(0, cell_mod_function, undefined, "class_output_field class_output_abiscore_mod_" + abiscores_arr[i]);
             
             cell_value.appendChild(cell_value_output);
-            m_outputs_value.push(cell_value_output);
-            
             cell_mod.appendChild(cell_mod_output);
-            m_outputs_mods.push(cell_mod_output);
         }
     }
 
 //public methods
-    this.Update_Value = function(abiscore){
-        let abiscores_arr = Object.values(ABISCORES);
-        
-        for (let i = 0; i < abiscores_arr.length; i++){
-            if (abiscore == abiscores_arr[i]){
-                m_outputs_value[i].value = chardata.stats.abiscores.values.Get_Sum(abiscore);
-                return;
-            }
-        }
-    }
-    
-    this.Update_Modifier = function(abiscore){
-        let abiscores_arr = Object.values(ABISCORES);
-        
-        for (let i = 0; i < abiscores_arr.length; i++){
-            if (abiscore == abiscores_arr[i]){
-                m_outputs_mods[i].value = GetModifierStr(chardata.stats.abiscores.modifiers.Get_Sum(abiscore));
-                return;
-            }
-        }
-    }
+
 
 //private properties
     var self = this;
     var m_table = document.getElementById("table_face_abiscores");
-    var m_outputs_value;
-    var m_outputs_mods;
 
 //public properties
 
@@ -69,7 +42,6 @@ function Block_Face_Skills_t(){
 //private methods
     var Init = function(){
         let skills_arr = Object.values(SKILLS);
-        m_outputs = new Array(0);
         
         while (m_table.rows.length > 0){
             m_table.deleteRow(0);
@@ -87,7 +59,6 @@ function Block_Face_Skills_t(){
             var cell_mod_output = HTML_Create_Output(0, cell_mod_function, undefined, "class_output_field class_output_skill_" + skills_arr[i]);
             
             cell_mod.appendChild(cell_mod_output);
-            m_outputs.push(cell_mod_output);
         }
     }
 
@@ -96,7 +67,6 @@ function Block_Face_Skills_t(){
 //private properties
     var self = this;
     var m_table = document.getElementById("table_face_skills");
-    var m_outputs;
 
 //public properties
 
