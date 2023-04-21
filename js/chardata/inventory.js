@@ -1371,9 +1371,18 @@ function Credits_t (){
     var Init = function(){
         let elems = document.getElementsByClassName(CLASS_INFIELD);
         for (let i = 0; i < elems.length; i++){
-            elems[i].onchange = self.Set;
+            elems[i].onchange = OnChange_Event;
         }
         Set_Field_Values();
+    }
+    
+    var OnChange_Event = function(event){
+        let value = event.target.value;
+        if(isNaN(value)){
+            event.target.value = self.count;
+            return;
+        }
+        self.Set(parseInt(value));
     }
     
     var Set_Field_Values = function(){
@@ -1384,16 +1393,10 @@ function Credits_t (){
     }
 
 //public methods
-    this.Set = function(event){
-        if(isNaN(event.target.value)){
-            event.target.value = self.count;
-        }else{
-            let new_value = parseInt(event.target.value);
-            if (self.count != new_value){
-                
-                self.count = new_value;
-                Set_Field_Values();
-            }
+    this.Set = function(value){
+        if (self.count != value){
+            self.count = value;
+            Set_Field_Values();
         }
     }
 
@@ -1423,9 +1426,18 @@ function Upb_t (){
     var Init = function(){
         let elems = document.getElementsByClassName(CLASS_INFIELD);
         for (let i = 0; i < elems.length; i++){
-            elems[i].onchange = self.Set;
+            elems[i].onchange = OnChange_Event;
         }
         Set_Field_Values();
+    }
+    
+    var OnChange_Event = function(event){
+        let value = event.target.value;
+        if(isNaN(value)){
+            event.target.value = self.count;
+            return;
+        }
+        self.Set(parseInt(value));
     }
     
     var Set_Field_Values = function(){
@@ -1436,23 +1448,17 @@ function Upb_t (){
     }
 
 //public methods
-    this.Set = function(event){
-        if(isNaN(event.target.value)){
-            event.target.value = self.count;
-        }else{
-            let new_value = parseInt(event.target.value);
-            if (self.count != new_value){
-                
-                self.count = new_value;
-                Set_Field_Values();
-            }
+    this.Set = function(value){
+        if (self.count != value){
+            self.count = value;
+            Set_Field_Values();
         }
     }
 
     this.ChangeBy = function(value){
-        this.count -= value;
-        if (this.count < 0){
-            this.count = 0;
+        self.count -= value;
+        if (self.count < 0){
+            self.count = 0;
         }
         /* else NOTHING TO DO */
     }

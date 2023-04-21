@@ -433,6 +433,149 @@ function Block_Face_Spells_t(){
     Init();
 }
 
+function Block_Current_State_t(){
+//constants
+    const CLASS_TEMP_HP = "class_infield_temp_hp";
+    const CLASS_HP = "class_infield_hp";
+    const CLASS_SP = "class_infield_sp";
+    const CLASS_RP = "class_infield_rp";
+    
+//private methods
+    var Init = function(){
+        Set_OnChange_Func(CLASS_TEMP_HP, Temp_HP_Onchange);
+        Set_OnChange_Func(CLASS_HP, HP_Onchange);
+        Set_OnChange_Func(CLASS_SP, SP_Onchange);
+        Set_OnChange_Func(CLASS_RP, RP_Onchange);
+        Set_Field_Values(CLASS_TEMP_HP, 0);
+        Set_Field_Values(CLASS_HP, 0);
+        Set_Field_Values(CLASS_SP, 0);
+        Set_Field_Values(CLASS_RP, 0);
+    }
+    
+    var Set_OnChange_Func = function(class_name, func){
+        let elems = document.getElementsByClassName(class_name);
+        for (let i = 0; i < elems.length; i++){
+            elems[i].onclick = func;
+        }
+    }
+    
+    var Set_Field_Values = function(class_name, value){
+        let elems = document.getElementsByClassName(class_name);
+        for (let i = 0; i < elems.length; i++){
+            elems[i].value = value;
+        }
+    }
+    
+    var Temp_HP_Onchange = function(event){
+        let value = event.target.value;
+        if(isNaN(value)){
+            event.target.value = chardata.current_state.temp_hp;
+            return;
+        }
+        self.Set_Temp_HP(parseInt(value));
+    }
+    
+    var HP_Onchange = function(event){
+        let value = event.target.value;
+        if(isNaN(value)){
+            event.target.value = chardata.current_state.hp;
+            return;
+        }
+        self.Set_HP(parseInt(value));
+    }
+    
+    var SP_Onchange = function(event){
+        let value = event.target.value;
+        if(isNaN(value)){
+            event.target.value = chardata.current_state.sp;
+            return;
+        }
+        self.Set_SP(parseInt(value));
+    }
+    
+    var RP_Onchange = function(event){
+        let value = event.target.value;
+        if(isNaN(value)){
+            event.target.value = chardata.current_state.rp;
+            return;
+        }
+        self.Set_RP(parseInt(value));
+    }
+
+//public methods
+    this.Set_HP = function(value){
+        if (chardata.current_state.hp != value){
+            let max_value = chardata.stats.hp.sum;
+            if (value > max_value){
+                chardata.current_state.hp = max_value;
+            }else{
+                chardata.current_state.hp = value;
+            }
+            Set_Field_Values(CLASS_HP, chardata.current_state.hp);
+        }
+    }
+    
+    this.Set_SP = function(value){
+        if (chardata.current_state.sp != value){
+            let max_value = chardata.stats.sp.sum;
+            if (value > max_value){
+                chardata.current_state.sp = max_value;
+            }else{
+                chardata.current_state.sp = value;
+            }
+            Set_Field_Values(CLASS_SP, chardata.current_state.sp);
+        }
+    }
+    
+    this.Set_RP = function(value){
+        if (chardata.current_state.rp != value){
+            let max_value = chardata.stats.rp.sum;
+            if (value > max_value){
+                chardata.current_state.rp = max_value;
+            }else{
+                chardata.current_state.rp = value;
+            }
+            Set_Field_Values(CLASS_RP, chardata.current_state.rp);
+        }
+    }
+    
+    this.Set_Temp_HP = function(value){
+        if (chardata.current_state.temp_hp != value){
+            chardata.current_state.temp_hp = value;
+            Set_Field_Values(CLASS_TEMP_HP, chardata.current_state.temp_hp);
+        }
+    }
+
+//private properties
+    var self = this;
+
+//public properties
+    this.Load_From_Obj = function(obj){
+        if (obj == undefined){
+            return;
+        }
+        
+        if (obj.hp != undefined){
+            self.Set_HP(obj.hp);
+        }
+        
+        if (obj.sp != undefined){
+            self.Set_SP(obj.sp);
+        }
+        
+        if (obj.rp != undefined){
+            self.Set_RP(obj.rp);
+        }
+        
+        if (obj.temp_hp != undefined){
+            self.Set_Temp_HP(obj.temp_hp);
+        }
+    }
+
+//additional initialization
+    Init();
+}
+
 function Layer_Face_t(){
 //public methods
     this.Load_From_Obj = function(obj){
@@ -440,7 +583,7 @@ function Layer_Face_t(){
             return;
         }
         
-        //TODO
+        self.block_current_state.Load_From_Obj(obj);
     }
     
     this.Set_Active_Block = function(evt, block_name){
@@ -473,4 +616,5 @@ function Layer_Face_t(){
     this.block_inventory = new Block_Face_Inventory_t();
     this.block_abilities = new Block_Face_Abilities_t();
     this.block_spells = new Block_Face_Spells_t();
+    this.block_current_state = new Block_Current_State_t();
 }

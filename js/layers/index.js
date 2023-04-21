@@ -1,4 +1,3 @@
-//TODO: move saving to layers instead of chardata
 function OutSaveFile(){
     this.name = chardata.name;
 
@@ -22,8 +21,10 @@ function OutSaveFile(){
     this.inventory = chardata.inventory.Get_SaveData_Obj();
     this.abilities = chardata.abilities.Get_SaveData_Obj();
     this.custom = chardata.stats.custom_mods.Get_SaveData_Obj();
+    this.current_state = chardata.current_state.Get_SaveData_Obj();
 }
 
+//TODO: refactor to load from chardata instead of layers
 function InSaveFile(data){
     layers.maininfo.Set_Name(data.name, true);
     if (data.race != null){
@@ -42,6 +43,7 @@ function InSaveFile(data){
     layers.inventory.Load_From_Obj(data.inventory);
     layers.abilities.Load_From_Obj(data.abilities);
     layers.custom.Load_From_Obj(data.custom);
+    layers.face.Load_From_Obj(data.current_state);
 }
 
 function Save_Character_To_File() {
