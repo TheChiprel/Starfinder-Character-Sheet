@@ -22,8 +22,9 @@
     border-collapse: collapse;
 }
 
-#table_face_abilities {
+.table_face_list {
     text-align: center;
+    width: 100%;
 }
 
 .class_face_stats_column > div {
