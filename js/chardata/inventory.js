@@ -289,9 +289,11 @@ function Weapon_Collection_t(){
 
 //public methods
     this.Add = function(database_entry, row, is_from_database){
-        var len = m_arr.push(new Weapon_t (database_entry, row, is_from_database));
+        var new_weapon = new Weapon_t (database_entry, row, is_from_database)
+        var len = m_arr.push(new_weapon);
         Add_Weapon_To_Recalc_Func(len - 1);
         chardata.inventory.weight.Add_Item(row.name, database_entry.weight, database_entry.name, count = 1);
+        layers.face.block_inventory.weapons.Add(new_weapon);
         return true;
     }
 
@@ -299,6 +301,7 @@ function Weapon_Collection_t(){
         Remove_Weapon_From_Recalc_Func(table_row);
         chardata.inventory.weight.Remove_Item(m_arr[table_row].row.name);
         m_arr.splice(table_row, 1);
+        layers.face.block_inventory.weapons.Remove(table_row);
     }
     
     this.Set_Crystal = function(table_row, entry){

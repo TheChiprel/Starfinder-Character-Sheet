@@ -80,13 +80,148 @@ function Block_Face_Stats_t(){
 
 //private properties
     var self = this;
-    
 
 //public properties
     this.abiscores = new Block_Face_Abiscores_t();
     this.skills = new Block_Face_Skills_t();
 
 //additional initialization
+}
+
+function Block_Face_Weapons(){
+//constants
+    const COLSPAN_VALUE = 5;
+    const ROWS_PER_ENTRY = 7;
+    
+//private methods
+    var Init = function(){
+        while (m_table.rows.length > 0){
+            m_table.deleteRow(0);
+        }
+    }
+
+//public methods
+    this.Add = function(weapon_obj){
+        m_arr.push(weapon_obj);
+        
+        let row_name = m_table.insertRow(m_table.rows.length);
+        var cell_name = document.createElement('th');
+        cell_name.innerHTML = weapon_obj.entry.name;
+        cell_name.colSpan = COLSPAN_VALUE;
+        row_name.appendChild(cell_name);
+            
+        let row_headers =  m_table.insertRow(m_table.rows.length);
+        let cell_mod_header = row_headers.insertCell(row_headers.cells.length);
+        cell_mod_header.innerHTML = "Мод.";
+        let cell_dmg_header = row_headers.insertCell(row_headers.cells.length);
+        cell_dmg_header.innerHTML = "Урон";
+        let cell_dist_header = row_headers.insertCell(row_headers.cells.length);
+        cell_dist_header.innerHTML = "Дист.";
+        let cell_usage_header = row_headers.insertCell(row_headers.cells.length);
+        cell_usage_header.innerHTML = "Расход";
+        let cell_capacity_header = row_headers.insertCell(row_headers.cells.length);
+        cell_capacity_header.innerHTML = "Ёмкость";
+        
+        let row_stats = m_table.insertRow(m_table.rows.length);
+        let cell_mod = row_stats.insertCell(row_stats.cells.length);
+        var mod_outfield = HTML_Create_Output(
+            GetModifierStr(weapon_obj.hit_mod),
+            weapon_obj.Show_Hit_Detail_Popup,
+            undefined,
+            "class_output_field"
+        );
+        cell_mod.appendChild(mod_outfield);
+        
+        let cell_dmg = row_stats.insertCell(row_stats.cells.length);
+        var dmg_outfield = HTML_Create_Output(
+            GetModifierStr(weapon_obj.damage),
+            weapon_obj.Show_Damage_Detail_Popup,
+            undefined,
+            "class_output_field"
+        );
+        cell_dmg.appendChild(dmg_outfield);
+        
+        let cell_dist = row_stats.insertCell(row_stats.cells.length);
+        if (weapon_obj.entry.dist == null){
+            cell_dist.innerHTML = "---";
+        }else{
+            cell_dist.innerHTML = weapon_obj.entry.dist;
+        }
+        let cell_usage = row_stats.insertCell(row_stats.cells.length);
+        if (weapon_obj.entry.usage == null){
+            cell_usage.innerHTML = "---";
+        }else{
+            cell_usage.innerHTML = weapon_obj.entry.usage;
+        }
+        
+        let cell_capacity = row_stats.insertCell(row_stats.cells.length);
+        if (weapon_obj.entry.capacity == null){
+            cell_capacity.innerHTML = "---";
+        }else{
+            cell_capacity.innerHTML = weapon_obj.entry.capacity;
+        }
+        
+        let row_fusions = m_table.insertRow(m_table.rows.length);
+        let cell_fusions = row_fusions.insertCell(row_fusions.cells.length);
+        cell_fusions.colSpan = COLSPAN_VALUE;
+        if (true){ //TODO: fusions
+            cell_fusions.innerHTML = "&nbsp;"
+            row_fusions.style.display = "none";
+        }else{
+            //TODO
+        }
+        
+        let row_crits = m_table.insertRow(m_table.rows.length);
+        let cell_crits = row_crits.insertCell(row_crits.cells.length);
+        cell_crits.colSpan = COLSPAN_VALUE;
+        if (weapon_obj.entry.crit_effect == null){
+            cell_crits.innerHTML = "&nbsp;"
+            row_crits.style.display = "none";
+        }else{
+            cell_crits.innerHTML = "Крит. эффект: " + weapon_obj.entry.crit_effect;
+        }
+        
+        let row_special = m_table.insertRow(m_table.rows.length);
+        let cell_special = row_special.insertCell(row_special.cells.length);
+        cell_special.colSpan = COLSPAN_VALUE;
+        if (weapon_obj.entry.special == null){
+            cell_special.innerHTML = "&nbsp;"
+            row_special.style.display = "none";
+        }else{
+            cell_special.innerHTML = "Особые свойства: " + weapon_obj.entry.special;
+        }
+        
+        let row_additional = m_table.insertRow(m_table.rows.length);
+        let cell_additional = row_additional.insertCell(row_additional.cells.length);
+        cell_additional.colSpan = COLSPAN_VALUE;
+        if (weapon_obj.entry.additional_info == null){
+            cell_additional.innerHTML = "&nbsp;"
+            row_additional.style.display = "none";
+        }else{
+            cell_additional.innerHTML = "Дополнительно: " + weapon_obj.entry.additional_info;
+        }
+    }
+    
+    this.Remove = function(row){
+        let start_table_row = ROWS_PER_ENTRY * row
+        for (let i = 0; i < ROWS_PER_ENTRY; i++){
+            m_table.deleteRow(start_table_row);
+        }
+    }
+    
+    this.Update = function(row){
+        //TODO: update by class
+    }
+
+//private properties
+    var self = this;
+    var m_table = document.getElementById("table_face_weapons");
+    var m_arr = new Array(0);
+
+//public properties
+
+//additional initialization
+    Init();
 }
 
 function Block_Face_Inventory_t(){
@@ -98,6 +233,8 @@ function Block_Face_Inventory_t(){
     var self = this;
 
 //public properties
+    this.weapons = new Block_Face_Weapons();
+    this.equipment = null; //TODO
 
 //additional initialization
 }
@@ -271,7 +408,7 @@ function Layer_Face_t(){
 
 //public properties
     this.block_stats = new Block_Face_Stats_t();
-    this.block_inventory = null;
+    this.block_inventory = new Block_Face_Inventory_t();
     this.block_abilities = new Block_Face_Abilities_t();
     this.block_spells = new Block_Face_Spells_t();
 }
