@@ -589,6 +589,12 @@ const ID_PREFIX = "grenade_";
 
 function Armor_t(){
 //private methods
+    var Update = function(){
+        if (m_update_func != null){
+            m_update_func();
+        }
+    }
+
     var Clean_Prof_Recalc_Functions = function(){
         let armor_type = self.Get_Armor_Type();
         if (armor_type != ARMOR_TYPES.NONE){
@@ -666,6 +672,7 @@ function Armor_t(){
         chardata.inventory.weight.Add_Item("armor_upgr_" + entry.name, entry.weight, entry.name);
 
         Recalc_Armor_Upgr_Slots_Cur();
+        Update();
     }
 
     this.Remove_Armor_Upgr = function(row){
@@ -673,6 +680,7 @@ function Armor_t(){
         self.upgrades.splice(row, 1);
 
         Recalc_Armor_Upgr_Slots_Cur();
+        Update();
     }
 
     this.Open_Descr_Tooltip = function(in_name){
@@ -683,6 +691,30 @@ function Armor_t(){
                 return;
             }
         }
+    }
+    
+    this.Get_Equip_List = function(){
+        let item_list = new Array(0);
+        
+        self.upgrades.forEach(item => {
+            if ((item != null) && (item.name != "")){
+                let str = item.name;
+                item_list.push({
+                    name: str,
+                    descr_func: self.Open_Descr_Tooltip.bind(null, item.name)
+                });
+            }
+        });
+        
+        if (item_list.length == 0){
+            return null;
+        }
+        
+        item_list.unshift({
+            name: "Улучшения брони",
+            descr_func: null
+        });
+        return item_list;
     }
 
     this.Get_SaveData_Obj = function(){
@@ -704,14 +736,22 @@ function Armor_t(){
 
 //private properties
     var self = this;
+    var m_update_func = null;
 
 //public properties
     this.entry = null;
     this.upgrades = new Array(0);   //for now it is collection of entries
+    
+//additional initialization
+    m_update_func = combined_collections.equipment.Add("ArmorUpgr", self);
 }
 
 function Augment_t(database_entry){
 //public methods
+    this.Show_Descr = function(){
+        Popup_Descr.Call(self.entry.name, self.entry.descr);
+    }
+    
     this.Get_SaveData_Obj = function(){
         var ret = {
             name: self.entry.name
@@ -727,21 +767,54 @@ function Augment_t(database_entry){
 }
 
 function Augment_Collection_t(){
+//private methods
+    var Update = function(){
+        if (m_update_func != null){
+            m_update_func();
+        }
+    }
+    
 //public methods
     this.Add = function(database_entry){
         var len = m_arr.push(new Augment_t (database_entry));
+        Update();
         return true;
     }
 
     this.Remove = function(table_row){
         m_arr.splice(table_row, 1);
+        Update();
+    }
+    
+    this.Get_Equip_List = function(){
+        let item_list = new Array(0);
+        
+        m_arr.forEach(item => {
+            if ((item != null) && (item.entry.name != "")){
+                let str = item.entry.name;
+                item_list.push({
+                    name: str,
+                    descr_func: item.Show_Descr
+                });
+            }
+        });
+        
+        if (item_list.length == 0){
+            return null;
+        }
+        
+        item_list.unshift({
+            name: "Аугментации",
+            descr_func: null
+        });
+        return item_list;
     }
 
     this.Open_Descr_Tooltip = function(in_name){
         for (let i = 0; i < m_arr.length; i++){
             var augment = m_arr[i];
             if (augment.entry.name == in_name){
-                Popup_Descr.Call(in_name, augment.entry.descr);
+                m_arr[i].Show_Descr();
                 return;
             }
         }
@@ -756,11 +829,20 @@ function Augment_Collection_t(){
     }
 
 //private properties
+    var self = this;
     var m_arr = new Array(0);
+    var m_update_func = null;
+    
+//additional initialization
+    m_update_func = combined_collections.equipment.Add("augments", self);
 }
 
 function Equipment_t(entry, in_count = 1){
 //public methods
+    this.Show_Descr = function(){
+        Popup_Descr.Call(self.entry.name, self.entry.descr);
+    }
+
     this.Get_SaveData_Obj = function(){
         var ret = {
             name: self.entry.name,
@@ -781,6 +863,13 @@ function Equipment_Collection_t(){
 //constants
 const ID_PREFIX = "item_";
 
+//private methods
+    var Update = function(){
+        if (m_update_func != null){
+            m_update_func();
+        }
+    }
+
 //public methods
     this.Add = function(entry, in_count = 1){
         m_arr.push(new Equipment_t(entry, in_count));
@@ -789,27 +878,57 @@ const ID_PREFIX = "item_";
             entry.weight,
             entry.name,
             in_count);
+        Update();
     }
 
     this.Remove = function(num){
         chardata.inventory.weight.Remove_Item(ID_PREFIX + m_arr[num].entry.name);
         m_arr.splice(num, 1);
+        Update();
     }
 
     this.Change_Count = function(num, value){
         let cur_item = m_arr[num];
         cur_item.count = value;
         chardata.inventory.weight.Change_Count(ID_PREFIX + cur_item.entry.name, value);
+        Update();
     }
 
     this.Open_Descr_Tooltip = function(in_name){
         for (let i = 0; i < m_arr.length; i++){
             var equipment_item = m_arr[i];
             if (equipment_item.entry.name == in_name){
-                Popup_Descr.Call(in_name, equipment_item.entry.descr);
+                equipment_item.Show_Descr();
                 return;
             }
         }
+    }
+    
+    this.Get_Equip_List = function(){
+        let item_list = new Array(0);
+        
+        m_arr.forEach(item => {
+            if ((item != null) && (item.entry.name != "")){
+                let str = item.entry.name;
+                if (item.count != 1){
+                    str += " x" + item.count;
+                }
+                item_list.push({
+                    name: str,
+                    descr_func: item.Show_Descr
+                });
+            }
+        });
+        
+        if (item_list.length == 0){
+            return null;
+        }
+        
+        item_list.unshift({
+            name: "Снаряжение",
+            descr_func: null
+        });
+        return item_list;
     }
 
     this.Get_SaveData_Obj = function(){
@@ -823,6 +942,10 @@ const ID_PREFIX = "item_";
 //private properties
     var self = this;
     var m_arr = new Array(0);
+    var m_update_func = null;
+    
+//additional initialization
+    m_update_func = combined_collections.equipment.Add("equipment", self);
 }
 
 function Ammo_t(id, in_count, entry){
@@ -848,21 +971,56 @@ function Ammo_Collection_t(){
 //constants
 const ID_PREFIX = "ammo_";
 
+//private methods
+    var Update = function(){
+        if (m_update_func != null){
+            m_update_func();
+        }
+    }
+
 //public methods
     this.Add = function(id, in_count, entry){
         let new_id = ID_PREFIX + id
         m_arr.push(new Ammo_t(new_id, in_count, entry));
         chardata.inventory.weight.Add_Item(new_id, entry.weight, entry.name);
+        Update();
     }
 
     this.Remove = function(num){
         chardata.inventory.weight.Remove_Item(m_arr[num].id);
         m_arr.splice(num, 1);
+        Update();
     }
 
     this.Change_Count = function(num, value){
         let cur_ammo = m_arr[num];
         cur_ammo.count = value;
+        Update();
+    }
+    
+    this.Get_Equip_List = function(){
+        let item_list = new Array(0);
+        
+        m_arr.forEach(item => {
+            if ((item != null) && (item.entry.name != "")){
+                let str = item.entry.name;
+                str += " (" + item.count + "/" + item.entry.capacity + ")";
+                item_list.push({
+                    name: str,
+                    descr_func: null
+                });
+            }
+        });
+        
+        if (item_list.length == 0){
+            return null;
+        }
+        
+        item_list.unshift({
+            name: "Боеприпасы",
+            descr_func: null
+        });
+        return item_list;
     }
 
     this.Get_SaveData_Obj = function(){
@@ -876,10 +1034,18 @@ const ID_PREFIX = "ammo_";
 //private properties
     var self = this;
     var m_arr = new Array(0);
+    var m_update_func = null;
+    
+//additional initialization
+    m_update_func = combined_collections.equipment.Add("ammo", self);
 }
 
 function Custom_Item_t(id, name, descr, weight, count){
 //public methods
+    this.Show_Descr = function(){
+        Popup_Descr.Call(self.name, self.descr);
+    }
+
     this.Get_SaveData_Obj = function(){
         var ret = {
             name: self.name,
@@ -902,21 +1068,31 @@ function Custom_Item_t(id, name, descr, weight, count){
 }
 
 function Custom_Item_Collection_t(){
+//private methods
+    var Update = function(){
+        if (m_update_func != null){
+            m_update_func();
+        }
+    }
+    
 //public methods
     this.Add = function(id, name = "", descr = "", weight = "", count = 1){
         m_arr.push(new Custom_Item_t(id, name, descr, weight, count));
         chardata.inventory.weight.Add_Item(id, 0, "");
+        Update();
     }
 
     this.Remove = function(num){
         chardata.inventory.weight.Remove_Item(m_arr[num].id);
         m_arr.splice(num, 1);
+        Update();
     }
 
     this.Change_Name = function(num, value){
         let cur_item = m_arr[num];
         cur_item.name = value;
         chardata.inventory.weight.Change_Name(cur_item.id, value);
+        Update();
     }
 
     this.Change_Descr = function(num, value){
@@ -927,6 +1103,34 @@ function Custom_Item_Collection_t(){
         let cur_item = m_arr[num];
         cur_item.count = value;
         chardata.inventory.weight.Change_Count(cur_item.id, value);
+        Update();
+    }
+    
+    this.Get_Equip_List = function(){
+        let item_list = new Array(0);
+        
+        m_arr.forEach(item => {
+            if ((item != null) && (item.name != "")){
+                let str = item.name;
+                if (item.count != 1){
+                    str += " x" + item.count;
+                }
+                item_list.push({
+                    name: str,
+                    descr_func: item.Show_Descr
+                });
+            }
+        });
+        
+        if (item_list.length == 0){
+            return null;
+        }
+        
+        item_list.unshift({
+            name: "Прочее",
+            descr_func: null
+        });
+        return item_list;
     }
 
     this.Change_Weight = function (num, value){
@@ -946,6 +1150,10 @@ function Custom_Item_Collection_t(){
 //private properties
     var self = this;
     var m_arr = new Array(0);
+    var m_update_func = null;
+    
+//additional initialization
+    m_update_func = combined_collections.equipment.Add("other", self);
 }
 
 function Weight_Entry_t(id, weight, name, count){
