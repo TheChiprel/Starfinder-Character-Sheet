@@ -1,4 +1,8 @@
 function Weapon_Block_t(){
+//constants
+    const CLASS_WEAPON_OUTFIELD_PREFIX_HIT_MOD = "class_outfield_weapon_mod_";
+    const CLASS_WEAPON_OUTFIELD_PREFIX_DMG = "class_outfield_weapon_dmg_";
+    
 //private methods
     var Reset = function(){
         m_table.style.display = "none";
@@ -51,6 +55,7 @@ function Weapon_Block_t(){
 
         for (let i = 0; i < 11; i++){
             var cell = row.insertCell(i);
+            var outfield;
             var func;
             switch (i){
                 case 0:
@@ -59,14 +64,22 @@ function Weapon_Block_t(){
 
                 case 1:
                     func = self.Show_Hit_Detail_Popup.bind(null, row.name);
-                    cell.innerHTML = "0";
-                    cell.onclick = func;
+                    outfield = HTML_Create_Output(
+                        0,
+                        func,
+                        undefined,
+                        CLASS_WEAPON_OUTFIELD_PREFIX_HIT_MOD + row_name)
+                    cell.appendChild(outfield);
                     break;
 
                 case 2:
                     func = self.Show_Damage_Detail_Popup.bind(null, row.name);
-                    cell.innerHTML = entry.damage + " " + entry.damage_type;
-                    cell.onclick = func;
+                    outfield = HTML_Create_Output(
+                        entry.damage + " " + entry.damage_type,
+                        func,
+                        undefined,
+                        CLASS_WEAPON_OUTFIELD_PREFIX_DMG + row_name)
+                    cell.appendChild(outfield);
                     break;
 
                 case 3:
@@ -136,7 +149,7 @@ function Weapon_Block_t(){
         }
         m_table.style.display = "block";
 
-        chardata.inventory.weapons.Add(entry, row, is_from_database);
+        chardata.inventory.weapons.Add(entry, row_name, is_from_database);
         return row.name;
     }
     

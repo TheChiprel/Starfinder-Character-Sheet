@@ -1,4 +1,4 @@
-function Weapon_t(database_entry, row, is_from_database = true){
+function Weapon_t(database_entry, id, is_from_database = true){
     const BASIC_HIT_MOD_ID_T = Object.freeze(
         {
             "ATTACK_MOD": 'ATTACK_MOD',
@@ -13,14 +13,24 @@ function Weapon_t(database_entry, row, is_from_database = true){
             "CRYSTAL": 'CRYSTAL'
         }
     );
+    const CLASS_WEAPON_OUTFIELD_PREFIX_HIT_MOD = "class_outfield_weapon_mod_";
+    const CLASS_WEAPON_OUTFIELD_PREFIX_DMG = "class_outfield_weapon_dmg_";
 
 //private methods
     var Set_Hit_Mod_Field_Values = function(){
-        self.row.cells[1].innerHTML = GetModifierStr(self.hit_mod); //TODO: magic!
+        let str = GetModifierStr(self.hit_mod);
+        let elems = document.getElementsByClassName(CLASS_WEAPON_OUTFIELD_PREFIX_HIT_MOD + id);
+        for (let i = 0; i < elems.length; i++){
+            elems[i].value = str;
+        }
     }
 
     var Set_Damage_Field_Values = function(){
-        self.row.cells[2].innerHTML = self.damage; //TODO: magic!
+        let str = self.damage;
+        let elems = document.getElementsByClassName(CLASS_WEAPON_OUTFIELD_PREFIX_DMG + id);
+        for (let i = 0; i < elems.length; i++){
+            elems[i].value = str;
+        }
     }
     
     var Set_Crit_Effect_Field = function(){
@@ -172,12 +182,12 @@ function Weapon_t(database_entry, row, is_from_database = true){
     this.is_melee = false; //will be set lower
     this.hit_mod = 0;
     this.damage = 0;
-    this.row = row;
     this.modifier_hit_map = new Modifier_Map_t(this.Recalc);
     this.damage_map = new Damage_Map_t(this.Recalc);
     this.is_from_database = is_from_database;
     this.crystal = null;
     this.entry = database_entry;
+    this.id = id;
 
 //additional initialization
     //getting weapon type
@@ -254,8 +264,8 @@ function Weapon_Collection_t(){
         var weapon = m_arr[weapon_num];
 
 
-        var recalc_mod = new Recalc_Function_t (weapon.row.name + "_mod", weapon.Recalc_Hit_Mod);
-        var recalc_dmg = new Recalc_Function_t (weapon.row.name + "_dmg", weapon.Recalc_Damage_Mod);
+        var recalc_mod = new Recalc_Function_t (weapon.id + "_mod", weapon.Recalc_Hit_Mod);
+        var recalc_dmg = new Recalc_Function_t (weapon.id + "_dmg", weapon.Recalc_Damage_Mod);
 
         //adding modifier recalc function
         chardata.stats.weapon_proficiency.Add_Recalc_Func(weapon.w_type, recalc_mod);
@@ -272,8 +282,8 @@ function Weapon_Collection_t(){
 
     var Remove_Weapon_From_Recalc_Func = function(weapon_num){
         var weapon = m_arr[weapon_num];
-        var recalc_mod_id = weapon.row.name + "_mod";
-        var recalc_dmg_id = weapon.row.name + "_dmg";
+        var recalc_mod_id = weapon.id + "_mod";
+        var recalc_dmg_id = weapon.id + "_dmg";
 
         //removing modifier recalc function
         chardata.stats.weapon_proficiency.Remove_Recalc_Func(weapon.w_type, recalc_mod_id);
@@ -288,18 +298,18 @@ function Weapon_Collection_t(){
     }
 
 //public methods
-    this.Add = function(database_entry, row, is_from_database){
-        var new_weapon = new Weapon_t (database_entry, row, is_from_database)
+    this.Add = function(database_entry, id, is_from_database){
+        var new_weapon = new Weapon_t (database_entry, id, is_from_database)
         var len = m_arr.push(new_weapon);
         Add_Weapon_To_Recalc_Func(len - 1);
-        chardata.inventory.weight.Add_Item(row.name, database_entry.weight, database_entry.name, count = 1);
+        chardata.inventory.weight.Add_Item(id, database_entry.weight, database_entry.name, count = 1);
         layers.face.block_inventory.weapons.Add(new_weapon);
         return true;
     }
 
     this.Remove = function(table_row){
         Remove_Weapon_From_Recalc_Func(table_row);
-        chardata.inventory.weight.Remove_Item(m_arr[table_row].row.name);
+        chardata.inventory.weight.Remove_Item(m_arr[table_row].id);
         m_arr.splice(table_row, 1);
         layers.face.block_inventory.weapons.Remove(table_row);
     }

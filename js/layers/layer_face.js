@@ -92,6 +92,8 @@ function Block_Face_Weapons(){
 //constants
     const COLSPAN_VALUE = 5;
     const ROWS_PER_ENTRY = 7;
+    const CLASS_WEAPON_OUTFIELD_PREFIX_HIT_MOD = "class_outfield_weapon_mod_";
+    const CLASS_WEAPON_OUTFIELD_PREFIX_DMG = "class_outfield_weapon_dmg_";
     
 //private methods
     var Init = function(){
@@ -128,7 +130,7 @@ function Block_Face_Weapons(){
             GetModifierStr(weapon_obj.hit_mod),
             weapon_obj.Show_Hit_Detail_Popup,
             undefined,
-            "class_output_field"
+            "class_output_field " + CLASS_WEAPON_OUTFIELD_PREFIX_HIT_MOD +weapon_obj.id
         );
         cell_mod.appendChild(mod_outfield);
         
@@ -137,7 +139,7 @@ function Block_Face_Weapons(){
             GetModifierStr(weapon_obj.damage),
             weapon_obj.Show_Damage_Detail_Popup,
             undefined,
-            "class_output_field"
+            "class_output_field " + CLASS_WEAPON_OUTFIELD_PREFIX_DMG +weapon_obj.id
         );
         cell_dmg.appendChild(dmg_outfield);
         
