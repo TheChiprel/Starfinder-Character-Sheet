@@ -173,7 +173,7 @@
                                 Кредиты: <input type="text" class="class_input_credits" value="0"></input>
                             </td>
                             <td style="width:50%">
-                                УПО: <input type="text" class="class_input_epb" value="0"></input>
+                                УПО: <input type="text" class="class_input_upb" value="0"></input>
                             </td>
                         </tr>
                     </table>
@@ -404,8 +404,8 @@
         <div class="class_layer_main" id="layer_inventory">
             <div class="layer_inventory">
                 <div class="layer_inventory_block" id="block_inventory_top" name="block_inventory_top">
-                    Кредиты: <input type="text" id="inventory_credits" value="0" class="class_input_credits" onchange="layers.inventory.resourses_block.Set_Credits(Number(event.target.value))"></input>
-                    УПО: <input type="text" id="inventory_UPB" value="0" class="class_input_epb" onchange="layers.inventory.resourses_block.Set_UPB(Number(event.target.value))"></input><br>
+                    Кредиты: <input type="text" id="inventory_credits" value="0" class="class_input_credits"></input>
+                    УПО: <input type="text" id="inventory_UPB" value="0" class="class_input_upb"></input><br/>
                     Текущий вес: <output class="class_output_field" name="outfield_weight_current" form="textarea" id="outfield_weight_current" onclick="chardata.inventory.weight.Show_Curr_Detail_Popup()">0</output><br>
                     Вес до нагрузки: <output class="class_output_field" name="outfield_weight_encumbered" form="textarea" id="outfield_weight_encumbered" onclick="chardata.inventory.weight.Show_Encumbered_Detail_Popup()">5</output><br>
                     Вес до перегрузки: <output class="class_output_field" name="outfield_weight_overburdened" form="textarea" id="outfield_weight_overburdened" onclick="chardata.inventory.weight.Show_Overburdened_Detail_Popup()">10</output><br>

@@ -1364,35 +1364,89 @@ function Weight_t(){
 }
 
 function Credits_t (){
+//constants
+    const CLASS_INFIELD = "class_input_credits";
+    
 //private methods
+    var Init = function(){
+        let elems = document.getElementsByClassName(CLASS_INFIELD);
+        for (let i = 0; i < elems.length; i++){
+            elems[i].onchange = self.Set;
+        }
+        Set_Field_Values();
+    }
+    
+    var Set_Field_Values = function(){
+        let elems = document.getElementsByClassName(CLASS_INFIELD);
+        for (let i = 0; i < elems.length; i++){
+            elems[i].value = self.count;
+        }
+    }
 
 //public methods
-    this.Set = function(value){
-        this.count = value;
+    this.Set = function(event){
+        if(isNaN(event.target.value)){
+            event.target.value = self.count;
+        }else{
+            let new_value = parseInt(event.target.value);
+            if (self.count != new_value){
+                
+                self.count = new_value;
+                Set_Field_Values();
+            }
+        }
     }
 
     this.ChangeBy = function(value){
-        this.count -= value;
-        if (this.count < 0){
-            this.count = 0;
+        self.count -= value;
+        if (self.count < 0){
+            self.count = 0;
         }
         /* else NOTHING TO DO */
     }
 
 //private properties
+    var self = this;
 
 //public properties
     this.count = 0;
 
 //additional initialization
+    Init();
 }
 
 function Upb_t (){
+//constants
+    const CLASS_INFIELD = "class_input_upb";
+    
 //private methods
+    var Init = function(){
+        let elems = document.getElementsByClassName(CLASS_INFIELD);
+        for (let i = 0; i < elems.length; i++){
+            elems[i].onchange = self.Set;
+        }
+        Set_Field_Values();
+    }
+    
+    var Set_Field_Values = function(){
+        let elems = document.getElementsByClassName(CLASS_INFIELD);
+        for (let i = 0; i < elems.length; i++){
+            elems[i].value = self.count;
+        }
+    }
 
 //public methods
-    this.Set = function(value){
-        this.count = value;
+    this.Set = function(event){
+        if(isNaN(event.target.value)){
+            event.target.value = self.count;
+        }else{
+            let new_value = parseInt(event.target.value);
+            if (self.count != new_value){
+                
+                self.count = new_value;
+                Set_Field_Values();
+            }
+        }
     }
 
     this.ChangeBy = function(value){
@@ -1404,11 +1458,13 @@ function Upb_t (){
     }
 
 //private properties
+    var self = this;
 
 //public properties
     this.count = 0;
 
 //additional initialization
+    Init();
 }
 
 function Inventory_t (){
