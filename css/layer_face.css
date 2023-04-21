@@ -18,6 +18,8 @@
 
 #table_face_weapons{
     text-align: left;
+    border: 1px solid #ccc;
+    border-collapse: collapse;
 }
 
 #table_face_abilities {

@@ -19,6 +19,7 @@
 
 .table_inventory {
     display: none;
+    border-collapse: collapse;
 }
 
 .table_inventory td, .table_inventory th {

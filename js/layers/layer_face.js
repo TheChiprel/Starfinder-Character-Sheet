@@ -107,12 +107,16 @@ function Block_Face_Weapons(){
         m_arr.push(weapon_obj);
         
         let row_name = m_table.insertRow(m_table.rows.length);
+        if (m_table.rows.length != 1){
+            row_name.style.borderTop = "2px solid #ccc";
+        }
         var cell_name = document.createElement('th');
         cell_name.innerHTML = weapon_obj.entry.name;
         cell_name.colSpan = COLSPAN_VALUE;
         row_name.appendChild(cell_name);
             
         let row_headers =  m_table.insertRow(m_table.rows.length);
+        row_headers.style.textAlign = "center";
         let cell_mod_header = row_headers.insertCell(row_headers.cells.length);
         cell_mod_header.innerHTML = "Мод.";
         let cell_dmg_header = row_headers.insertCell(row_headers.cells.length);
@@ -125,6 +129,7 @@ function Block_Face_Weapons(){
         cell_capacity_header.innerHTML = "Ёмкость";
         
         let row_stats = m_table.insertRow(m_table.rows.length);
+        row_stats.style.textAlign = "center";
         let cell_mod = row_stats.insertCell(row_stats.cells.length);
         var mod_outfield = HTML_Create_Output(
             GetModifierStr(weapon_obj.hit_mod),
@@ -180,7 +185,7 @@ function Block_Face_Weapons(){
             cell_crits.innerHTML = "&nbsp;"
             row_crits.style.display = "none";
         }else{
-            cell_crits.innerHTML = "Крит. эффект: " + weapon_obj.entry.crit_effect;
+            cell_crits.innerHTML = "<b>Крит. эффект:</b> " + weapon_obj.entry.crit_effect;
         }
         
         let row_special = m_table.insertRow(m_table.rows.length);
@@ -190,7 +195,7 @@ function Block_Face_Weapons(){
             cell_special.innerHTML = "&nbsp;"
             row_special.style.display = "none";
         }else{
-            cell_special.innerHTML = "Особые свойства: " + weapon_obj.entry.special;
+            cell_special.innerHTML = "<b>Особые свойства:</b> " + weapon_obj.entry.special;
         }
         
         let row_additional = m_table.insertRow(m_table.rows.length);
@@ -200,7 +205,7 @@ function Block_Face_Weapons(){
             cell_additional.innerHTML = "&nbsp;"
             row_additional.style.display = "none";
         }else{
-            cell_additional.innerHTML = "Дополнительно: " + weapon_obj.entry.additional_info;
+            cell_additional.innerHTML = "<b>Дополнительно:</b> " + weapon_obj.entry.additional_info;
         }
     }
     
