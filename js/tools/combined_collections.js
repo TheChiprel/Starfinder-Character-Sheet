@@ -42,6 +42,7 @@ function CS_Combined_Collections(){
     this.Reset = function(){
         self.abilities = new Combined_Collection_t();
         self.spells = new Combined_Collection_t();
+        self.equipment = new Combined_Collection_t();
     }
 
 //private properties

@@ -231,6 +231,61 @@ function Block_Face_Weapons(){
     Init();
 }
 
+function Block_Face_Equipment(){
+    //private methods
+    var Clear_Table = function(){
+        while (m_table.rows.length > 0){
+            m_table.deleteRow(0);
+        }
+    }
+    
+    var Init = function(){
+        Clear_Table();
+        m_table.insertRow(m_table.rows.length).insertCell(0).innerHTML = "У вашего персонажа нет снаряжения";
+        combined_collections.equipment.Set_Update_Function(self.Update);
+    }
+
+//public methods
+    this.Update = function(){
+        let equip_map = combined_collections.equipment.Get_Map();
+        Clear_Table();
+        equip_map.forEach((collection, key) => {
+            let equipment = collection.Get_Equip_List();
+            if (equipment != null){
+                for (let i = 0; i < equipment.length; i++){
+                    let row = m_table.insertRow(m_table.rows.length);
+                    var cell;
+                    if (i == 0){
+                        cell = document.createElement('th');
+                        row.appendChild(cell);
+                    }else{
+                        cell = row.insertCell(0);
+                    }
+                    cell.innerHTML = equipment[i].name;
+                    
+                    if (equipment[i].descr_func != null){
+                        cell.onclick = equipment[i].descr_func;
+                    }
+                }
+                m_table.insertRow(m_table.rows.length).insertCell(0).innerHTML = "&nbsp;";
+            }
+        });
+        if (m_table.rows.length == 0){
+            m_table.insertRow(m_table.rows.length).insertCell(0).innerHTML = "У вашего персонажа нет снаряжения";
+        }
+    }
+
+//private properties
+    var self = this;
+    var m_map = new Map();
+    var m_table = document.getElementById("table_face_equipment");
+
+//public properties
+
+//additional initialization
+    Init();
+}
+
 function Block_Face_Inventory_t(){
 //private methods
 
@@ -241,7 +296,7 @@ function Block_Face_Inventory_t(){
 
 //public properties
     this.weapons = new Block_Face_Weapons();
-    this.equipment = null; //TODO
+    this.equipment = new Block_Face_Equipment();
 
 //additional initialization
 }

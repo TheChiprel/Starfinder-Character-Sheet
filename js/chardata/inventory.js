@@ -394,6 +394,14 @@ const BASIC_MOD_ID_T = Object.freeze(
         }
         return ret;
     }
+    
+    this.Show_Descr = function(){
+        let text = self.entry.special;
+        if (self.entry.additional_info != null){
+            text += ".\n" + self.entry.additional_info;
+        }
+        Popup_Descr.Call(self.entry.name, text);
+    }
 
 //private properties
     var self = this;
@@ -433,6 +441,25 @@ const ID_PREFIX = "grenade_";
     );
 
 //private methods
+    var Init = function(){
+        Set_Throw_Field_Values();
+
+        self.throw_modifier_map.Add(
+            BASIC_MOD_ID_T.ATTACK_MOD,
+            new Modifier_t(0, "Модификатор атаки", WEAPON_MODIFIER.THROWN));
+        self.throw_modifier_map.Add(
+            BASIC_MOD_ID_T.PROF,
+            new Modifier_t(-4, "Отсутствие владения типом оружия", WEAPON_TYPES.GRENADE));
+
+        m_update_func = combined_collections.equipment.Add("grenades", self);
+    }
+
+    var Update = function(){
+        if (m_update_func != null){
+            m_update_func();
+        }
+    }
+
     var Set_Throw_Field_Values = function(){
         outfield_throw_mod.innerHTML = GetModifierStr(self.throw_mod);
     }
@@ -462,24 +489,56 @@ const ID_PREFIX = "grenade_";
             database_entry.weight,
             database_entry.name,
             in_count);
+        Update();
         return true;
     }
 
     this.Remove = function(table_row){
         chardata.inventory.weight.Remove_Item(ID_PREFIX + m_arr[table_row].row.name);
         m_arr.splice(table_row, 1);
+        Update();
     }
 
     this.Change_Count = function(num, value){
         let cur_grenade = m_arr[num];
         cur_grenade.count = value;
         chardata.inventory.weight.Change_Count(ID_PREFIX + cur_grenade.row.name, value);
+        Update();
+    }
+    
+    this.Get_Equip_List = function(){
+        let item_list = new Array(0);
+        
+        m_arr.forEach(item => {
+            if ((item != null) && (item.entry.name != "")){
+                let str = item.entry.name;
+                if (item.count != 1){
+                    str += " x" + item.count;
+                }
+                str += " (СЛ: " + item.dc + ")";
+                item_list.push({
+                    name: str,
+                    descr_func: item.Show_Descr
+                });
+            }
+        });
+        
+        if (item_list.length == 0){
+            return null;
+        }
+        
+        item_list.unshift({
+            name: "Гранаты (Мод. броска: " + GetModifierStr(self.throw_mod) + ")",
+            descr_func: self.Show_Throw_Mod_Detail_Popup
+        });
+        return item_list;
     }
 
     this.Recalc_All_DC = function(){
         m_arr.forEach(grenade => {
             grenade.Recalc_DC();
         });
+        Update();
     }
 
     this.Recalc_Throw_Mod = function(){
@@ -501,12 +560,7 @@ const ID_PREFIX = "grenade_";
     }
     
     this.Open_Descr_Tooltip = function(row){
-        let grenade = m_arr[row];
-        let text = grenade.entry.special;
-        if (grenade.entry.additional_info != null){
-            text += ".\n" + grenade.entry.additional_info;
-        }
-        Popup_Descr.Call(grenade.entry.name, text);
+        m_arr[row].Show_Descr();
     }
 
     this.Get_SaveData_Obj = function(){
@@ -521,6 +575,7 @@ const ID_PREFIX = "grenade_";
     var self = this;
     var outfield_throw_mod = document.getElementById("outfield_grenade_mod");
     var m_arr = new Array(0);
+    var m_update_func = null;
     /* var m_throw_mod_map; */
 
 //public properties
@@ -529,15 +584,7 @@ const ID_PREFIX = "grenade_";
     /* this.throw_mod_other = new Other_Mod_Collection_t (); */
 
 //additional initialization
-    Set_Throw_Field_Values();
-
-    this.throw_modifier_map.Add(
-        BASIC_MOD_ID_T.ATTACK_MOD,
-        new Modifier_t(0, "Модификатор атаки", WEAPON_MODIFIER.THROWN));
-    this.throw_modifier_map.Add(
-        BASIC_MOD_ID_T.PROF,
-        new Modifier_t(-4, "Отсутствие владения типом оружия", WEAPON_TYPES.GRENADE));
-
+    Init();
 }
 
 function Armor_t(){
