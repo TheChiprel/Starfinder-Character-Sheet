@@ -102,19 +102,6 @@ function Health_t () {
     }
 
     var Update_Mod_Map = function(){
-        //updating race modifier
-        if (chardata.race != null){
-            self.modifier_map.Change_Value(
-                BASIC_MOD_ID_T.RACE,
-                chardata.race.hp);
-            self.modifier_map.Change_Substring(BASIC_MOD_ID_T.RACE, chardata.race.name);
-        }else{
-            self.modifier_map.Change_Value(
-                BASIC_MOD_ID_T.RACE,
-                chardata.stats.abiscores.modifiers.Get_Sum(ABISCORES.AGI));
-            self.modifier_map.Change_Substring(BASIC_MOD_ID_T.RACE, "Нет");
-        }
-
         //updating class modifier
         chardata.classes.class_map.forEach((class_obj, class_name) => {
             let class_id = CLASS_ID_PREFIX + class_name;
@@ -123,6 +110,19 @@ function Health_t () {
     }
 
 //public methods
+    this.Set_Race_Mod = function(race_name, value){
+        self.modifier_map.Change_Value(
+            BASIC_MOD_ID_T.RACE,
+            value);
+            
+        if (race_name == null){
+            self.modifier_map.Change_Substring(BASIC_MOD_ID_T.RACE, "Нет");
+        }else{
+            self.modifier_map.Change_Substring(BASIC_MOD_ID_T.RACE, race_name);
+        }
+        self.Recalc();
+    }
+
     this.Recalc = function (){
         Update_Mod_Map();
 

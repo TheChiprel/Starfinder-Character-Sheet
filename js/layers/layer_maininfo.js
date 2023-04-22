@@ -132,50 +132,18 @@ function Layer_MainInfo_t(){
     }
 
     this.Set_Race = function(race_name, update_field = false){
-        let outfield_race = document.getElementById("selector_race");
-        let out_size = document.getElementById("outfield_size");
-        let out_type = document.getElementById("outfield_race_type");
-
-        let new_race_value = race_name;
-        let new_race_stats = [0, 0, 0, 0, 0, 0];
-        let new_race_base_speed = 0;
-        let is_abiscore_any = false;
-
-        if ((new_race_value == "---") || (new_race_value == null)){
-            out_size.value = "---";
-            out_type.value = "---";
-            chardata.race = null;
-            new_race_value = null;
-
-            if (update_field){
-                outfield_race.value = "---";
-            }
-            //else NOTHING TO DO
-        }else{
+        var entry = null;
+        if ((race_name != "---") && (race_name != null)){
             for (let i = 0; i < RACE_DATABASE.length; i++){
-                let cur_race_entry = RACE_DATABASE[i];
-                if (cur_race_entry.name == new_race_value){
-                    out_size.value = cur_race_entry.size;
-                    out_type.value = cur_race_entry.type;
-                    chardata.race = cur_race_entry;
-                    new_race_stats = cur_race_entry.abiscores;
-                    new_race_base_speed = cur_race_entry.speed;
-                    is_abiscore_any = cur_race_entry.plus2;
-                    chardata.abilities.race.Set_Abilities(cur_race_entry.name, cur_race_entry.abilities);
-                    if (update_field){
-                        outfield_race.value = new_race_value;
-                    }
-                    //else NOTHING TO DO
+                if (RACE_DATABASE[i].name == race_name){
+                    entry = RACE_DATABASE[i];
                     break;
                 }
                 //else NOTHING TO DO
             }
         }
         //else NOTHING TO DO
-
-        chardata.stats.abiscores.values.SetRaceValues(new_race_stats, is_abiscore_any);
-        chardata.stats.speeds.land.Set_Base_Value(new_race_base_speed, new_race_value);
-        chardata.stats.hp.Recalc();//TODO: set to mod instead!
+        chardata.race.Set(entry);
     }
 
     this.Set_Theme = function(theme_name, update_field = false){
