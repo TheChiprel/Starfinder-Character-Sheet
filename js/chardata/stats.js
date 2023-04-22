@@ -130,6 +130,7 @@ function Health_t () {
         if (new_sum != self.sum){
             self.sum = new_sum;
             Set_Field_Values();
+            self.arr_recalc_functions.Call();
         }
     }
 
@@ -147,6 +148,7 @@ function Health_t () {
 //public properties
     this.sum = 0;
     this.modifier_map = new Modifier_Map_t(this.Recalc);
+    this.arr_recalc_functions = new Recalc_Function_Collection_t();
 
 //additional initialization
     Init();
@@ -210,6 +212,7 @@ function Stamina_t () {
         if (new_sum != self.sum){
             self.sum = new_sum;
             Set_Field_Values();
+            self.arr_recalc_functions.Call();
         }
     }
 
@@ -227,6 +230,7 @@ function Stamina_t () {
 //public properties
     this.sum = 0;
     this.modifier_map = new Modifier_Map_t(this.Recalc);
+    this.arr_recalc_functions = new Recalc_Function_Collection_t();
 
 //additional initialization
     Init();
@@ -311,6 +315,7 @@ function Resolve_t () {
         if (new_sum != self.sum){
             self.sum = new_sum;
             Set_Field_Values();
+            self.arr_recalc_functions.Call();
         }
     }
 
@@ -333,6 +338,7 @@ function Resolve_t () {
 //public properties
     this.sum = 0;
     this.modifier_map = new Modifier_Map_t(this.Recalc);
+    this.arr_recalc_functions = new Recalc_Function_Collection_t();
 
 //additional initialization
     Init();
@@ -1212,9 +1218,39 @@ function Init_Callbacks_Defense(){
         new Recalc_Function_t ('against_maneuver', chardata.stats.defense.against_maneuver.Recalc));
 }
 
+function Init_Callbacks_Max_States(){
+    //max hp-> current hp
+    chardata.current_state.hp.Set_Max_Value_Obj(chardata.stats.hp);
+    chardata.stats.hp.arr_recalc_functions.Add(
+        new Recalc_Function_t (
+            'current_hp',
+            chardata.current_state.hp.Update_Max_Value
+        )
+    );
+    
+    //max sp-> current sp
+    chardata.current_state.sp.Set_Max_Value_Obj(chardata.stats.sp);
+    chardata.stats.sp.arr_recalc_functions.Add(
+        new Recalc_Function_t (
+            'current_sp',
+            chardata.current_state.sp.Update_Max_Value
+        )
+    );
+    
+    //max rp-> current rp
+    chardata.current_state.rp.Set_Max_Value_Obj(chardata.stats.rp);
+    chardata.stats.rp.arr_recalc_functions.Add(
+        new Recalc_Function_t (
+            'current_rp',
+            chardata.current_state.rp.Update_Max_Value
+        )
+    );
+}
+
 function Init_Callbacks_Stats(){
     Init_Callbacks_Level();
     Init_Callbacks_Abiscores();
     Init_Callbacks_Attacks();
     Init_Callbacks_Defense();
+    Init_Callbacks_Max_States();
 }

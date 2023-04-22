@@ -1,4 +1,4 @@
-function Numeric_State_t(class_field){
+function Numeric_State_t(class_field, max_value_func){
 //constants
     const CLASS_FIELD = class_field;
     
@@ -28,10 +28,6 @@ function Numeric_State_t(class_field){
     }
 
 //public methods
-    this.Update_Max_Value = function(){
-        
-    }
-
     this.Set_Value = function(new_value){
         if (self.value != new_value){
             if (new_value > self.max_value){
@@ -45,8 +41,38 @@ function Numeric_State_t(class_field){
         }
     }
     
+    
     this.Change_Value = function(diff){
         //TODO
+    }
+    
+    this.Set_Max_Value_Obj = function(obj){
+        m_max_value_obj = obj;
+        self.Update_Max_Value();
+    }
+    
+    this.Update_Max_Value = function(){
+        let prev_value = self.max_value;
+        if (m_max_value_obj == null){
+            return;
+        }
+        
+        self.max_value = m_max_value_obj.sum;
+        if (self.max_value == prev_value){
+            return;
+        }
+        
+        if (self.value > self.max_value){
+            self.value = self.max_value;
+        }else if (self.max_value > prev_value){
+            self.value += (self.max_value - prev_value);
+        }
+        
+        let elems = document.getElementsByClassName(CLASS_FIELD);
+        for (let i = 0; i < elems.length; i++){
+            elems[i].max = self.max_value;
+            elems[i].value = self.value;
+        }
     }
     
     this.Get_SaveData_Obj = function(){
@@ -55,6 +81,7 @@ function Numeric_State_t(class_field){
 
 //private properties
     var self = this;
+    var m_max_value_obj = null;
 
 //public properties
     this.value = 0;
