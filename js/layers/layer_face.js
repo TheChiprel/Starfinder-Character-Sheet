@@ -62,6 +62,31 @@ function Block_Face_Skills_t(){
     }
 
 //public methods
+    this.Clear_Table = function(){
+        //clearing table
+        while (m_table.rows.length > 0){
+            m_table.deleteRow(0);
+        }
+    }
+    
+    this.Add_Skill = function(skill_name, outfield_class){
+        var row = m_table.insertRow(m_table.rows.length);
+            
+        var cell_name = document.createElement('th');
+        cell_name.innerHTML = skill_name;
+        row.appendChild(cell_name);
+
+        let cell_mod = row.insertCell(1);
+        let cell_mod_function = chardata.skills.Show_Detail_Popup.bind(null, skills_arr[i]);
+        var cell_mod_output = HTML_Create_Output(
+            0,
+            undefined,
+            undefined,
+            "class_output_field " + outfield_class
+        );
+        
+        cell_mod.appendChild(cell_mod_output);
+    }
 
 //private properties
     var self = this;

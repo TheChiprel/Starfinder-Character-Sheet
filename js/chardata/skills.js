@@ -9,9 +9,50 @@ function Skill_Data_t (name, abiscore, is_learn_req, has_armor_penalty){
         }
     );
     
+    const INFIELD_POINTS = "class_infield_skill_points_" + name;
     const OUTFIELD_CLASS_NAME = "class_output_skill_" + name;
 
 //private methods
+    var Init = function(){
+        self.modifier_map.Add(
+            BASIC_MOD_ID_T.POINTS,
+            new Modifier_t(0, "Вложено пунктов"));
+        self.modifier_map.Add(
+            BASIC_MOD_ID_T.CLASS,
+            new Modifier_t(0, "Классовый"));
+        self.modifier_map.Add(
+            BASIC_MOD_ID_T.ABISCORE,
+            new Modifier_t(0, self.abiscore));
+        if (self.has_armor_penalty){
+            self.modifier_map.Add(
+                BASIC_MOD_ID_T.ARMOR_PENALTY,
+                new Modifier_t(0, "Штраф брони", "Без брони"));
+        }
+        //else NOTHING TO DO
+        
+        layers.skills.Add_Skill(self.name, INFIELD_POINTS, OUTFIELD_CLASS_NAME);
+        //layers.face.block_stats.skills.Add_Skill(self.name, OUTFIELD_CLASS_NAME);
+        
+        let elems = document.getElementsByClassName(OUTFIELD_CLASS_NAME);
+        for (let i = 0; i < elems.length; i++){
+            elems[i].onclick = self.Show_Detail_Popup;
+        }
+        
+        elems = document.getElementsByClassName(INFIELD_POINTS);
+        for (let i = 0; i < elems.length; i++){
+            elems[i].onchange = Proc_Points_Onchange_Event;
+        }
+    }
+    
+    var Proc_Points_Onchange_Event = function(event){
+        let new_value = event.target.value;
+        if (isNaN(new_value)){
+            event.target.value = self.points;
+            return;
+        }
+        self.Set_Points(parseInt(new_value));
+    }
+
     var Set_Field_Values = function(){
         let elems = document.getElementsByClassName(OUTFIELD_CLASS_NAME);
         for (let i = 0; i < elems.length; i++){
@@ -54,6 +95,11 @@ function Skill_Data_t (name, abiscore, is_learn_req, has_armor_penalty){
             BASIC_MOD_ID_T.POINTS,
             self.points);
         self.Recalc();
+        
+        let elems = document.getElementsByClassName(INFIELD_POINTS);
+        for (let i = 0; i < elems.length; i++){
+            elems[i].value = value;
+        }
     }
 
     this.Set_Armor_Penalty = function (value, source){
@@ -97,21 +143,7 @@ function Skill_Data_t (name, abiscore, is_learn_req, has_armor_penalty){
     this.modifier_map = new Modifier_Map_t(this.Recalc);
 
 //additional initialization
-    this.modifier_map.Add(
-        BASIC_MOD_ID_T.POINTS,
-        new Modifier_t(0, "Вложено пунктов"));
-    this.modifier_map.Add(
-        BASIC_MOD_ID_T.CLASS,
-        new Modifier_t(0, "Классовый"));
-    this.modifier_map.Add(
-        BASIC_MOD_ID_T.ABISCORE,
-        new Modifier_t(0, this.abiscore));
-    if (this.has_armor_penalty){
-        this.modifier_map.Add(
-            BASIC_MOD_ID_T.ARMOR_PENALTY,
-            new Modifier_t(0, "Штраф брони", "Без брони"));
-    }
-    //else NOTHING TO DO
+    Init();
 }
 
 function Skill_Point_t (out_field_total, out_field_spent, out_field_left){
@@ -206,7 +238,35 @@ function Skill_Point_t (out_field_total, out_field_spent, out_field_left){
 
 function Skills_t (){
 //private methods
-    Find_Skill_By_Name = function (skill_name){
+    var Init = function(){
+        layers.skills.Clear_Table();
+        //layers.face.block_stats.skills.Clear_Table(); //TODO
+        
+        self.arr = [
+            new Skill_Data_t(SKILLS.ACROBATICS,         ABISCORES.AGI, false, true  ),
+            new Skill_Data_t(SKILLS.ATHLETICS,          ABISCORES.STR, false, true  ),
+            new Skill_Data_t(SKILLS.LIFE_SCIENCE,       ABISCORES.INT, true,  false ),
+            new Skill_Data_t(SKILLS.BLUFF,              ABISCORES.CHA, false, false ),
+            new Skill_Data_t(SKILLS.PERCEPTION,         ABISCORES.WIS, false, false ),
+            new Skill_Data_t(SKILLS.SURVIVAL,           ABISCORES.WIS, false, false ),
+            new Skill_Data_t(SKILLS.DIPLOMACY,          ABISCORES.CHA, false, false ),
+            new Skill_Data_t(SKILLS.INTIMIDATE,         ABISCORES.CHA, false, false ),
+            new Skill_Data_t(SKILLS.ENGINEERING,        ABISCORES.INT, true,  false ),
+            new Skill_Data_t(SKILLS.COMPUTERS,          ABISCORES.INT, true,  false ),
+            new Skill_Data_t(SKILLS.CULTURE,            ABISCORES.INT, true,  false ),
+            new Skill_Data_t(SKILLS.SLEIGHT_OF_HAND,    ABISCORES.AGI, true,  true  ),
+            new Skill_Data_t(SKILLS.DISGUISE,           ABISCORES.CHA, false, false ),
+            new Skill_Data_t(SKILLS.MEDICINE,           ABISCORES.INT, true,  false ),
+            new Skill_Data_t(SKILLS.MYSTICISM,          ABISCORES.WIS, true,  false ),
+            new Skill_Data_t(SKILLS.PILOTING,           ABISCORES.AGI, false, false ),
+            new Skill_Data_t(SKILLS.SENSE_MOTIVE,       ABISCORES.WIS, false, false ),
+            new Skill_Data_t(SKILLS.STEALTH,            ABISCORES.AGI, false, true  ),
+            new Skill_Data_t(SKILLS.PHYSICAL_SCIENCE,   ABISCORES.INT, true,  false )
+        ];
+    }
+
+
+    var Find_Skill_By_Name = function (skill_name){
         for (let i = 0; i < self.arr.length; i++){
             if (skill_name == self.arr[i].name){
                 return self.arr[i];
@@ -316,36 +376,29 @@ function Skills_t (){
         });
         return Object.fromEntries(ret);
     }
+    
+    this.Load_From_Obj = function(obj){
+        if (obj == undefined){
+            return;
+        }
+        
+        for (const [skill_name, points] of Object.entries(obj)){
+            self.Set_Skill_Points(skill_name, points);
+        };
+    }
 
 //private properties
     var self = this;
 
 //public properties
-    this.arr = [
-        new Skill_Data_t(SKILLS.ACROBATICS,         ABISCORES.AGI, false, true  ),
-        new Skill_Data_t(SKILLS.ATHLETICS,          ABISCORES.STR, false, true  ),
-        new Skill_Data_t(SKILLS.LIFE_SCIENCE,       ABISCORES.INT, true,  false ),
-        new Skill_Data_t(SKILLS.BLUFF,              ABISCORES.CHA, false, false ),
-        new Skill_Data_t(SKILLS.PERCEPTION,         ABISCORES.WIS, false, false ),
-        new Skill_Data_t(SKILLS.SURVIVAL,           ABISCORES.WIS, false, false ),
-        new Skill_Data_t(SKILLS.DIPLOMACY,          ABISCORES.CHA, false, false ),
-        new Skill_Data_t(SKILLS.INTIMIDATE,         ABISCORES.CHA, false, false ),
-        new Skill_Data_t(SKILLS.ENGINEERING,        ABISCORES.INT, true,  false ),
-        new Skill_Data_t(SKILLS.COMPUTERS,          ABISCORES.INT, true,  false ),
-        new Skill_Data_t(SKILLS.CULTURE,            ABISCORES.INT, true,  false ),
-        new Skill_Data_t(SKILLS.SLEIGHT_OF_HAND,    ABISCORES.AGI, true,  true  ),
-        new Skill_Data_t(SKILLS.DISGUISE,           ABISCORES.CHA, false, false ),
-        new Skill_Data_t(SKILLS.MEDICINE,           ABISCORES.INT, true,  false ),
-        new Skill_Data_t(SKILLS.MYSTICISM,          ABISCORES.WIS, true,  false ),
-        new Skill_Data_t(SKILLS.PILOTING,           ABISCORES.AGI, false, false ),
-        new Skill_Data_t(SKILLS.SENSE_MOTIVE,       ABISCORES.WIS, false, false ),
-        new Skill_Data_t(SKILLS.STEALTH,            ABISCORES.AGI, false, true  ),
-        new Skill_Data_t(SKILLS.PHYSICAL_SCIENCE,   ABISCORES.INT, true,  false )
-    ];
+    this.arr;
 
     this.skill_points = new Skill_Point_t (
         (document.getElementById('outfield_skill_points_total')),
         (document.getElementById('outfield_skill_points_spent')),
         (document.getElementById('outfield_skill_points_left'))
     );
+    
+//additional initialization
+    Init();
 }

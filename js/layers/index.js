@@ -83,7 +83,7 @@ function Layers_t (){
 //public properties
     this.maininfo;
     this.abiscores;
-    this.skills;
+    this.skills = new Layer_Skills_t();
     this.inventory;
     this.classes;
     this.abilities;
