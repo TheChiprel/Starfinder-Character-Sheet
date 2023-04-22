@@ -42,7 +42,6 @@ function Chardata_t(){
         self.stats.abiscores.Load_From_Obj(obj.abiscores);
         self.skills.Load_From_Obj(obj.skills);
 
-        //layers.skills.Load_From_Obj(obj.skills);
         layers.maininfo.Load_Classes_From_Obj(obj.classes);
         layers.inventory.Load_From_Obj(obj.inventory);
         layers.abilities.Load_From_Obj(obj.abilities);
