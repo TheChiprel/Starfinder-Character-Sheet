@@ -58,7 +58,7 @@ function Abiscore_Mod_Data_t(name, outfield){
         new Modifier_t(0, "Значение " + self.name));
 }
 
-function Abiscore_Value_Data_t (name, outfield){
+function Abiscore_Value_Data_t (name, cb_table_row){
 //constants
     const BASIC_VALUE_MOD_ID_T = Object.freeze(
         {
@@ -73,8 +73,59 @@ function Abiscore_Value_Data_t (name, outfield){
         }
     );
     const OUTFIELD_CLASS_NAME = "class_output_abiscore_value_" + name;
+    const CHECKBOX_ID_PREFIX = "class_checkbox_abiscore_" + name + "_";
 
 //private methods
+    var Init = function(cb_table_row){
+        Create_Checkboxes(cb_table_row);
+        Set_Field_Value();
+
+        self.mod_map.Add(
+            BASIC_VALUE_MOD_ID_T.BASE_VALUE,
+            new Modifier_t(10, "Начальное значение"));//TODO: magic
+        self.mod_map.Add(
+            BASIC_VALUE_MOD_ID_T.POINTS,
+            new Modifier_t(self.points, "Вложенные пункты"));
+        self.mod_map.Add(
+            BASIC_VALUE_MOD_ID_T.RACE,
+            new Modifier_t(m_value_race, "Раса"));
+        self.mod_map.Add(
+            BASIC_VALUE_MOD_ID_T.THEME,
+            new Modifier_t(m_value_theme, "Тема"));
+        self.mod_map.Add(
+            BASIC_VALUE_MOD_ID_T.BOOST_LVL_5,
+            new Modifier_t(0, "Увеличение на 5 уровне"));
+        self.mod_map.Add(
+            BASIC_VALUE_MOD_ID_T.BOOST_LVL_10,
+            new Modifier_t(0, "Увеличение на 10 уровне"));
+        self.mod_map.Add(
+            BASIC_VALUE_MOD_ID_T.BOOST_LVL_15,
+            new Modifier_t(0, "Увеличение на 15 уровне"));
+        self.mod_map.Add(
+            BASIC_VALUE_MOD_ID_T.BOOST_LVL_20,
+            new Modifier_t(0, "Увеличение на 20 уровне"));
+    }
+    
+    var Create_Checkboxes = function(cb_table_row){
+        var cell_name = document.createElement('th');
+        cell_name.innerHTML = self.name;
+        cb_table_row.appendChild(cell_name);
+        
+        for (let i = 0; i < self.upgrades.length; i++){
+            let cb_cell = cb_table_row.insertCell(cb_table_row.cells.length);
+            var cb = HTML_Create_Input_Checkbox(
+                    false,
+                    Proc_Checkbox_OnChange_Event.bind(null, i)
+            );
+            cb.setAttribute('id', CHECKBOX_ID_PREFIX + i);
+            cb_cell.appendChild(cb);
+        }
+    }
+    
+    var Proc_Checkbox_OnChange_Event = function(lvl_boost, event){
+        self.SetUpgradeValue(lvl_boost, event.target.checked);
+    }
+
     var Set_Field_Value = function(){
         let elems = document.getElementsByClassName(OUTFIELD_CLASS_NAME);
         for (let i = 0; i < elems.length; i++){
@@ -144,7 +195,9 @@ function Abiscore_Value_Data_t (name, outfield){
     }
 
     this.SetUpgradeValue = function(lvlup_num, value){
+        let cb = document.getElementById(CHECKBOX_ID_PREFIX + lvlup_num);
         self.upgrades[lvlup_num] = value;
+        cb.checked = value;
         self.Recalc();
     }
 
@@ -156,7 +209,6 @@ function Abiscore_Value_Data_t (name, outfield){
     var self = this;
     var m_value_race = 0;
     var m_value_theme = 0;
-    var m_value_output_field = outfield;
 
 //public properties
     this.name = name;
@@ -170,32 +222,7 @@ function Abiscore_Value_Data_t (name, outfield){
     this.arr_recalc_functions = new Recalc_Function_Collection_t();
 
 //additional initialization
-    Set_Field_Value();
-
-    this.mod_map.Add(
-        BASIC_VALUE_MOD_ID_T.BASE_VALUE,
-        new Modifier_t(10, "Начальное значение"));//TODO: magic
-    this.mod_map.Add(
-        BASIC_VALUE_MOD_ID_T.POINTS,
-        new Modifier_t(self.points, "Вложенные пункты"));
-    this.mod_map.Add(
-        BASIC_VALUE_MOD_ID_T.RACE,
-        new Modifier_t(m_value_race, "Раса"));
-    this.mod_map.Add(
-        BASIC_VALUE_MOD_ID_T.THEME,
-        new Modifier_t(m_value_theme, "Тема"));
-    this.mod_map.Add(
-        BASIC_VALUE_MOD_ID_T.BOOST_LVL_5,
-        new Modifier_t(0, "Увеличение на 5 уровне"));
-    this.mod_map.Add(
-        BASIC_VALUE_MOD_ID_T.BOOST_LVL_10,
-        new Modifier_t(0, "Увеличение на 10 уровне"));
-    this.mod_map.Add(
-        BASIC_VALUE_MOD_ID_T.BOOST_LVL_15,
-        new Modifier_t(0, "Увеличение на 15 уровне"));
-    this.mod_map.Add(
-        BASIC_VALUE_MOD_ID_T.BOOST_LVL_20,
-        new Modifier_t(0, "Увеличение на 20 уровне"));
+    Init(cb_table_row);
 }
 
 function Abiscore_Mod_Collection_t(){
@@ -282,7 +309,22 @@ function Abiscore_Mod_Collection_t(){
 }
 
 function Abiscore_Value_Collection_t(){
+//constants
+    const CHECKBOX_TABLE = document.getElementById('table_abiscores_upgrades');
+    
 //private methods
+    var Init = function(){
+        const ABISCORE_ARR = Object.values(ABISCORES);
+        while(CHECKBOX_TABLE.rows.length > 1){
+            CHECKBOX_TABLE.deleteRow(1);
+        }
+        
+        ABISCORE_ARR.forEach(abiscore => {
+            let cb_table_row = CHECKBOX_TABLE.insertRow(CHECKBOX_TABLE.rows.length);
+            m_map.set (abiscore, new Abiscore_Value_Data_t (abiscore, cb_table_row));
+        });
+    }
+
     var FindAbiscoreByName = function(abiscore){
         if (!m_map.has(abiscore)){
             return null;
@@ -445,6 +487,23 @@ function Abiscore_Value_Collection_t(){
         }
         return ret;
     }
+    
+    this.Load_From_Obj = function(obj){
+        const ABISCORE_ARR = Object.values(ABISCORES);
+        if (obj.points != undefined){
+            for (let i = 0; i < obj.points.length; i++){
+                self.SetPoints(ABISCORE_ARR[i], obj.points[i])
+            }
+        }
+        
+        if (obj.upgr != undefined){
+            for (let i = 0; i < obj.upgr.length; i++){
+                for (j = 0; j < obj.upgr[i].length; j++){
+                    self.SetLvlupUpgrade(ABISCORE_ARR[i], j, obj.upgr[i][j]);
+                }
+            }
+        }
+    }
 
 //private properties
     var self = this;
@@ -458,12 +517,7 @@ function Abiscore_Value_Collection_t(){
     );
 
 //additional initialization
-    m_map.set (ABISCORES.STR, new Abiscore_Value_Data_t (ABISCORES.STR, document.getElementById('outfield_abiscore_value_str')));
-    m_map.set (ABISCORES.AGI, new Abiscore_Value_Data_t (ABISCORES.AGI, document.getElementById('outfield_abiscore_value_agi')));
-    m_map.set (ABISCORES.CON, new Abiscore_Value_Data_t (ABISCORES.CON, document.getElementById('outfield_abiscore_value_con')));
-    m_map.set (ABISCORES.INT, new Abiscore_Value_Data_t (ABISCORES.INT, document.getElementById('outfield_abiscore_value_int')));
-    m_map.set (ABISCORES.WIS, new Abiscore_Value_Data_t (ABISCORES.WIS, document.getElementById('outfield_abiscore_value_wis')));
-    m_map.set (ABISCORES.CHA, new Abiscore_Value_Data_t (ABISCORES.CHA, document.getElementById('outfield_abiscore_value_cha')));
+    Init();
 }
 
 function Abiscore_Key_Collection_t(){
@@ -658,6 +712,12 @@ function Abiscore_t (){
 //public methods
     this.Get_SaveData_Obj = function(){
         return self.values.Get_SaveData_Obj();
+    }
+    
+    this.Load_From_Obj = function(obj){
+        if (obj != undefined){
+            self.values.Load_From_Obj(obj);
+        }
     }
 
 //private properties

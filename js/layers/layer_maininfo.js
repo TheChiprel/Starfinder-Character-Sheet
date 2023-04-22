@@ -1,27 +1,5 @@
 function Layer_MainInfo_t(){
 //private methods
-    var Init_Race_Selector = function(){
-        var select_race = document.getElementById('selector_race');
-        HTML_Selector_Clear_Options(select_race);
-
-        HTML_Selector_Add_Option(select_race, "---");
-
-        for (let i = 0; i < RACE_DATABASE.length; i++){
-            HTML_Selector_Add_Option(select_race, RACE_DATABASE[i].name);
-        }
-    }
-
-    var Init_Theme_Selector = function(){
-        var select_theme = document.getElementById('selector_theme');
-        HTML_Selector_Clear_Options(select_theme);
-
-        HTML_Selector_Add_Option(select_theme, "---");
-
-        for (let i = 0; i < THEME_DATABASE.length; i++){
-            HTML_Selector_Add_Option(select_theme, THEME_DATABASE[i].name);
-        }
-    }
-
     var Init_Class_Selector = function(){
         m_class_add_button_map = new Map();
         let class_ddlist = document.getElementById('class_ddlist_classes_content');
@@ -116,66 +94,8 @@ function Layer_MainInfo_t(){
     }
 
     var Reset = function (){
-        Init_Race_Selector();
-        Init_Theme_Selector();
         Init_Class_Selector();
         Init_Proficiency_HTML();
-        document.getElementById('infield_charname').value = "";
-    }
-
-//public methods
-    this.Set_Name = function(name, update_field = false){
-        chardata.name = name;
-        if (update_field){
-            document.getElementById('infield_charname').value = name;
-        }
-    }
-
-    this.Set_Race = function(race_name, update_field = false){
-        var entry = null;
-        if ((race_name != "---") && (race_name != null)){
-            for (let i = 0; i < RACE_DATABASE.length; i++){
-                if (RACE_DATABASE[i].name == race_name){
-                    entry = RACE_DATABASE[i];
-                    break;
-                }
-                //else NOTHING TO DO
-            }
-        }
-        //else NOTHING TO DO
-        chardata.race.Set(entry);
-    }
-
-    this.Set_Theme = function(theme_name, update_field = false){
-        let outfield_theme = document.getElementById("selector_theme");
-        let new_theme_value = theme_name;
-        let theme_abiscore = null;
-
-        if ((new_theme_value == "---") || (new_theme_value == null)){
-            chardata.theme = null;
-            
-            if (update_field){
-                outfield_theme.value = "---";
-            }
-            //else NOTHING TO DO
-        }else{
-            for (let i = 0; i < THEME_DATABASE.length; i++){
-                let cur_theme_entry = THEME_DATABASE[i];
-                if (cur_theme_entry.name == new_theme_value){
-                    chardata.theme = cur_theme_entry;
-                    theme_abiscore = cur_theme_entry.abiscore;
-                    chardata.abilities.theme.Set_Abilities(cur_theme_entry.name, cur_theme_entry.abilities);
-                    if (update_field){
-                        outfield_theme.value = new_theme_value;
-                    }
-                    //else NOTHING TO DO
-                    break;
-                }
-                //else NOTHING TO DO
-            }
-        }
-
-        chardata.stats.abiscores.values.SetThemeValue(theme_abiscore);
     }
 
     this.Add_New_Class = function(class_name, lvl = 1){

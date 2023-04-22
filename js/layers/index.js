@@ -1,23 +1,6 @@
 //TODO: refactor to load from chardata instead of layers
 function InSaveFile(data){
-    layers.maininfo.Set_Name(data.name, true);
-    if (data.race != null){
-        layers.maininfo.Set_Race(data.race, true);
-    }
-    //else NOTHING TO DO
 
-    if (data.theme != null){
-        layers.maininfo.Set_Theme(data.theme, true);
-    }
-    //else NOTHING TO DO
-
-    layers.abiscores.Load_From_Obj(data.abiscores);
-    layers.skills.Load_From_Obj(data.skills);
-    layers.maininfo.Load_Classes_From_Obj(data.classes);
-    layers.inventory.Load_From_Obj(data.inventory);
-    layers.abilities.Load_From_Obj(data.abilities);
-    layers.custom.Load_From_Obj(data.custom);
-    layers.face.Load_From_Obj(data.current_state);
 }
 
 function Save_Character_To_File() {
@@ -50,7 +33,7 @@ function Load_Character_From_File(event) {
         let data = JSON.parse(text);
 
         Reset();
-        InSaveFile(data);
+        chardata.Load_From_Obj(data);
     }
 
     fr.readAsText(files.item(0));

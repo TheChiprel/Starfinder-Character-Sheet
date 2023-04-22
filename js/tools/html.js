@@ -228,11 +228,3 @@ function HTML_Create_Selector(null_option = false, list = undefined, onchange_el
 
     return ret_elem;
 }
-
-/* function HTML_Table_Add_Row(table, columns){
-
-}
-
-function HTML_Remove_Row(table, row_num){
-
-} */

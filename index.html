@@ -212,13 +212,13 @@
         <div class="class_layer_main" id="layer_maininfo">
             <div class="layer_maininfo_block">
                 <label for="infield_charname">Имя:</label><br>
-                <input type="text" id="infield_charname" name="infield_charname" onchange="layers.maininfo.Set_Name(event.target.value)"><br>
+                <input type="text" id="infield_charname"><br>
 
                 <label for="race_selector">Раса:</label><br>
-                <select name="race" id="selector_race" onchange="layers.maininfo.Set_Race(event.target.value)"></select><br>
+                <select name="race" id="selector_race"></select><br>
 
                 <label for="theme_selector">Тема:</label><br>
-                <select name="theme" id="selector_theme" onchange="layers.maininfo.Set_Theme(event.target.value)"></select><br>
+                <select name="theme" id="selector_theme"></select><br>
 
                 <label for="outfield_size">Размер:</label><br>
                 <output class="class_output_field" name="outfield_size" form="textarea" id="outfield_size">---</output><br>
@@ -968,6 +968,7 @@
         <script src="js\test.js"></script>
         <script src="js\init.js"></script>
 
+        <script src="js\chardata\name_race_theme.js"></script>
         <script src="js\chardata\abilities.js"></script>
         <script src="js\chardata\spells.js"></script>
         <script src="js\chardata\abiscores.js"></script>
