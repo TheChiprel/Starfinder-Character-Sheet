@@ -1,29 +1,3 @@
-function OutSaveFile(){
-    this.name = chardata.name;
-
-    this.race = null;
-    if (chardata.race != null){
-        this.race = chardata.race.name;
-    }
-
-    this.theme = null;
-    if (chardata.theme != null){
-        this.theme = chardata.theme.name;
-    }
-
-    this.abiscores = {
-        points: chardata.stats.abiscores.values.GetPointArray(),
-        upgr: chardata.stats.abiscores.values.GetUpgrArray()
-    };
-
-    this.skills = chardata.skills.Get_Point_Obj();
-    this.classes = chardata.classes.Get_SaveData_Obj();
-    this.inventory = chardata.inventory.Get_SaveData_Obj();
-    this.abilities = chardata.abilities.Get_SaveData_Obj();
-    this.custom = chardata.stats.custom_mods.Get_SaveData_Obj();
-    this.current_state = chardata.current_state.Get_SaveData_Obj();
-}
-
 //TODO: refactor to load from chardata instead of layers
 function InSaveFile(data){
     layers.maininfo.Set_Name(data.name, true);
@@ -48,7 +22,7 @@ function InSaveFile(data){
 
 function Save_Character_To_File() {
     const filename = "sf_character.json";
-    let obj = new OutSaveFile();
+    let obj = chardata.Get_SaveData_Obj();
     let text = JSON.stringify(obj);
 
     var element = document.createElement('a');

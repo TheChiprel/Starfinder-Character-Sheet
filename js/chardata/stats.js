@@ -1177,6 +1177,41 @@ function Saves_t (){
     this.will = new Save_Type_t("Воля", 'will', ABISCORES.WIS, "class_output_save_will");
 }
 
+function Stats_t(){
+//public properties
+    this.abiscores = new Abiscore_t();
+    this.initiative = new Initative_t();
+    this.hp = new Health_t();
+    this.sp = new Stamina_t();
+    this.rp = new Resolve_t();
+    this.saves = new Saves_t();
+    this.attacks = new Attacks_t();
+    this.defense = new Defense_t();
+    this.speeds = new Speeds_t();
+    this.weapon_proficiency = new Prof_Spec_Collection_t([
+        WEAPON_TYPES.MELEE_SIMPLE,
+        WEAPON_TYPES.MELEE_ADVANCED,
+        WEAPON_TYPES.RANGED_SMALL,
+        WEAPON_TYPES.RANGED_LONG,
+        WEAPON_TYPES.RANGED_SNIPER,
+        WEAPON_TYPES.RANGED_HEAVY,
+        WEAPON_TYPES.GRENADE
+    ]);
+    this.weapon_specialization = new Prof_Spec_Collection_t([
+        WEAPON_TYPES.MELEE_SIMPLE,
+        WEAPON_TYPES.MELEE_ADVANCED,
+        WEAPON_TYPES.RANGED_SMALL,
+        WEAPON_TYPES.RANGED_LONG,
+        WEAPON_TYPES.RANGED_SNIPER,
+        WEAPON_TYPES.RANGED_HEAVY
+    ]);
+    this.armor_proficiency = new Prof_Spec_Collection_t([
+        ARMOR_TYPES.LIGHT,
+        ARMOR_TYPES.HEAVY,
+        ARMOR_TYPES.POWER,
+    ]);
+    this.custom_mods = new Custom_Data_t();
+}
 
 //===============initial callback assignment===============//
 
