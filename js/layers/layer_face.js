@@ -26,6 +26,36 @@ function Block_Face_Abiscores_t(){
     }
 
 //public methods
+    this.Clear_Table = function(){
+        //clearing table
+        while (m_table.rows.length > 1){
+            m_table.deleteRow(1);
+        }
+    }
+    
+    this.Add_Abiscore = function(abiscore_name, class_outfield_value, class_outfield_mod){
+        var row = m_table.insertRow(m_table.rows.length);
+            
+        var cell_name = document.createElement('th');
+        cell_name.innerHTML = abiscore_name;
+        row.appendChild(cell_name);
+        
+        let cell_value = row.insertCell(1);
+        var cell_value_output = HTML_Create_Output(
+            10,
+            undefined,
+            undefined,
+            "class_output_field " + class_outfield_value);
+        cell_value.appendChild(cell_value_output);
+            
+        let cell_mod = row.insertCell(2);
+        var cell_mod_output = HTML_Create_Output(
+            0,
+            undefined,
+            undefined,
+            "class_output_field " + class_outfield_mod);
+        cell_mod.appendChild(cell_mod_output);
+    }
 
 //private properties
     var self = this;

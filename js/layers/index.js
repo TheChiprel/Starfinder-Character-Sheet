@@ -45,8 +45,8 @@ function Layers_t (){
 //public methods
     this.Reset = function(){
         self.maininfo = new Layer_MainInfo_t();
-        self.abiscores = new Layer_Abiscores_t();
-        self.skills = new Layer_Skills_t();
+        //self.abiscores = new Layer_Abiscores_t();
+        //self.skills = new Layer_Skills_t();
         self.inventory = new Layer_Inventory_t();
         self.classes = new Layer_Classes_t();
         self.abilities = new Layer_Abilities_t();
@@ -82,7 +82,7 @@ function Layers_t (){
 
 //public properties
     this.maininfo;
-    this.abiscores;
+    this.abiscores = new Layer_Abiscores_t();
     this.skills = new Layer_Skills_t();
     this.inventory;
     this.classes;

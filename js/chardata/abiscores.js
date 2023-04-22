@@ -1,3 +1,11 @@
+function Get_Class_Abiscore_Value(abiscore_name){
+    return "class_output_abiscore_value_" + abiscore_name;
+}
+
+function Get_Class_Abiscore_Mod(abiscore_name){
+    return "class_output_abiscore_mod_" + abiscore_name;
+}
+
 //TODO: get rid of name here and in values?
 function Abiscore_Mod_Data_t(name, outfield){
 //constants
@@ -6,9 +14,21 @@ function Abiscore_Mod_Data_t(name, outfield){
             "ABISCORE_VALUE": 'ABISCORE_VALUE',
         }
     );
-    const OUTFIELD_CLASS_NAME = "class_output_abiscore_mod_" + name;
+    const OUTFIELD_CLASS_NAME = Get_Class_Abiscore_Mod(name);
 
 //private methods
+    var Init = function(){
+        self.mod_map.Add(
+            BASIC_MOD_MOD_ID_T.ABISCORE_VALUE,
+            new Modifier_t(0, "Значение " + self.name));
+        
+        let elems = document.getElementsByClassName(OUTFIELD_CLASS_NAME);
+        for (let i = 0; i < elems.length; i++){
+            elems[i].onclick = self.Show_Detail_Popup;
+            elems[i].value = self.sum;
+        }
+    }
+
     var Set_Field_Value = function(){
         let elems = document.getElementsByClassName(OUTFIELD_CLASS_NAME);
         for (let i = 0; i < elems.length; i++){
@@ -51,11 +71,7 @@ function Abiscore_Mod_Data_t(name, outfield){
     this.arr_recalc_functions = new Recalc_Function_Collection_t();
 
 //additional initialization
-    Set_Field_Value();
-
-    this.mod_map.Add(
-        BASIC_MOD_MOD_ID_T.ABISCORE_VALUE,
-        new Modifier_t(0, "Значение " + self.name));
+    Init();
 }
 
 function Abiscore_Value_Data_t (name, cb_table_row){
@@ -72,13 +88,12 @@ function Abiscore_Value_Data_t (name, cb_table_row){
             "BOOST_LVL_20": 'BOOST_LVL_20',
         }
     );
-    const OUTFIELD_CLASS_NAME = "class_output_abiscore_value_" + name;
+    const OUTFIELD_CLASS_NAME = Get_Class_Abiscore_Value(name);
     const CHECKBOX_ID_PREFIX = "class_checkbox_abiscore_" + name + "_";
 
 //private methods
     var Init = function(cb_table_row){
         Create_Checkboxes(cb_table_row);
-        Set_Field_Value();
 
         self.mod_map.Add(
             BASIC_VALUE_MOD_ID_T.BASE_VALUE,
@@ -104,8 +119,15 @@ function Abiscore_Value_Data_t (name, cb_table_row){
         self.mod_map.Add(
             BASIC_VALUE_MOD_ID_T.BOOST_LVL_20,
             new Modifier_t(0, "Увеличение на 20 уровне"));
+            
+        let elems = document.getElementsByClassName(OUTFIELD_CLASS_NAME);
+        for (let i = 0; i < elems.length; i++){
+            elems[i].onclick = self.Show_Detail_Popup;
+            elems[i].value = self.sum;
+        }
     }
     
+    //TODO: replace with setting event
     var Create_Checkboxes = function(cb_table_row){
         var cell_name = document.createElement('th');
         cell_name.innerHTML = self.name;
@@ -708,6 +730,25 @@ function Abiscore_Point_t (out_field_total, out_field_spent, out_field_left){
 
 function Abiscore_t (){
 //private methods
+    var Init = function(){
+        const ABISCORE_ARR = Object.values(ABISCORES);
+        layers.abiscores.Clear_Tables();
+        //layers.face.block_stats.abiscores.Clear_Table(); //TODO
+        
+        ABISCORE_ARR.forEach(abiscore => {
+            layers.abiscores.Add_Abiscore(
+                abiscore,
+                self.values.ChangeBaseValue,
+                Get_Class_Abiscore_Value(abiscore),
+                Get_Class_Abiscore_Mod(abiscore)
+            );
+            /*layers.face.block_stats.abiscores.Add_Abiscore(
+                abiscore,
+                Get_Class_Abiscore_Value(abiscore),
+                Get_Class_Abiscore_Mod(abiscore)
+            );*/ //TODO
+        });
+    }
 
 //public methods
     this.Get_SaveData_Obj = function(){
@@ -727,6 +768,9 @@ function Abiscore_t (){
     this.values = new Abiscore_Value_Collection_t();
     this.modifiers = new Abiscore_Mod_Collection_t();
     this.key = new Abiscore_Key_Collection_t();
+    
+//additional initialization
+    Init();
 }
 
 function Init_Callbacks_Abiscores(){

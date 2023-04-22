@@ -115,19 +115,12 @@ function Skill_Data_t (name, abiscore, is_learn_req, has_armor_penalty){
         //else NOTHING TO DO
     }
 
-    this.Set_Outfield = function (out_field){
-        m_out_field = out_field;
-        Set_Field_Values();
-    }
-
     this.Show_Detail_Popup = function(){
         Popup_Stat_Details.Call(self.name, self.sum, self.modifier_map.Get_Mod_Map(), true);
     }
 
 //private properties
     var self = this;
-    var m_out_field; //will be set during initialization
-    /* var m_mod_map = new Map(); */
 
 //public properties
     this.name = name;
@@ -139,7 +132,6 @@ function Skill_Data_t (name, abiscore, is_learn_req, has_armor_penalty){
 
     this.sum = 0;
     this.points = 0;
-    /* this.mod_other = new Other_Mod_Collection_t (this.Recalc); */
     this.modifier_map = new Modifier_Map_t(this.Recalc);
 
 //additional initialization
@@ -263,6 +255,13 @@ function Skills_t (){
             new Skill_Data_t(SKILLS.STEALTH,            ABISCORES.AGI, false, true  ),
             new Skill_Data_t(SKILLS.PHYSICAL_SCIENCE,   ABISCORES.INT, true,  false )
         ];
+        
+        self.arr.forEach(skill => {
+            skill.arr_recalc_functions.Add(new Recalc_Function_t(
+                "points_spent",
+                self.skill_points.Recalc_Spent
+            ));
+        });
     }
 
 
@@ -291,7 +290,6 @@ function Skills_t (){
         let skill_obj = Find_Skill_By_Name(skill_name);
         if (skill_obj != null){
             skill_obj.Set_Points(value);
-            self.skill_points.Recalc_Spent();
         }else{
             console.warn("Attempting to set modifier to unknown skill: " + skill_name);
             return null;
