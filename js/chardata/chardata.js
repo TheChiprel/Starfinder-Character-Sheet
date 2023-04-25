@@ -46,7 +46,6 @@ function Chardata_t(){
         layers.inventory.Load_From_Obj(obj.inventory);
         layers.abilities.Load_From_Obj(obj.abilities);
         layers.custom.Load_From_Obj(obj.custom);
-        //layers.face.Load_From_Obj(obj.current_state);
         
         self.current_state.Load_From_Obj(obj.current_state);
     }

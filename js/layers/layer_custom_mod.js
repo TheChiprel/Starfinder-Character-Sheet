@@ -4,7 +4,7 @@ function Custom_List_Entry_t (name, types, owner){
     this.owner = owner;
 }
 
-function Sublayer_Custom_t(sublayer_div, infield_id, infield_value, type_selector, add_callback){
+function Sublayer_Custom_t(sublayer_div, infield_id, infield_value, type_selector){
 //private methods
     var Reset = function(){
         m_infield_id.value = "";
@@ -33,17 +33,26 @@ function Sublayer_Custom_t(sublayer_div, infield_id, infield_value, type_selecto
     this.Hide = function(){
         m_sublayer_div.style.display = 'none';
     }
+    
+    this.Set_Callback = function(func){
+        m_add_callback = func;
+    }
 
     this.Add = function(){
+        if (m_add_callback == null){
+            console.error("add callback not set!")
+            return;
+        }
+        
         let name = m_infield_id.value;
         let category = document.getElementById('custom_main_category').value;
         let type = m_type_selector.value;
 
         if (m_infield_value != null){
             let value = Number(m_infield_value.value);
-            m_add_callback(name, category, type, value);
+            m_add_callback(category, type, name, value);
         }else{
-            m_add_callback(name, category, type);
+            m_add_callback(category, type, name);
         }
     }
 
@@ -53,7 +62,7 @@ function Sublayer_Custom_t(sublayer_div, infield_id, infield_value, type_selecto
     var m_infield_id = infield_id;
     var m_infield_value = infield_value;
     var m_type_selector = type_selector;
-    var m_add_callback = add_callback;
+    var m_add_callback = null;
 
 //public properties
 
@@ -63,7 +72,103 @@ function Sublayer_Custom_t(sublayer_div, infield_id, infield_value, type_selecto
 
 function Layer_Custom_t(){
 //private methods
-    var Reset = function(){
+    var Add_Row_To_Table = function(
+        category,
+        type,
+        id,
+        name,
+        value,
+        is_bool
+    ){
+        var row = m_custom_mod_table.insertRow(m_custom_mod_table.rows.length);
+        //row.class = 'class_row_custom_mod';
+        row.name = id;
+
+        var cell_name = row.insertCell(0);
+        var cell_category = row.insertCell(1);
+        var cell_type = row.insertCell(2);
+        var cell_value = row.insertCell(3);
+        var cell_remove_button = row.insertCell(4);
+
+        cell_name.innerHTML = name;
+        cell_category.innerHTML = category;
+        cell_type.innerHTML = type;
+
+        if (is_bool){
+            cell_value.innerHTML = value;
+        }else{
+            var field_mod_value = HTML_Create_Input_Number(
+                value,
+                undefined,
+                undefined,
+                Change_Mod_Value.bind(null, id),
+                undefined,
+                undefined
+            );
+            cell_value.appendChild(field_mod_value);
+        }
+
+        let remove_func;
+        if (is_bool){
+            remove_func = Button_Remove_Bool_Event.bind(null, id);
+        }else{
+            remove_func = Button_Remove_Mod_Event.bind(null, id);
+        }
+        var button_mod_remove = HTML_Create_Button(
+            "Удалить",
+            remove_func
+        );
+        cell_remove_button.appendChild(button_mod_remove);
+    }
+
+    var Hide_All_Sublayers = function(){
+        self.sublayer_stats.Hide();
+        self.sublayer_bools.Hide();
+    }
+
+    var Get_Free_ID = function(){
+        //searching free id
+        let id;
+        for (let id_enum = 0; id_enum < 1000; id_enum++){
+            let found = false;
+            let cur_name = "custom_" + id_enum;
+            for (let i = 0; i < m_custom_mod_table.rows.length; i++){
+                if (m_custom_mod_table.rows[i].name == cur_name){
+                    found = true;
+                    break;
+                }
+                //else NOTHING TO DO
+            }
+
+            if (!found){
+                id = cur_name;
+                break;
+            }
+            //else NOTHING TO DO
+        }
+        return id;
+    }
+    
+    var Change_Mod_Value = function(id, event){
+        let new_value = event.target.value;
+        if (isNaN(new_value)){
+            event.target.value = chardata.custom.Change_Value.stats.Get_Value(id);
+            return;
+        }
+        chardata.stats.custom_mods.stats.Change_Value(id, parseInt(new_value));
+    }
+    
+    var Button_Remove_Mod_Event = function(id){
+        chardata.stats.custom_mods.stats.Remove(id);
+    }
+    
+    var Button_Remove_Bool_Event = function(id){
+        chardata.stats.custom_mods.bools.Remove(id);
+    }
+
+//public methods
+    this.Reset = function(){
+        //TODO: move these lists somewhere as const, create selectors based on const
         m_stats_list = [
             new Custom_List_Entry_t('Значение хар-ки', Object.values(ABISCORES), chardata.stats.abiscores.values),
             new Custom_List_Entry_t('Модификатор хар-ки', Object.values(ABISCORES), chardata.stats.abiscores.modifiers),
@@ -101,43 +206,34 @@ function Layer_Custom_t(){
         for (let i = 0; i < m_bool_list.length; i++){
             HTML_Selector_Add_Option(category_selector, m_bool_list[i].name);
         }
+    }
 
-        while (custom_mod_table.rows.length > 1){
-            custom_mod_table.deleteRow(1);
+    this.Clear_Table = function(){
+        while (m_custom_mod_table.rows.length > 1){
+            m_custom_mod_table.deleteRow(1);
         }
-
-        m_owner_map = new Map();
     }
-
-    var Hide_All_Sublayers = function(){
-        self.sublayer_stats.Hide();
-        self.sublayer_bools.Hide();
+    
+    this.Add_Modifier = function(id, name, category, type, value){
+        Add_Row_To_Table(category, type, id, name, value, false);
     }
-
-    var Get_Free_ID = function(){
-        //searching free id
-        let id;
-        for (let id_enum = 0; id_enum < 1000; id_enum++){
-            let found = false;
-            let cur_name = "custom_" + id_enum;
-            for (let i = 0; i < custom_mod_table.rows.length; i++){
-                if (custom_mod_table.rows[i].name == cur_name){
-                    found = true;
-                    break;
-                }
-                //else NOTHING TO DO
+    
+    this.Add_Bool = function(id, name, category, type){
+        Add_Row_To_Table(category, type, id, name, "+", true);
+    }
+    
+    this.Remove = function(id){
+        for (let i = 0; i < m_custom_mod_table.rows.length; i++){
+            var row = m_custom_mod_table.rows[i];
+            if(row.name == id){
+                m_custom_mod_table.deleteRow(i);
+                return;
             }
-
-            if (!found){
-                id = cur_name;
-                break;
-            }
-            //else NOTHING TO DO
         }
-        return id;
+        
+        console.warn("Failed to remove unknown custom modifier from table");
     }
 
-//public methods
     this.Custom_Mod_Change_Category = function(event){
         var category = event.target.value;
 
@@ -157,108 +253,6 @@ function Layer_Custom_t(){
             if (category == m_bool_list[i].name){
                 self.sublayer_bools.Show(m_bool_list[i].types);
                 return;
-            }
-        }
-    }
-
-    this.Add_Custom_Mod_To_Table = function(category, type, id, name, value){
-        var row = custom_mod_table.insertRow(custom_mod_table.rows.length);
-        row.class = 'class_row_custom_mod';
-        row.name = id;
-
-        var cell_name = row.insertCell(0);
-        var cell_category = row.insertCell(1);
-        var cell_type = row.insertCell(2);
-        var cell_value = row.insertCell(3);
-        var cell_remove_button = row.insertCell(4);
-
-        cell_name.innerHTML = name;
-        cell_category.innerHTML = category;
-        cell_type.innerHTML = type;
-
-        if (!isNaN(value)){
-            var field_mod_value = document.createElement("input");
-            var change_value_func = self.Custom_Mod_Change_Value.bind(null, id);
-            field_mod_value.type = 'number';
-            field_mod_value.value = value;
-            field_mod_value.onchange = change_value_func;
-            cell_value.appendChild(field_mod_value);
-        }else{
-            cell_value.innerHTML = value;
-        }
-
-        var remove_func = self.Custom_Mod_Remove.bind(null, id);
-        var button_mod_remove = document.createElement("input");
-        button_mod_remove.type = "button";
-        button_mod_remove.value = "Удалить";
-        button_mod_remove.onclick = remove_func;
-        cell_remove_button.appendChild(button_mod_remove);
-    }
-
-    this.Add_Custom_Stats = function(name, category, type, value){
-        if (name == ""){
-            alert("Введите название для модификатора");
-            return;
-        }
-
-        let id = Get_Free_ID();
-
-        if (id == undefined){
-            alert("Нельзя добавить более 1000 модификаторов.");
-            return;
-        }
-        //else NOTHING TO DO
-
-        if (chardata.stats.custom_mods.stats.Add(category, type, id, name, value)){
-            self.Add_Custom_Mod_To_Table(category, type, id, name, value);
-            m_owner_map.set(id, chardata.stats.custom_mods.stats);
-        }
-        //else NOTHING TO DO
-    }
-
-    this.Add_Custom_Bool = function(name, category, type){
-        if (name == ""){
-            alert("Введите название для модификатора");
-            return;
-        }
-
-        let id = Get_Free_ID();
-
-        if (id == undefined){
-            alert("Нельзя добавить более 1000 модификаторов.");
-            return;
-        }
-        //else NOTHING TO DO
-
-        if (chardata.stats.custom_mods.bools.Add(category, type, id, name)){
-            self.Add_Custom_Mod_To_Table(category, type, id, name, "+");
-            m_owner_map.set(id, chardata.stats.custom_mods.bools);
-        }
-        //else NOTHING TO DO
-    }
-
-    this.Custom_Mod_Change_Value = function(event, id){
-        if (!m_owner_map.has(id)){
-            console.error("Custom mod '" + id + "' not found in owner map.");
-            return;
-        }
-
-        m_owner_map.get(id).Change_Value(id, Number(event.target.value));
-    }
-
-    this.Custom_Mod_Remove = function(id){
-        if (!m_owner_map.has(id)){
-            console.error("Custom mod '" + id + "' not found in owner map.");
-            return;
-        }
-
-        m_owner_map.get(id).Remove(id);
-
-        for (let i = 0; i < custom_mod_table.rows.length; i++){
-            var row = custom_mod_table.rows[i];
-            if(row.name == id){
-                custom_mod_table.deleteRow(i);
-                break;
             }
         }
     }
@@ -283,27 +277,12 @@ function Layer_Custom_t(){
         return null;
     }
 
-    this.Load_From_Obj = function(obj){
-        if (obj == undefined){
-            return;
-        }
-        
-        obj.stats.forEach(mod => {
-           self.Add_Custom_Stats(mod.name, mod.category, mod.type, mod.value);
-        });
-        obj.bools.forEach(mod => {
-           self.Add_Custom_Bool(mod.name, mod.category, mod.type);
-        });
-    }
-
 //private properties
     var self = this;
     var m_stats_list;
     var m_bool_list;
 
-    var m_owner_map;
-
-    var custom_mod_table = document.getElementById("table_custom_mods");
+    var m_custom_mod_table = document.getElementById("table_custom_mods");
     var category_selector = document.getElementById('custom_main_category');
 
 //public properties
@@ -312,7 +291,6 @@ function Layer_Custom_t(){
         document.getElementById('custom_stats_id'),
         document.getElementById('custom_stats_value'),
         document.getElementById('custom_stats_type'),
-        this.Add_Custom_Stats
     );
 
     this.sublayer_bools = new Sublayer_Custom_t(
@@ -320,9 +298,7 @@ function Layer_Custom_t(){
         document.getElementById('custom_bools_id'),
         null,
         document.getElementById('custom_bools_type'),
-        this.Add_Custom_Bool
     );
 
 //additional initialization
-    Reset();
 }
