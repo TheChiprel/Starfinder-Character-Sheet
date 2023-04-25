@@ -64,7 +64,7 @@ function Block_Face_Abiscores_t(){
 //public properties
 
 //additional initialization
-    Init();
+    //Init();
 }
 
 function Block_Face_Skills_t(){
@@ -107,7 +107,6 @@ function Block_Face_Skills_t(){
         row.appendChild(cell_name);
 
         let cell_mod = row.insertCell(1);
-        let cell_mod_function = chardata.skills.Show_Detail_Popup.bind(null, skills_arr[i]);
         var cell_mod_output = HTML_Create_Output(
             0,
             undefined,
@@ -125,7 +124,7 @@ function Block_Face_Skills_t(){
 //public properties
 
 //additional initialization
-    Init();
+    //Init();
 }
 
 function Block_Face_Stats_t(){

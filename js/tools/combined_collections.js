@@ -24,6 +24,10 @@ function Combined_Collection_t(){
             m_update_func();
         }
     }
+    
+    this.Clear = function(){
+        m_map.clear()
+    }
 
 //private properties
     var self = this;
@@ -40,17 +44,18 @@ function CS_Combined_Collections(){
 
 //public methods
     this.Reset = function(){
-        self.abilities = new Combined_Collection_t();
-        self.spells = new Combined_Collection_t();
-        self.equipment = new Combined_Collection_t();
+        self.abilities.Clear();
+        self.spells.Clear();
+        self.equipment.Clear();
     }
 
 //private properties
     var self = this;
 
 //public properties
-    this.abilities;
-    this.spells;
+    this.abilities = new Combined_Collection_t();
+    this.spells = new Combined_Collection_t();
+    this.equipment = new Combined_Collection_t();
 
 //additional initialization
 }

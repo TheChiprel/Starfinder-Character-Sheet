@@ -733,7 +733,7 @@ function Abiscore_t (){
     var Init = function(){
         const ABISCORE_ARR = Object.values(ABISCORES);
         layers.abiscores.Clear_Tables();
-        //layers.face.block_stats.abiscores.Clear_Table(); //TODO
+        layers.face.block_stats.abiscores.Clear_Table();
         
         ABISCORE_ARR.forEach(abiscore => {
             layers.abiscores.Add_Abiscore(
@@ -742,11 +742,11 @@ function Abiscore_t (){
                 Get_Class_Abiscore_Value(abiscore),
                 Get_Class_Abiscore_Mod(abiscore)
             );
-            /*layers.face.block_stats.abiscores.Add_Abiscore(
+            layers.face.block_stats.abiscores.Add_Abiscore(
                 abiscore,
                 Get_Class_Abiscore_Value(abiscore),
                 Get_Class_Abiscore_Mod(abiscore)
-            );*/ //TODO
+            );
         });
     }
 

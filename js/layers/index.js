@@ -48,7 +48,7 @@ function Layers_t (){
         self.inventory = new Layer_Inventory_t();
         self.classes = new Layer_Classes_t();
         self.abilities = new Layer_Abilities_t();
-        self.face = new Layer_Face_t();
+        //self.face = new Layer_Face_t();
         self.custom.Reset();
         //self.custom = new Layer_Custom_t();
     }
@@ -86,7 +86,7 @@ function Layers_t (){
     this.inventory;
     this.classes;
     this.abilities;
-    this.face;
+    this.face = new Layer_Face_t();
     this.custom = new Layer_Custom_t();
 }
 

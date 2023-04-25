@@ -31,7 +31,7 @@ function Skill_Data_t (name, abiscore, is_learn_req, has_armor_penalty){
         //else NOTHING TO DO
         
         layers.skills.Add_Skill(self.name, INFIELD_POINTS, OUTFIELD_CLASS_NAME);
-        //layers.face.block_stats.skills.Add_Skill(self.name, OUTFIELD_CLASS_NAME);
+        layers.face.block_stats.skills.Add_Skill(self.name, OUTFIELD_CLASS_NAME);
         
         let elems = document.getElementsByClassName(OUTFIELD_CLASS_NAME);
         for (let i = 0; i < elems.length; i++){
@@ -232,7 +232,7 @@ function Skills_t (){
 //private methods
     var Init = function(){
         layers.skills.Clear_Table();
-        //layers.face.block_stats.skills.Clear_Table(); //TODO
+        layers.face.block_stats.skills.Clear_Table();
         
         self.arr = [
             new Skill_Data_t(SKILLS.ACROBATICS,         ABISCORES.AGI, false, true  ),
