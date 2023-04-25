@@ -10,7 +10,6 @@ function Mod_Table_Item_t (id, name, mod_map, category, type, value){
 
     this.Remove = function(){
         self.mod_map.Remove(self.id, true);
-        layers.custom.Remove(self.id);
     }
 
     this.Get_SaveData_Obj = function(){
@@ -39,19 +38,10 @@ function Mod_Table_Item_t (id, name, mod_map, category, type, value){
 
 function Bool_Table_Item_t (id, name, bool_map, category, type){
 //private methods
-    var Init = function(){
-        m_infield_value = layers.custom.Add_Bool(
-            self.id,
-            self.name,
-            self.category,
-            self.type
-        );
-    }
 
 //public methods
     this.Remove = function(){
         self.bool_map.Remove(self.id, true);
-        layers.custom.Remove(self.id);
     }
 
     this.Get_SaveData_Obj = function(){
@@ -76,7 +66,6 @@ function Bool_Table_Item_t (id, name, bool_map, category, type){
     this.bool_map = bool_map;
 
 //additional initialization
-    Init();
 }
 
 function Mod_Table_t (){
@@ -107,6 +96,25 @@ function Mod_Table_t (){
         }
         return id;
     }
+    
+    var OnChange_Event = function(id, event){
+        let new_value = event.target.value;
+        if (isNaN(new_value)){
+            event.target.value = self.Get_Value(id);
+            return;
+        }
+        self.Change_Value(id, parseInt(new_value));
+    }
+    
+    //TODO: reword m_arr as map
+    var Find_Mod_By_ID = function(id){
+        for (let i = 0; i < m_arr.length; i++){
+            if (m_arr[i].id == id){
+                return m_arr[i];
+            }
+        }
+        return null;
+    }
 
 //public methods
     this.Add = function(category, type, name, value){
@@ -132,34 +140,46 @@ function Mod_Table_t (){
 
         m_arr.push(new Mod_Table_Item_t (id, name, mod_map, category, type, value));
         
-        layers.custom.Add_Modifier(id, name, category, type, value);
+        layers.custom.Add(
+            id,
+            name,
+            category,
+            type,
+            value,
+            OnChange_Event.bind(null, id),
+            self.Remove.bind(null, id)
+        );
         return true;
     }
 
     this.Change_Value = function(id, new_value){
-        for (let i = 0; i < m_arr.length; i++){
-            if (m_arr[i].id == id){
-                m_arr[i].Change_Value(new_value);
-                return;
-            }
+        let mod = Find_Mod_By_ID(id);
+        if (mod == null){
+            //TODO: warn
+            return;
         }
+        
+        mod.Change_Value(new_value);
+        layers.custom.Change_Value(id, new_value);
     }
     
     this.Get_Value = function(id){
-        for (let i = 0; i < m_arr.length; i++){
-            if (m_arr[i].id == id){
-                return m_arr[i].value;
-            }
+        let mod = Find_Mod_By_ID(id);
+        if (mod == null){
+            //TODO: warn
+            return null;
         }
         
-        return null;
+        return mod.value;
     }
 
     this.Remove = function(id){
         for (let i = 0; i < m_arr.length; i++){
-            if (m_arr[i].id == id){
-                m_arr[i].Remove();
+            let mod = m_arr[i];
+            if (mod.id == id){
+                mod.Remove();
                 m_arr.splice(i, 1);
+                layers.custom.Remove(id);
                 return;
             }
         }
@@ -171,6 +191,16 @@ function Mod_Table_t (){
             ret.push(mod.Get_SaveData_Obj());
         });
         return ret;
+    }
+    
+    this.Load_From_Obj = function(obj){
+        if (obj == undefined){
+            return;
+        }
+        
+        obj.forEach(mod => {
+            self.Add(mod.category, mod.type, mod.name, mod.value);
+        });
     }
 
 //private properties
@@ -211,6 +241,16 @@ function Bool_Table_t (){
         }
         return id;
     }
+    
+    //TODO: reword m_arr as map
+    var Find_Mod_By_ID = function(id){
+        for (let i = 0; i < m_arr.length; i++){
+            if (m_arr[i].id == id){
+                return m_arr[i];
+            }
+        }
+        return null;
+    }
 
 //public methods
     this.Add = function(category, type, name){
@@ -231,6 +271,17 @@ function Bool_Table_t (){
         }
 
         m_arr.push(new Bool_Table_Item_t (id, name, bool_map, category, type));
+        
+        layers.custom.Add(
+            id,
+            name,
+            category,
+            type,
+            "+",
+            null,
+            self.Remove.bind(null, id)
+        );
+        
         return true;
     }
 
@@ -239,6 +290,7 @@ function Bool_Table_t (){
             if (m_arr[i].id == id){
                 m_arr[i].Remove();
                 m_arr.splice(i, 1);
+                layers.custom.Remove(id);
                 return;
             }
         }
@@ -258,7 +310,7 @@ function Bool_Table_t (){
         }
         
         obj.forEach(mod => {
-            self.Add(mod.category, mod.type, mod.id, mod.name);
+            self.Add(mod.category, mod.type, mod.name);
         });
     }
 
@@ -292,17 +344,8 @@ function Custom_Data_t (){
             return;
         }
         
-        obj.stats.Load_From_Obj(obj.stats);
-        obj.bools.Load_From_Obj(obj.bools);
-        
-        /*
-        obj.stats.forEach(mod => {
-           self.Add_Custom_Stats(mod.name, mod.category, mod.type, mod.value);
-        });
-        obj.bools.forEach(mod => {
-           self.Add_Custom_Bool(mod.name, mod.category, mod.type);
-        });
-        */
+        self.stats.Load_From_Obj(obj.stats);
+        self.bools.Load_From_Obj(obj.bools);
     }
 
 //private properties

@@ -45,8 +45,8 @@ function Chardata_t(){
         layers.maininfo.Load_Classes_From_Obj(obj.classes);
         layers.inventory.Load_From_Obj(obj.inventory);
         layers.abilities.Load_From_Obj(obj.abilities);
-        layers.custom.Load_From_Obj(obj.custom);
         
+        self.stats.custom_mods.Load_From_Obj(obj.custom);
         self.current_state.Load_From_Obj(obj.current_state);
     }
 
