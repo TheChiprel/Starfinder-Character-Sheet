@@ -78,6 +78,14 @@ function Numeric_State_t(class_field, max_value_func){
     this.Get_SaveData_Obj = function(){
         return self.value;
     }
+    
+    this.Load_From_Obj = function(obj){
+        if (obj == undefined){
+            return;
+        }
+        
+        self.Set_Value(obj);
+    }
 
 //private properties
     var self = this;
@@ -111,6 +119,17 @@ function Current_State_t(){
             temp_hp: self.temp_hp.Get_SaveData_Obj()
         };
         return ret;
+    }
+    
+    this.Load_From_Obj = function(obj){
+        if (obj == undefined){
+            return;
+        }
+        
+        self.hp.Load_From_Obj(obj.hp);
+        self.sp.Load_From_Obj(obj.sp);
+        self.rp.Load_From_Obj(obj.rp);
+        self.temp_hp.Load_From_Obj(obj.temp_hp);
     }
 
 //private properties

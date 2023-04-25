@@ -488,43 +488,6 @@ function Block_Face_Spells_t(){
     Init();
 }
 
-function Block_Current_State_t(){
-//constants
-    
-//private methods
-
-//public methods
-
-//private properties
-    var self = this;
-
-//public properties
-//TODO: move to chardata
-    this.Load_From_Obj = function(obj){
-        if (obj == undefined){
-            return;
-        }
-        
-        if (obj.hp != undefined){
-            chardata.current_state.hp.Set_Value(obj.hp);
-        }
-        
-        if (obj.sp != undefined){
-            chardata.current_state.sp.Set_Value(obj.sp);
-        }
-        
-        if (obj.rp != undefined){
-            chardata.current_state.rp.Set_Value(obj.rp);
-        }
-        
-        if (obj.temp_hp != undefined){
-            chardata.current_state.temp_hp.Set_Value(obj.temp_hp);
-        }
-    }
-
-//additional initialization
-}
-
 function Layer_Face_t(){
 //public methods
     this.Load_From_Obj = function(obj){
@@ -565,5 +528,4 @@ function Layer_Face_t(){
     this.block_inventory = new Block_Face_Inventory_t();
     this.block_abilities = new Block_Face_Abilities_t();
     this.block_spells = new Block_Face_Spells_t();
-    this.block_current_state = new Block_Current_State_t();
 }
