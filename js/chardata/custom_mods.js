@@ -80,21 +80,11 @@ function Mod_Table_t (){
         for (let id_enum = 0; id_enum < 1000; id_enum++){
             let found = false;
             let cur_name = "custom_stats_" + id_enum;
-            for (let i = 0; i < m_arr.length; i++){
-                if (m_arr[i].id == cur_name){
-                    found = true;
-                    break;
-                }
-                //else NOTHING TO DO
+            if (!m_map.has(cur_name)){
+                return cur_name;
             }
-
-            if (!found){
-                id = cur_name;
-                break;
-            }
-            //else NOTHING TO DO
         }
-        return id;
+        return null;
     }
     
     var OnChange_Event = function(id, event){
@@ -106,13 +96,11 @@ function Mod_Table_t (){
         self.Change_Value(id, parseInt(new_value));
     }
     
-    //TODO: reword m_arr as map
     var Find_Mod_By_ID = function(id){
-        for (let i = 0; i < m_arr.length; i++){
-            if (m_arr[i].id == id){
-                return m_arr[i];
-            }
+        if (m_map.has(id)){
+            return m_map.get(id);
         }
+        
         return null;
     }
 
@@ -138,7 +126,10 @@ function Mod_Table_t (){
             return false;
         }
 
-        m_arr.push(new Mod_Table_Item_t (id, name, mod_map, category, type, value));
+        m_map.set(
+            id,
+            new Mod_Table_Item_t (id, name, mod_map, category, type, value)
+        );
         
         layers.custom.Add(
             id,
@@ -155,7 +146,7 @@ function Mod_Table_t (){
     this.Change_Value = function(id, new_value){
         let mod = Find_Mod_By_ID(id);
         if (mod == null){
-            //TODO: warn
+            console.warn("Attempt to change value of unknown custom modifier: " + id);
             return;
         }
         
@@ -166,7 +157,7 @@ function Mod_Table_t (){
     this.Get_Value = function(id){
         let mod = Find_Mod_By_ID(id);
         if (mod == null){
-            //TODO: warn
+            console.warn("Attempt to get value of unknown custom modifier: " + id);
             return null;
         }
         
@@ -174,15 +165,15 @@ function Mod_Table_t (){
     }
 
     this.Remove = function(id){
-        for (let i = 0; i < m_arr.length; i++){
-            let mod = m_arr[i];
-            if (mod.id == id){
-                mod.Remove();
-                m_arr.splice(i, 1);
-                layers.custom.Remove(id);
-                return;
-            }
+        let mod = Find_Mod_By_ID(id);
+        if (mod == null){
+            console.warn("Attempt to remove unknown custom modifier: " + id);
+            return;
         }
+        
+        mod.Remove();
+        m_map.delete(id);
+        layers.custom.Remove(id);
     }
 
     this.Get_SaveData_Obj = function(){
@@ -205,7 +196,7 @@ function Mod_Table_t (){
 
 //private properties
     var self = this;
-    var m_arr = new Array(0);
+    var m_map = new Map();
 
 //public properties
 
@@ -225,30 +216,18 @@ function Bool_Table_t (){
         for (let id_enum = 0; id_enum < 1000; id_enum++){
             let found = false;
             let cur_name = "custom_bool_" + id_enum;
-            for (let i = 0; i < m_arr.length; i++){
-                if (m_arr[i].id == cur_name){
-                    found = true;
-                    break;
-                }
-                //else NOTHING TO DO
+            if (!m_map.has(cur_name)){
+                return cur_name;
             }
-
-            if (!found){
-                id = cur_name;
-                break;
-            }
-            //else NOTHING TO DO
         }
-        return id;
+        return null;
     }
     
-    //TODO: reword m_arr as map
     var Find_Mod_By_ID = function(id){
-        for (let i = 0; i < m_arr.length; i++){
-            if (m_arr[i].id == id){
-                return m_arr[i];
-            }
+        if (m_map.has(id)){
+            return m_map.get(id);
         }
+        
         return null;
     }
 
@@ -270,7 +249,10 @@ function Bool_Table_t (){
             return false;
         }
 
-        m_arr.push(new Bool_Table_Item_t (id, name, bool_map, category, type));
+        m_map.set(
+            id,
+            new Bool_Table_Item_t (id, name, bool_map, category, type)
+        );
         
         layers.custom.Add(
             id,
@@ -286,14 +268,15 @@ function Bool_Table_t (){
     }
 
     this.Remove = function(id){
-        for (let i = 0; i < m_arr.length; i++){
-            if (m_arr[i].id == id){
-                m_arr[i].Remove();
-                m_arr.splice(i, 1);
-                layers.custom.Remove(id);
-                return;
-            }
+        let mod = Find_Mod_By_ID(id);
+        if (mod == null){
+            console.warn("Attempt to remove unknown custom modifier: " + id);
+            return;
         }
+        
+        mod.Remove();
+        m_map.delete(id);
+        layers.custom.Remove(id);
     }
 
     this.Get_SaveData_Obj = function(){
@@ -316,7 +299,7 @@ function Bool_Table_t (){
 
 //private properties
     var self = this;
-    var m_arr = new Array(0);
+    var m_map = new Map();
 
 //public properties
 
