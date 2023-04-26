@@ -1,43 +1,28 @@
 function Block_Face_Abiscores_t(){
 //private methods
     var Init = function(){
-        let abiscores_arr = Object.values(ABISCORES);
+        const ABISCORE_ARR = Object.values(ABISCORES);
         
-        while (m_table.rows.length > 1){
-            m_table.deleteRow(1);
-        }
+        Clear_Table();
         
-        for (let i = 0; i < abiscores_arr.length; i++){
-            var row = m_table.insertRow(m_table.rows.length);
-            
-            var cell_name = document.createElement('th');
-            cell_name.innerHTML = abiscores_arr[i];
-            row.appendChild(cell_name);
-            let cell_value = row.insertCell(1);
-            let cell_value_function = chardata.stats.abiscores.values.Show_Detail_Popup.bind(null, abiscores_arr[i]);
-            var cell_value_output = HTML_Create_Output(10, cell_value_function, undefined, "class_output_field class_output_abiscore_value_" + abiscores_arr[i]);
-            let cell_mod = row.insertCell(2);
-            let cell_mod_function = chardata.stats.abiscores.modifiers.Show_Detail_Popup.bind(null, abiscores_arr[i]);
-            var cell_mod_output = HTML_Create_Output(0, cell_mod_function, undefined, "class_output_field class_output_abiscore_mod_" + abiscores_arr[i]);
-            
-            cell_value.appendChild(cell_value_output);
-            cell_mod.appendChild(cell_mod_output);
-        }
+        ABISCORE_ARR.forEach(abiscore => {
+            Add_Abiscore(abiscore);
+        });
     }
 
 //public methods
-    this.Clear_Table = function(){
+    var Clear_Table = function(){
         //clearing table
         while (m_table.rows.length > 1){
             m_table.deleteRow(1);
         }
     }
     
-    this.Add_Abiscore = function(abiscore_name, class_outfield_value, class_outfield_mod){
+    var Add_Abiscore = function(abiscore){
         var row = m_table.insertRow(m_table.rows.length);
             
         var cell_name = document.createElement('th');
-        cell_name.innerHTML = abiscore_name;
+        cell_name.innerHTML = abiscore;
         row.appendChild(cell_name);
         
         let cell_value = row.insertCell(1);
@@ -45,7 +30,7 @@ function Block_Face_Abiscores_t(){
             10,
             undefined,
             undefined,
-            "class_output_field " + class_outfield_value);
+            "class_output_field " + Get_Class_Abiscore_Value(abiscore));
         cell_value.appendChild(cell_value_output);
             
         let cell_mod = row.insertCell(2);
@@ -53,7 +38,7 @@ function Block_Face_Abiscores_t(){
             0,
             undefined,
             undefined,
-            "class_output_field " + class_outfield_mod);
+            "class_output_field " + Get_Class_Abiscore_Mod(abiscore));
         cell_mod.appendChild(cell_mod_output);
     }
 
@@ -64,7 +49,7 @@ function Block_Face_Abiscores_t(){
 //public properties
 
 //additional initialization
-    //Init();
+    Init();
 }
 
 function Block_Face_Skills_t(){

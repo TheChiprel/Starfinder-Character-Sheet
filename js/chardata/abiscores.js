@@ -1,11 +1,3 @@
-function Get_Class_Abiscore_Value(abiscore_name){
-    return "class_output_abiscore_value_" + abiscore_name;
-}
-
-function Get_Class_Abiscore_Mod(abiscore_name){
-    return "class_output_abiscore_mod_" + abiscore_name;
-}
-
 //TODO: get rid of name here and in values?
 function Abiscore_Mod_Data_t(name, outfield){
 //constants
@@ -74,7 +66,7 @@ function Abiscore_Mod_Data_t(name, outfield){
     Init();
 }
 
-function Abiscore_Value_Data_t (name, cb_table_row){
+function Abiscore_Value_Data_t (name){
 //constants
     const BASIC_VALUE_MOD_ID_T = Object.freeze(
         {
@@ -89,12 +81,9 @@ function Abiscore_Value_Data_t (name, cb_table_row){
         }
     );
     const OUTFIELD_CLASS_NAME = Get_Class_Abiscore_Value(name);
-    const CHECKBOX_ID_PREFIX = "class_checkbox_abiscore_" + name + "_";
 
 //private methods
-    var Init = function(cb_table_row){
-        Create_Checkboxes(cb_table_row);
-
+    var Init = function(){
         self.mod_map.Add(
             BASIC_VALUE_MOD_ID_T.BASE_VALUE,
             new Modifier_t(10, "Начальное значение"));//TODO: magic
@@ -125,27 +114,6 @@ function Abiscore_Value_Data_t (name, cb_table_row){
             elems[i].onclick = self.Show_Detail_Popup;
             elems[i].value = self.sum;
         }
-    }
-    
-    //TODO: replace with setting event
-    var Create_Checkboxes = function(cb_table_row){
-        var cell_name = document.createElement('th');
-        cell_name.innerHTML = self.name;
-        cb_table_row.appendChild(cell_name);
-        
-        for (let i = 0; i < self.upgrades.length; i++){
-            let cb_cell = cb_table_row.insertCell(cb_table_row.cells.length);
-            var cb = HTML_Create_Input_Checkbox(
-                    false,
-                    Proc_Checkbox_OnChange_Event.bind(null, i)
-            );
-            cb.setAttribute('id', CHECKBOX_ID_PREFIX + i);
-            cb_cell.appendChild(cb);
-        }
-    }
-    
-    var Proc_Checkbox_OnChange_Event = function(lvl_boost, event){
-        self.SetUpgradeValue(lvl_boost, event.target.checked);
     }
 
     var Set_Field_Value = function(){
@@ -217,9 +185,8 @@ function Abiscore_Value_Data_t (name, cb_table_row){
     }
 
     this.SetUpgradeValue = function(lvlup_num, value){
-        let cb = document.getElementById(CHECKBOX_ID_PREFIX + lvlup_num);
         self.upgrades[lvlup_num] = value;
-        cb.checked = value;
+        layers.abiscores.SetUpgradeValue(self.name, lvlup_num, value);
         self.Recalc();
     }
 
@@ -244,7 +211,7 @@ function Abiscore_Value_Data_t (name, cb_table_row){
     this.arr_recalc_functions = new Recalc_Function_Collection_t();
 
 //additional initialization
-    Init(cb_table_row);
+    Init();
 }
 
 function Abiscore_Mod_Collection_t(){
@@ -337,13 +304,12 @@ function Abiscore_Value_Collection_t(){
 //private methods
     var Init = function(){
         const ABISCORE_ARR = Object.values(ABISCORES);
-        while(CHECKBOX_TABLE.rows.length > 1){
-            CHECKBOX_TABLE.deleteRow(1);
-        }
+        
+        layers.abiscores.Set_Func_Change_Value(self.ChangeBaseValue);
+        layers.abiscores.Set_Func_Checkbox_Onchange(self.SetLvlupUpgrade);
         
         ABISCORE_ARR.forEach(abiscore => {
-            let cb_table_row = CHECKBOX_TABLE.insertRow(CHECKBOX_TABLE.rows.length);
-            m_map.set (abiscore, new Abiscore_Value_Data_t (abiscore, cb_table_row));
+            m_map.set (abiscore, new Abiscore_Value_Data_t (abiscore));
         });
     }
 
@@ -731,23 +697,7 @@ function Abiscore_Point_t (out_field_total, out_field_spent, out_field_left){
 function Abiscore_t (){
 //private methods
     var Init = function(){
-        const ABISCORE_ARR = Object.values(ABISCORES);
-        layers.abiscores.Clear_Tables();
-        layers.face.block_stats.abiscores.Clear_Table();
         
-        ABISCORE_ARR.forEach(abiscore => {
-            layers.abiscores.Add_Abiscore(
-                abiscore,
-                self.values.ChangeBaseValue,
-                Get_Class_Abiscore_Value(abiscore),
-                Get_Class_Abiscore_Mod(abiscore)
-            );
-            layers.face.block_stats.abiscores.Add_Abiscore(
-                abiscore,
-                Get_Class_Abiscore_Value(abiscore),
-                Get_Class_Abiscore_Mod(abiscore)
-            );
-        });
     }
 
 //public methods

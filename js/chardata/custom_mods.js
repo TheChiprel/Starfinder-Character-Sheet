@@ -178,7 +178,7 @@ function Mod_Table_t (){
 
     this.Get_SaveData_Obj = function(){
         var ret = new Array(0);
-        m_arr.forEach(mod => {
+        m_map.forEach(mod => {
             ret.push(mod.Get_SaveData_Obj());
         });
         return ret;
@@ -281,7 +281,7 @@ function Bool_Table_t (){
 
     this.Get_SaveData_Obj = function(){
         var ret = new Array(0);
-        m_arr.forEach(mod => {
+        m_map.forEach(mod => {
             ret.push(mod.Get_SaveData_Obj());
         });
         return ret;
