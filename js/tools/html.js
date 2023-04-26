@@ -152,9 +152,9 @@ function HTML_Create_Input_Checkbox(value = false, onchange_elem = undefined, id
 
     if (onchange_elem != undefined){
         if ((typeof onchange_elem) == "function"){
-            ret_elem.onclick = onchange_elem;
+            ret_elem.onchange = onchange_elem;
         }else{
-            ret_elem.setAttribute('onclick', onchange_elem);
+            ret_elem.setAttribute('onchange', onchange_elem);
         }
     }
     //else NOTHING TO DO
@@ -209,9 +209,9 @@ function HTML_Create_Selector(null_option = false, list = undefined, onchange_el
 
     if (onchange_elem != undefined){
         if ((typeof onchange_elem) == "function"){
-            ret_elem.onclick = onchange_elem;
+            ret_elem.onchange = onchange_elem;
         }else{
-            ret_elem.setAttribute('onclick', onchange_elem);
+            ret_elem.setAttribute('onchange', onchange_elem);
         }
     }
     //else NOTHING TO DO
