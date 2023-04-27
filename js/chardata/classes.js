@@ -54,6 +54,16 @@ function Class_t (entry){
 
 function Class_Collection_t (){
 //private methods
+    var Init = function(){
+        layers.maininfo.Clear_Class_Table();
+        layers.maininfo.Clear_Class_Add_Buttons();
+        
+        CLASS_DATABASE.forEach(entry => {
+            self.class_map.set (entry.name, new Class_t (entry));
+            layers.maininfo.Add_Class_Add_Button(entry.name, self.SetLvl.bind(null, entry.name, 1));
+        });
+    }
+
     var Find_Class_By_Name = function (class_name){
         if (!self.class_map.has(class_name)){
             return null;
@@ -155,8 +165,10 @@ function Class_Collection_t (){
         
         if (class_obj.context.lvl == 0){
             Activate_Class(class_obj);
+            layers.maininfo.Add_New_Class(class_name, lvl_to_set);
         }else if (lvl_to_set == 0){
             Deactivate_Class(class_obj);
+            layers.maininfo.Remove_Class(class_name);
         }
 
         if ((class_obj.context.lvl < 3) && (lvl_to_set >= 3)){
@@ -174,7 +186,7 @@ function Class_Collection_t (){
         var class_obj = Find_Class_By_Name(class_name);
         if (class_obj == null){
             console.error("Attempt to get level of unknown class: '" + class_name + "'");
-            return;
+            return null;
         }
         
         return class_obj.context.lvl;
@@ -190,6 +202,16 @@ function Class_Collection_t (){
         });
         return ret;
     }
+    
+    this.Load_From_Obj = function(obj){
+        if (obj != undefined){
+            obj.forEach(cl => {
+                self.SetLvl(cl.name, cl.context.lvl);
+                layers.classes.Load_From_Obj(cl.name, cl.context); //TODO: replace
+                //Find_Class_By_Name(cl.name).Load_From_Obj(cl.context);
+            });
+        }
+    }
 
 //private properties
     var self = this;
@@ -199,9 +221,7 @@ function Class_Collection_t (){
     this.arr_recalc_functions = new Recalc_Function_Collection_t();
 
 //additional initialization
-    CLASS_DATABASE.forEach(entry => {
-        this.class_map.set (entry.name, new Class_t (entry));
-    });
+    Init();
 }
 
 //===============initial callback assignment===============//

@@ -44,7 +44,8 @@ function Layers_t (){
 
 //public methods
     this.Reset = function(){
-        self.maininfo = new Layer_MainInfo_t();
+        self.maininfo.Reset();  //TODO: rework, remove
+        //self.maininfo = new Layer_MainInfo_t();
         self.inventory = new Layer_Inventory_t();
         self.classes = new Layer_Classes_t();
         self.abilities = new Layer_Abilities_t();
@@ -80,7 +81,7 @@ function Layers_t (){
     var self = this;
 
 //public properties
-    this.maininfo;
+    this.maininfo = new Layer_MainInfo_t();
     this.abiscores = new Layer_Abiscores_t();
     this.skills = new Layer_Skills_t();
     this.inventory;

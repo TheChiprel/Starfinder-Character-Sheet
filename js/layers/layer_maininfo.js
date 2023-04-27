@@ -1,32 +1,5 @@
 function Layer_MainInfo_t(){
 //private methods
-    var Init_Class_Selector = function(){
-        m_class_add_button_map = new Map();
-        let class_ddlist = document.getElementById('class_ddlist_classes_content');
-        class_ddlist.innerHTML = "";
-        for (let i = 0; i < CLASS_DATABASE.length; i++){
-            var class_name = CLASS_DATABASE[i].name;
-            var add_func = self.Add_New_Class.bind(null, class_name, 1);
-            var new_button = HTML_Create_Button(
-                class_name,
-                add_func,
-                undefined,
-                "class_button_add_class");
-            class_ddlist.appendChild(new_button);
-
-            var br = document.createElement("br");
-            class_ddlist.appendChild(br);
-
-            m_class_add_button_map.set(class_name, new_button);
-        }
-
-        let table = document.getElementById("table_classes_lvl");
-        while (table.rows.length > 1){
-            table.deleteRow(1);
-        }
-        table.style.display = "none";
-    }
-
     var Init_Proficiency_HTML = function(){
         let table_prof_weapon = document.getElementById('table_prof_weapon');
         let table_prof_armor = document.getElementById('table_prof_armor');
@@ -93,9 +66,48 @@ function Layer_MainInfo_t(){
         });
     }
 
-    var Reset = function (){
-        Init_Class_Selector();
+    var Proc_Set_Class_Lvl_Event = function(class_name, event){
+        let new_value = event.target.value;
+        if (isNaN(new_value)){
+            event.target.value = chardata.classes.Get_Lvl(class_name);
+            return;
+        }
+        chardata.classes.SetLvl(class_name, parseInt(new_value));
+    }
+    
+    var Proc_Remove_Class_Event = function(class_name){
+        chardata.classes.SetLvl(class_name, 0);
+    }
+    
+//public methods
+    //TODO: rework, remove
+    this.Reset = function (){
         Init_Proficiency_HTML();
+    }
+
+    this.Clear_Class_Add_Buttons = function(){
+        m_class_add_list.innerHTML = "";
+    }
+
+    this.Clear_Class_Table = function(){
+        while (m_class_table.rows.length > 1){
+            m_class_table.deleteRow(1);
+        }
+        m_class_table.style.display = "none";
+    }
+    
+    this.Add_Class_Add_Button = function(class_name, call_back_func){
+        var new_button = HTML_Create_Button(
+            class_name,
+            call_back_func,
+            undefined,
+            "class_button_add_class");
+        m_class_add_list.appendChild(new_button);
+
+        var br = document.createElement("br");
+        m_class_add_list.appendChild(br);
+
+        m_class_add_button_map.set(class_name, new_button);
     }
 
     this.Add_New_Class = function(class_name, lvl = 1){
@@ -106,8 +118,7 @@ function Layer_MainInfo_t(){
             return;
         }
 
-        let table = document.getElementById("table_classes_lvl");
-        var row = table.insertRow(table.rows.length);
+        var row = m_class_table.insertRow(m_class_table.rows.length);
         row.class = 'class_row_class_lvl';
         row.name =  class_name;
 
@@ -116,16 +127,20 @@ function Layer_MainInfo_t(){
         var cell_button = row.insertCell(2);
 
         var class_label = HTML_Create_Label(class_name);
-        var class_lvl = HTML_Create_Input_Number(lvl, 1, 20, "layers.maininfo.Set_Class_Lvl(Number(event.target.value), '" + class_name + "')"); //TODO: magic
-        var remove_func = self.Remove_Class.bind(null, class_name);
-        var class_button_remove = HTML_Create_Button("X", remove_func);
+        var class_lvl = HTML_Create_Input_Number(
+            lvl,
+            1,
+            20, 
+            Proc_Set_Class_Lvl_Event.bind(null, class_name)
+        );//TODO: magic
+        var class_button_remove = HTML_Create_Button("X", Proc_Remove_Class_Event.bind(null, class_name));
 
         cell_label.appendChild(class_label);
         cell_lvl.appendChild(class_lvl);
         cell_button.appendChild(class_button_remove);
-        table.style.display = "block";
+        m_class_table.style.display = "block";
 
-        chardata.classes.SetLvl(class_name, lvl);
+        //chardata.classes.SetLvl(class_name, lvl);
         layers.classes.Show_Block(class_name);
     }
     
@@ -135,17 +150,14 @@ function Layer_MainInfo_t(){
     }
 
     this.Remove_Class = function(class_name){
-        //getting class table
-        var table = document.getElementById("table_classes_lvl");
-
         //removing table row
-        for (let i = 1; i < table.rows.length; i++){
-            var row = table.rows[i];
+        for (let i = 1; i < m_class_table.rows.length; i++){
+            var row = m_class_table.rows[i];
 
             if(row.name == class_name){
-                table.deleteRow(i);
-                if (table.rows.length <= 1){
-                    table.style.display = "none";
+                m_class_table.deleteRow(i);
+                if (m_class_table.rows.length <= 1){
+                    m_class_table.style.display = "none";
                 }
                 break;
             }
@@ -159,7 +171,7 @@ function Layer_MainInfo_t(){
             return;
         }
 
-        chardata.classes.SetLvl(class_name, 0);
+        //chardata.classes.SetLvl(class_name, 0);
         layers.classes.Hide_Block(class_name);
     }
 
@@ -175,10 +187,11 @@ function Layer_MainInfo_t(){
 
 //private properties
     var self = this;
-    var m_class_add_button_map;
+    var m_class_add_list = document.getElementById('class_ddlist_classes_content');
+    var m_class_add_button_map = new Map();
+    var m_class_table = document.getElementById("table_classes_lvl");
 
 //public properties
 
 //additional initialization
-    Reset();
 }
