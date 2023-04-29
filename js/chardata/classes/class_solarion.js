@@ -393,8 +393,14 @@ const SELECTOR_LIST = ["Огонь", "Холод"];
 
 function Manifistation_t(){
 //constants
+const GUI_BLOCK = layers.classes.Get_Block(CLASSES.SOLARION).manifistation;
 const MANIFISTATION_SOLAR_WEAPON = "Звёздное оружие";
 const MANIFISTATION_SOLAR_ARMOR = "Звёздная броня";
+
+//private methods
+    var Init = function(){
+        GUI_BLOCK.Reset(self);
+    }
 
 //public methods
     this.Set = function(entry){
@@ -403,7 +409,7 @@ const MANIFISTATION_SOLAR_ARMOR = "Звёздная броня";
             manif_type = entry.name;
         }
 
-        m_entry = entry;
+        
         if (m_context != null){
             m_context.Clean();
         }
@@ -411,18 +417,28 @@ const MANIFISTATION_SOLAR_ARMOR = "Звёздная броня";
         switch(manif_type){
         case MANIFISTATION_SOLAR_WEAPON:
             m_context = new Manifistation_Solar_Weapon_t();
-            return true;
+            break;
 
         case MANIFISTATION_SOLAR_ARMOR:
             m_context = new Manifistation_Solar_Armor_t();
-            return true;
+            break;
 
         case null:
         default:
             m_context = null;
             break;
         }
-        return false;
+        
+        if (m_context == null){
+            GUI_BLOCK.Clear();
+            m_entry = null;
+            return false;
+        }
+        
+        m_entry = entry;
+        let [selector_label, selector_options] = m_context.Get_Selector_Options();
+        GUI_BLOCK.Set(entry.name, m_context.IsAlwaysActive(), selector_label, selector_options);
+        return true;
     }
 
     this.Clear = function(){
@@ -432,6 +448,7 @@ const MANIFISTATION_SOLAR_ARMOR = "Звёздная броня";
         }
 
         m_entry = null;
+        GUI_BLOCK.Clear();
     }
 
     this.Update_Lvl = function(lvl){
@@ -442,26 +459,12 @@ const MANIFISTATION_SOLAR_ARMOR = "Звёздная броня";
 
     this.Activate = function(){
         m_context.Activate();
+        GUI_BLOCK.Set_Active_State(true);
     }
 
     this.Deactivate = function(){
         m_context.Deactivate();
-    }
-
-    this.IsAlwaysActive = function(){
-        if (m_context == null){
-            return false;
-        }
-
-        return m_context.IsAlwaysActive();
-    }
-
-    this.Get_Selector_Options = function(){
-        if (m_context == null){
-            return false;
-        }
-
-        return m_context.Get_Selector_Options();
+        GUI_BLOCK.Set_Active_State(false);
     }
 
     this.Selector_Changed = function(value){
@@ -489,11 +492,23 @@ const MANIFISTATION_SOLAR_ARMOR = "Звёздная броня";
         };
         return ret;
     }
+    
+    this.Load_From_Obj = function(obj){
+        if (obj == undefined){
+            return;
+        }
+        
+        //TODO: put smaller db here
+        self.Set(Get_Ability_Entry_By_Name(ABILITIES_DATABASE, obj));
+    }
 
 //private properties
     var self = this;
     var m_context = null;
     var m_entry = null;
+    
+//additional initialization
+    Init();
 }
 
 function Class_Solarion_t (){

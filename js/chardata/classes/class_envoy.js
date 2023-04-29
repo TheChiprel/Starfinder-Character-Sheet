@@ -206,7 +206,7 @@ const TALENTS_LVLS = [3, 7, 11, 15, 19];
         }
     }
 
-//public methods    
+//public methods
     this.Set_Lvl = function(lvl){
         self.lvl = lvl;
         self.class_abilities.Update_Lvl(self.lvl);

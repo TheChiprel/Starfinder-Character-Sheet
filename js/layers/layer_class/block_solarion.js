@@ -84,30 +84,13 @@ const SELECTOR_CLASS = "class_selector_solarion_adept_skill";
     Init();
 }
 
-function Block_Manifistation_t(class_data){
+//TODO: rework selector as database
+function Block_Manifistation_t(){
 //constants
+    const BLOCK_DATABASE = Ability_Database_GetList(ABILITIES_DATABASE, "Класс", ["Солярион", "Звёздное воплощение"], undefined, undefined, true);
 
 //private methods
-    var Reset = function(){
-        m_outfield_name.value = "Не выбрано";
-        m_outfield_data.value = "";
-        m_button_select.innerHTML = "+";
-        m_button_select.onclick = self.Open_Database;
-        m_button_activate.onclick = self.Activate;
-        m_selector.onchange = self.Selector_Changed;
-        m_label_selector.innerHTML = "";
-        HTML_Selector_Clear_Options(m_selector);
-        
-        m_outfield_data.style.display = "none";
-        m_label_selector.style.display = "none";
-        m_selector.style.display = "none";
-        m_button_activate.style.display = "none";
-    }
-
-//public methods
-    this.Open_Database = function(){
-        m_database = Ability_Database_GetList(ABILITIES_DATABASE, "Класс", ["Солярион", "Звёздное воплощение"], undefined, undefined, true);
-
+    var Proc_Open_Database_Event = function(){
         var table_data = new Array(0);
         var filters = new Array(0);
 
@@ -117,8 +100,8 @@ function Block_Manifistation_t(class_data){
             "Ист."
         ];
 
-        for (let i = 0; i < m_database.length; i++){
-            let cur_ability = m_database[i];
+        for (let i = 0; i < BLOCK_DATABASE.length; i++){
+            let cur_ability = BLOCK_DATABASE[i];
 
             table_data.push([
                 cur_ability.name,
@@ -131,130 +114,144 @@ function Block_Manifistation_t(class_data){
 
         Popup_Database.Open(
             table_data,
-            self.Set_By_Entry_Num,
+            Proc_Manif_Change_Event,
             filters,
             headers,
-            self.Show_Info_Database);
+            Proc_Show_Database_Info_Event);
     }
-    
-    this.Set = function(entry){
-        if (!m_class_data.manifistation.Set(entry)){
+
+    var Proc_Manif_Change_Event = function(entry_num){
+        if (m_owner == null){
             return;
         }
+        
+        let entry = BLOCK_DATABASE[entry_num];
+        m_owner.Set(entry)
+        Popup_Database.Close();
+    }
+    
+    var Proc_Remove_Event = function(){
+        if (m_owner == null){
+            return;
+        }
+        
+        m_owner.Clear();
+    }
+    
+    var Proc_Show_Details_Event = function(){
+        if (m_owner == null){
+            return;
+        }
+        
+        m_owner.Show_Details();
+    }
+    
+    var Proc_Show_Database_Info_Event = function(entry_num){
+        let ability = BLOCK_DATABASE[entry_num];
 
-        m_outfield_name.value = entry.name;
-        m_outfield_name.onclick = self.Show_Details;
+        Popup_Descr.Call(ability.name, ability.descr);
+    }
+    
+    var Proc_Activate_Event = function(){
+        if (m_owner == null){
+            return;
+        }
+        
+        m_owner.Activate();
+    }
+    
+    var Proc_Deactivate_Event = function(){
+        if (m_owner == null){
+            return;
+        }
+        
+        m_owner.Deactivate();
+    }
+    
+    var Proc_Selector_OnChange_Event = function(){
+        let value = m_selector.value;
+        if (value == "---"){
+            m_owner.Selector_Changed(null);
+        }else{
+            m_owner.Selector_Changed(value);
+        }
+    }
+
+//public methods
+    this.Reset = function(owner){
+        m_owner = owner;
+        self.Clear();
+    }
+    
+    this.Clear = function(){
+        m_outfield_name.value = "Не выбрано";
+        m_outfield_data.value = "";
+        m_button_select.innerHTML = "+";
+        m_button_select.onclick = Proc_Open_Database_Event;
+        m_button_activate.onclick = Proc_Activate_Event;
+        m_selector.onchange = Proc_Selector_OnChange_Event;
+        m_label_selector.innerHTML = "";
+        HTML_Selector_Clear_Options(m_selector);
+        
+        m_outfield_data.style.display = "none";
+        m_label_selector.style.display = "none";
+        m_selector.style.display = "none";
+        m_button_activate.style.display = "none";
+    }
+    
+    this.Set = function(manif_name, isAlwaysActive, selector_label, selector_options){
+        m_outfield_name.value = manif_name;
+        m_outfield_name.onclick = Proc_Show_Details_Event;
 
         m_button_select.innerHTML = "X";
-        m_button_select.onclick = self.Remove;
+        m_button_select.onclick = Proc_Remove_Event;
         
         m_outfield_data.style.display = "inline";
         
-        if (!m_class_data.manifistation.IsAlwaysActive()){
+        if (!isAlwaysActive){
             m_button_activate.disabled = false;
             m_button_activate.style.display = "inline";
         }
         
         HTML_Selector_Clear_Options(m_selector);
-        let [label_value, option_list] = m_class_data.manifistation.Get_Selector_Options()
-        if (option_list != null){
-            m_label_selector.innerHTML = label_value;
+        if (selector_options != null){
+            m_label_selector.innerHTML = selector_label;
             HTML_Selector_Add_Option(m_selector, "---");
-            HTML_Selector_Add_Option_List(m_selector, option_list);
+            HTML_Selector_Add_Option_List(m_selector, selector_options);
             m_label_selector.style.display = "inline";
             m_selector.style.display = "inline";
         }
 
-        m_database = null;
         Popup_Database.Close();
     }
-
-    this.Set_By_Entry_Num = function(entry_num){
-        self.Set(m_database[entry_num]);
+    
+    this.Set_Selector_Value = function(value){
+        m_selector.value = value;
     }
     
-    this.Set_By_Name = function(name){
-        var entry = Get_Ability_Entry_By_Name(ABILITIES_DATABASE, name);
-        if (entry == null){
-            console.error("Failed to find ability: '" + name + "'");
-            return;
-        }
-        
-        self.Set(entry);
-    }
-
-    this.Remove = function(){
-        m_class_data.manifistation.Clear();
-        Reset();
-    }
-    
-    this.Activate = function(){
-        m_class_data.manifistation.Activate();
-        m_button_activate.innerHTML = "Деактивировать";
-        m_button_activate.onclick = self.Deactivate;
-    }
-    
-    this.Deactivate = function(){
-        m_class_data.manifistation.Deactivate();
-        m_button_activate.innerHTML = "Активировать";
-        m_button_activate.onclick = self.Activate;
-    }
-
-    this.Show_Details = function(row){
-        m_class_data.manifistation.Show_Details();
-    }
-
-    this.Show_Info_Database = function(entry_num){
-        let ability = m_database[entry_num];
-
-        Popup_Descr.Call(ability.name, ability.descr);
-    }
-    
-    this.Selector_Changed = function(){
-        let value = m_selector.value;
-        if (value == "---"){
-            m_class_data.manifistation.Selector_Changed(null);
+    this.Set_Active_State = function(is_Active){
+        if (is_Active){
+            m_button_activate.innerHTML = "Деактивировать";
+            m_button_activate.onclick = Proc_Deactivate_Event;
         }else{
-            m_class_data.manifistation.Selector_Changed(value);
-        }
-    }
-
-    this.Load_From_Obj = function(obj){
-        if (obj == undefined){
-            return;
-        }
-
-        //TODO
-        self.Set_By_Name(obj.name);
-        if (obj.context == undefined){
-            return;
-        }
-        
-        if ((obj.context.selector != undefined) && (obj.context.selector != null)){
-            m_selector.value = obj.context.selector;
-            self.Selector_Changed();
-        }
-        
-        if ((obj.context.is_active != undefined) && (obj.context.is_active)){
-            self.Activate();
+            m_button_activate.innerHTML = "Активировать";
+            m_button_activate.onclick = Proc_Activate_Event;
         }
     }
 
 //private properties
     var self = this;
-    var m_class_data = class_data;
+    var m_owner = null;
     var m_outfield_name = document.getElementById('outfield_manifistation_name');
     var m_outfield_data = document.getElementById('outfield_manifistation_data');
     var m_button_select = document.getElementById('button_manifistation_select');
     var m_button_activate = document.getElementById('button_manifistation_active');
     var m_label_selector = document.getElementById('label_manifistation_selector');
     var m_selector = document.getElementById('selector_manifistation');
-    var m_database = null;
 
 //public properties
 
 //additional initialization
-    Reset();
 }
 
 function Block_Class_Solarion_t(){
@@ -317,7 +314,7 @@ function Block_Class_Solarion_t(){
         Ability_Database_GetList(ABILITIES_DATABASE, "Класс", ["Солярион", "Наивысшее звёздное откровение", "Фотонное"], 2, undefined, true),
         false);
         
-    //this.manifistation = new Block_Manifistation_t(m_class_data);
+    this.manifistation = new Block_Manifistation_t();
 
 //additional initialization
     Init();
