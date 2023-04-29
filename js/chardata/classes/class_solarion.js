@@ -498,13 +498,59 @@ const MANIFISTATION_SOLAR_ARMOR = "Звёздная броня";
 
 function Class_Solarion_t (){
 //constants
+const ABILITY_LIST = [
+    ["Звёздное воплощение"],
+    ["Звёздное откровение"],
+    ["Звёздный режим"],
+    ["Знаток навыков"],
+    ["Сидерическое влияние"],
+    ["Привычное оружие [Солярион]"],
+    ["Блистательные удары"],
+    ["Наивысшие откровения"],
+    ["Солярионский натиск"],
+    ["Звёздный идеал"]
+];
 const CLASS_ABILITY_LVLS = [1, 1, 1, 1, 3, 3, 7, 9, 13, 20];
 const REVELATIONS_LVLS = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20];
+const STELLAR_MODES_LIST = [
+    ["Гравитонный режим"],
+    ["Нейтральный режим"],
+    ["Фотонный режим"]
+];
 const STELLAR_MODES_LVLS = [1, 1, 1];
 const ZENITHS_LVLS = [1, 9, 17];
 const ADEPT_SKILL_COUNT = 2;
-//private methods
 
+//private methods
+    var Init = function(){
+        let solarion_db = Ability_Database_GetList(ABILITIES_DATABASE, "Класс", ["Солярион"]);
+        
+        let curr_db = Ability_Database_GetList(solarion_db, undefined, ["Способность класса"]);
+        for (let i = 0; i < ABILITY_LIST.length; i++){
+            if (ABILITY_LIST[i].length == 1){
+                let abi_name = ABILITY_LIST[i][0];
+                let abi_entry = Get_Ability_Entry_By_Name(curr_db, abi_name);
+                self.class_abilities.Set(i, abi_entry, undefined, true);
+            }else{
+                //TODO?
+            }
+        }
+        
+        curr_db = Ability_Database_GetList(
+            solarion_db, undefined, ["Звёздный режим"]);
+        for (let i = 0; i < STELLAR_MODES_LIST.length; i++){
+            if (STELLAR_MODES_LIST[i].length == 1){
+                let abi_name = STELLAR_MODES_LIST[i][0];
+                let abi_entry = Get_Ability_Entry_By_Name(curr_db, abi_name);
+                self.stellar_modes.Set(i, abi_entry, undefined, true);
+            }else{
+                //TODO?
+            }
+        }
+        
+        self.zeniths_graviton.Set(0, Get_Ability_Entry_By_Name(solarion_db, "Чёрная дыра"), undefined, true);
+        self.zeniths_photon.Set(0, Get_Ability_Entry_By_Name(solarion_db, "Сверхновая"), undefined, true);
+    }
 
 //public methods
     this.Set_Lvl = function(lvl){
@@ -533,6 +579,18 @@ const ADEPT_SKILL_COUNT = 2;
         }
         return ret;
     }
+    
+    this.Load_From_Obj = function(obj){
+        if (obj == undefined){
+            return;
+        }
+        
+        self.adept_skills.Load_From_Obj(obj.adept_skills);
+        self.revelations.Load_From_Obj(obj.revelations);
+        self.zeniths_graviton.Load_From_Obj(obj.zeniths_graviton);
+        self.zeniths_photon.Load_From_Obj(obj.zeniths_photon);
+        self.manifistation.Load_From_Obj(obj.manifistation);
+    }
 
 //private properties
     var self = this;
@@ -543,29 +601,35 @@ const ADEPT_SKILL_COUNT = 2;
         "abi_class_solarion",
         "Классовые способности (Солярион)",
         CLASS_ABILITY_LVLS,
-        "solarion_class_");
+        "solarion_class_",
+        layers.classes.Get_Block(CLASSES.SOLARION).class_abilities);
     this.stellar_modes = new Leveled_Ability_List_t(
         "abi_class_solarion_modes",
         "Звёздные режимы",
         STELLAR_MODES_LVLS,
-        "solarion_stellar_mode_");
+        "solarion_stellar_mode_",
+        layers.classes.Get_Block(CLASSES.SOLARION).stellar_modes);
     this.adept_skills = new Adapt_Skills_Collection_t();
     this.revelations = new Leveled_Ability_List_t(
         "abi_class_solarion_revelations",
         "Звёздные откровения",
         REVELATIONS_LVLS,
-        "solarion_revelation_");
+        "solarion_revelation_",
+        layers.classes.Get_Block(CLASSES.SOLARION).revelations);
     this.zeniths_graviton = new Leveled_Ability_List_t(
         "abi_class_solarion_zeniths_grav",
         "Высшие откровения (Гравитонные)",
         ZENITHS_LVLS,
-        "solarion_zeniths_graviton_");
+        "solarion_zeniths_graviton_",
+        layers.classes.Get_Block(CLASSES.SOLARION).zeniths_graviton);
     this.zeniths_photon = new Leveled_Ability_List_t(
         "abi_class_solarion_zeniths_photon",
         "Высшие откровения (Фотонные)",
         ZENITHS_LVLS,
-        "solarion_zeniths_photon_");
+        "solarion_zeniths_photon_",
+        layers.classes.Get_Block(CLASSES.SOLARION).zeniths_photon);
     this.manifistation = new Manifistation_t();
 
 //additional initialization
+    Init();
 }

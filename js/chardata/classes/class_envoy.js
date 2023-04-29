@@ -180,7 +180,7 @@ const ENVOY_EXPERTISE_SKILL_LIST = [
 }
 
 function Class_Envoy_t (){
-const ENVOY_ABILITY_LIST = [
+const ABILITY_LIST = [
     ["Импровизация посланника"],
     ["Мастерство"],
     ["Мастерство в навыке"],
@@ -195,11 +195,11 @@ const TALENTS_LVLS = [3, 7, 11, 15, 19];
 //private methods
     var Init = function(){
         let db = Ability_Database_GetList(ABILITIES_DATABASE, "Класс", ["Посланник", "Способность класса"]);
-        for (let i = 0; i < ENVOY_ABILITY_LIST.length; i++){
-            if (ENVOY_ABILITY_LIST[i].length == 1){
-                let abi_name = ENVOY_ABILITY_LIST[i][0];
+        for (let i = 0; i < ABILITY_LIST.length; i++){
+            if (ABILITY_LIST[i].length == 1){
+                let abi_name = ABILITY_LIST[i][0];
                 let abi_entry = Get_Ability_Entry_By_Name(db, abi_name);
-                self.class_abilities.Set(i, abi_entry);
+                self.class_abilities.Set(i, abi_entry, undefined, true);
             }else{
                 //TODO?
             }

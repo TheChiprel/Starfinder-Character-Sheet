@@ -90,23 +90,19 @@ function Block_Class_Envoy_t(){
     this.class_abilities = new Leveled_Abilities_Block_t(
         document.getElementById('table_class_abilities_envoy'),
         null,
-        [1, 1, 1, 3, 3, 20],
         true);
-        //new Block_Class_Envoy_Class_Abilities_t(m_class_data);
+
     this.expertise_skills = new Block_Class_Envoy_Expertise_Skills_t();
+    
     this.improvs = new Leveled_Abilities_Block_t(
         document.getElementById('table_class_improvisations'),
         Ability_Database_GetList(ABILITIES_DATABASE, "Класс", ["Посланник", "Импровизация посланника"], undefined, 20, true),
-        [1, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20],
         false);
-    //new Block_Class_Envoy_Improv_t(m_class_data);
+
     this.talents = new Leveled_Abilities_Block_t(
         document.getElementById('table_class_talents'),
         Ability_Database_GetList(ABILITIES_DATABASE, "Класс", ["Посланник", "Мастерский талант"], undefined, 20, true),
-        [3, 7, 11, 15, 19],
         false);
-        //= new Block_Class_Envoy_Talents_t(m_class_data);
-    
 
 //additional initialization
     Init();

@@ -259,19 +259,18 @@ function Leveled_Ability_List_t (id, list_name, lvl_list, id_prefix, gui_block){
 //private methods
     var Init = function(){
         if (GUI_BLOCK != undefined){
-            GUI_BLOCK.Set_Owner(self);
-            GUI_BLOCK.Reset();
+            GUI_BLOCK.Reset(self, lvl_list);
         }
     }
 
 //public methods
-    this.Set = function(row, entry, name_suffix = null){
+    this.Set = function(row, entry, name_suffix = null, is_const = false){
         //TODO: add safety check
         let is_active = (cur_lvl >= m_lvl_list[row]);
         m_abilities.Replace(row, m_id_prefix + row, entry, name_suffix, is_active);
         
         if (GUI_BLOCK != undefined){
-            GUI_BLOCK.Set(row, entry.name);
+            GUI_BLOCK.Set(row, entry.name, is_const);
         }
     }
     

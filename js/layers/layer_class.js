@@ -1,11 +1,7 @@
-function Leveled_Abilities_Block_t(gui_table, database, lvl_list, is_constant){
+function Leveled_Abilities_Block_t(gui_table, database){
 //constants
     const GUI_TABLE = gui_table;
     const BLOCK_DATABASE = database;
-    //TODO: set below by owner?
-    const LVL_LIST = lvl_list;
-    const IS_CONSTANT = is_constant;
-    /*Ability_Database_GetList(ABILITIES_DATABASE, "Класс", ["Посланник", "Мастерский талант"], undefined, max_lvl, true);*/
     
 //private methods
     var Proc_Show_Detail_Event = function(row){
@@ -15,7 +11,7 @@ function Leveled_Abilities_Block_t(gui_table, database, lvl_list, is_constant){
     }
     
     var Proc_Open_Database_Event = function(row){
-        let max_lvl = LVL_LIST[row];
+        let max_lvl = m_lvl_list[row];
 
         var table_data = new Array(0);
         var filters = new Array(0);
@@ -74,13 +70,15 @@ function Leveled_Abilities_Block_t(gui_table, database, lvl_list, is_constant){
         m_owner = owner;
     }
 
-    this.Reset = function(){
+    this.Reset = function(owner, lvl_list){
+        m_owner = owner;
+        m_lvl_list = lvl_list;
         while (GUI_TABLE.rows.length > 1){
             GUI_TABLE.deleteRow(1);
         }
 
-        for (let i = 0; i < LVL_LIST.length; i++){
-            let cur_lvl = LVL_LIST[i];
+        for (let i = 0; i < m_lvl_list.length; i++){
+            let cur_lvl = m_lvl_list[i];
 
             var row = GUI_TABLE.insertRow(GUI_TABLE.rows.length);
             var cell_lvl = row.insertCell(0);
@@ -89,17 +87,15 @@ function Leveled_Abilities_Block_t(gui_table, database, lvl_list, is_constant){
             cell_lvl.innerHTML = cur_lvl;
             cell_ability.innerHTML = "---";
             
-            if (!IS_CONSTANT){
-                var cell_add_remove_button = row.insertCell(2);
-                
-                var add_func = Proc_Open_Database_Event.bind(null, i);
-                var add_remove_button = HTML_Create_Button("+", add_func);
-                cell_add_remove_button.appendChild(add_remove_button);
-            }
+            var cell_add_remove_button = row.insertCell(2);
+            
+            var add_func = Proc_Open_Database_Event.bind(null, i);
+            var add_remove_button = HTML_Create_Button("+", add_func);
+            cell_add_remove_button.appendChild(add_remove_button);
         }
     }
 
-    this.Set = function(row, abi_name){
+    this.Set = function(row, abi_name, is_const){
         let table_row = GUI_TABLE.rows[row + 1]; // +1 with header
         let cell_name = table_row.cells[1];
         var remove_func = Proc_Remove_Event.bind(null, row);
@@ -108,9 +104,10 @@ function Leveled_Abilities_Block_t(gui_table, database, lvl_list, is_constant){
         cell_name.innerHTML = abi_name;
         cell_name.onclick = show_details_func;
 
-        if (!IS_CONSTANT){
-            let cell_add_remove_button = table_row.cells[2];
-            cell_add_remove_button.innerHTML = "";
+        let cell_add_remove_button = table_row.cells[2];
+        cell_add_remove_button.innerHTML = "";
+        
+        if (!is_const){
             var add_remove_button = HTML_Create_Button("X", remove_func);
             cell_add_remove_button.appendChild(add_remove_button);
         }
@@ -127,17 +124,16 @@ function Leveled_Abilities_Block_t(gui_table, database, lvl_list, is_constant){
         cell_name.innerHTML = "---";
         cell_name.removeAttribute("onclick");
 
-        if (!IS_CONSTANT){
-            let cell_add_remove_button = table_row.cells[2];
-            cell_add_remove_button.innerHTML = "";
-            var add_remove_button = HTML_Create_Button("+", add_func);
-            cell_add_remove_button.appendChild(add_remove_button);
-        }
+        let cell_add_remove_button = table_row.cells[2];
+        cell_add_remove_button.innerHTML = "";
+        var add_remove_button = HTML_Create_Button("+", add_func);
+        cell_add_remove_button.appendChild(add_remove_button);
     }
 
 //private properties
     var self = this;
     var m_owner = null;
+    var m_lvl_list = null;
 
 //public properties
 
@@ -213,7 +209,7 @@ function Layer_Classes_t(){
     //m_map.set(CLASSES.OPERATIVE, new Block_Class_Operative_t());
     m_map.set(CLASSES.ENVOY, new Block_Class_Envoy_t());
     //m_map.set(CLASSES.SOLDIER, new Block_Class_Soldier_t());
-    //m_map.set(CLASSES.SOLARION, new Block_Class_Solarion_t());
+    m_map.set(CLASSES.SOLARION, new Block_Class_Solarion_t());
     //m_map.set(CLASSES.TECHNOMANCER, new Block_Class_Technomancer_t());
 
     // Reset();
