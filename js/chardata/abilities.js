@@ -29,71 +29,6 @@ function Get_Ability_Entry_By_Name(in_database, name){
     return null;
 }
 
-function Ability_Database_GetList(in_database, in_type = undefined, in_subtype = undefined, min_lvl = undefined, max_lvl = undefined, sort_lvl = false){
-    var ret = new Array(0);
-    if ((in_type == undefined) && (in_subtype == undefined) && (in_category == undefined)){
-        console.error("Extracting from database with no criteria set");
-        return in_database;
-    }
-
-    for (let i = 0; i < in_database.length; i++){
-        let entry = in_database[i]; //VAR?
-        if ((in_type != undefined) && (in_type != entry.type)){
-            continue;
-        }
-
-        if ((in_subtype != undefined) && (in_subtype.length > 0)){
-            if (entry.subtype == null){
-                continue;
-            }
-
-            let entry_subtypes = entry.subtype.split(', ');
-            let valid = true;
-            for (let j = 0; (j < in_subtype.length) && (valid); j++){
-                valid = (entry_subtypes.includes(in_subtype[j]));
-            }
-
-            if (!valid){
-                continue;
-            }
-        }
-
-        if (min_lvl != undefined){
-            if ((entry.lvl == null) || (entry.lvl < min_lvl)){
-                continue
-            }
-        }
-
-        if (max_lvl != undefined){
-            if ((entry.lvl == null) || (entry.lvl > max_lvl)){
-                continue
-            }
-        }
-
-        ret.push(entry);
-    }
-
-    if (sort_lvl){
-        ret.sort((a, b) => {
-            if (a.lvl == null){
-                if (b.lvl == null){
-                    return 0;
-                }
-
-                return -1;
-            }
-
-            if (b.lvl == null){
-                return 1;
-            }
-
-            return (a.lvl - b.lvl);
-        });
-    }
-
-    return ret;
-}
-
 function Ability_t(id, entry, name_suffix = null, is_active){
 //private methods
 
@@ -317,21 +252,35 @@ function Ability_Collection_t(
     Init(id);
 }
 
-function Leveled_Ability_List_t (id, list_name, lvl_list, id_prefix){
+function Leveled_Ability_List_t (id, list_name, lvl_list, id_prefix, gui_block){
 //constants
+    const GUI_BLOCK = gui_block;
 
 //private methods
+    var Init = function(){
+        if (GUI_BLOCK != undefined){
+            GUI_BLOCK.Set_Owner(self);
+            GUI_BLOCK.Reset();
+        }
+    }
 
 //public methods
     this.Set = function(row, entry, name_suffix = null){
         //TODO: add safety check
         let is_active = (cur_lvl >= m_lvl_list[row]);
         m_abilities.Replace(row, m_id_prefix + row, entry, name_suffix, is_active);
+        
+        if (GUI_BLOCK != undefined){
+            GUI_BLOCK.Set(row, entry.name);
+        }
     }
     
     this.Remove = function(row){
         //TODO: add safety check
         m_abilities.Remove(row, m_id_prefix + row);
+        if (GUI_BLOCK != undefined){
+            GUI_BLOCK.Remove(row);
+        }
     }
     
     this.Clear = function(){
@@ -365,6 +314,18 @@ function Leveled_Ability_List_t (id, list_name, lvl_list, id_prefix){
     this.Get_SaveData_Obj = function(){
         return m_abilities.Get_SaveData_Obj();
     }
+    
+    this.Load_From_Obj = function(obj){
+        if (obj == undefined){
+            return;
+        }
+        
+        for (let i = 0; i < m_lvl_list.length; i++){
+            if (obj[i] != null){
+                self.Set(i, Get_Ability_Entry_By_Name(obj[i]));
+            }
+        }
+    }
 
 //private properties
     var self = this;
@@ -382,6 +343,7 @@ function Leveled_Ability_List_t (id, list_name, lvl_list, id_prefix){
 //public properties
 
 //additional initialization
+    Init();
 }
 
 function Ability_Racial_Collection_t(){
@@ -460,7 +422,7 @@ function Ability_Theme_Collection_t(){
 
 //private properties
     var self = this;
-    var m_collection = new Leveled_Ability_List_t("abi_theme", NAME_PREFIX, THEME_ABILITIES_LVLS, "theme_");
+    var m_collection = new Leveled_Ability_List_t("abi_theme", NAME_PREFIX, THEME_ABILITIES_LVLS, "theme_");//TODO: add layers block here
 
 //public properties
 

@@ -128,6 +128,18 @@ const EXPERTISE_LVLS = [1, 1, 5, 9, 13, 17];
         }
         return ret;
     }
+    
+    this.Load_From_Obj = function(obj, curr_lvl){
+        if (obj == undefined){
+            return;
+        }
+        
+        for (let i = 1; i < EXPERTISE_LVLS.length; i++){
+            if (obj[i-1] != null){
+                self.Set(i, obj[i-1], curr_lvl);
+            }
+        }
+    }
 
 //private properties
     var self = this;
@@ -140,11 +152,31 @@ const EXPERTISE_LVLS = [1, 1, 5, 9, 13, 17];
 }
 
 function Class_Envoy_t (){
+const ENVOY_ABILITY_LIST = [
+    ["Импровизация посланника"],
+    ["Мастерство"],
+    ["Мастерство в навыке"],
+    ["Мастерский талант"],
+    ["Привычное оружие [Посланник]"],
+    ["Истинный мастер"]
+];
 const CLASS_ABILITY_LVLS = [1, 1, 1, 3, 3, 20];
 const IMPROV_LVLS = [1, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20];
 const TALENTS_LVLS = [3, 7, 11, 15, 19];
 
 //private methods
+    var Init = function(){
+        let db = Ability_Database_GetList(ABILITIES_DATABASE, "Класс", ["Посланник", "Способность класса"]);
+        for (let i = 0; i < ENVOY_ABILITY_LIST.length; i++){
+            if (ENVOY_ABILITY_LIST[i].length == 1){
+                let abi_name = ENVOY_ABILITY_LIST[i][0];
+                let abi_entry = Get_Ability_Entry_By_Name(db, abi_name);
+                self.class_abilities.Set(i, abi_entry);
+            }else{
+                //TODO?
+            }
+        }
+    }
 
 //public methods    
     this.Set_Lvl = function(lvl){
@@ -164,6 +196,16 @@ const TALENTS_LVLS = [3, 7, 11, 15, 19];
         }
         return ret;
     }
+    
+    this.Load_From_Obj = function(obj){
+        if (obj == undefined){
+            return;
+        }
+        
+        self.improvs.Load_From_Obj(obj.improvs);
+        self.talents.Load_From_Obj(obj.talents);
+        self.exp_skills.Load_From_Obj(obj.exp_skills, obj.lvl);
+    }
 
 //private properties
     var self = this;
@@ -174,18 +216,22 @@ const TALENTS_LVLS = [3, 7, 11, 15, 19];
         "abi_class_envoy",
         "Классовые способности (Посланник)",
         CLASS_ABILITY_LVLS,
-        "envoy_class_");
+        "envoy_class_",
+        layers.classes.Get_Block(CLASSES.ENVOY).class_abilities);
     this.improvs = new Leveled_Ability_List_t(
         "abi_class_envoy_improv",
         "Импровизации Посланника",
         IMPROV_LVLS,
-        "envoy_improv_");
+        "envoy_improv_",
+        layers.classes.Get_Block(CLASSES.ENVOY).improvs);
     this.talents = new Leveled_Ability_List_t(
         "abi_class_envoy_talants",
         "Мастерские таланты",
         TALENTS_LVLS,
-        "envoy_talent_");
+        "envoy_talent_",
+        layers.classes.Get_Block(CLASSES.ENVOY).talents);
     this.exp_skills = new Exp_Skills_Collection_t();
 
 //additional initialization
+    Init();
 }

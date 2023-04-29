@@ -1,13 +1,6 @@
+/*
 function Block_Class_Envoy_Class_Abilities_t(class_data){
 //constants
-const ENVOY_ABILITY_LIST = [
-    ["Импровизация посланника"],
-    ["Мастерство"],
-    ["Мастерство в навыке"],
-    ["Мастерский талант"],
-    ["Привычное оружие [Посланник]"],
-    ["Истинный мастер"]
-];
 
 //private methods
     var Init = function(){
@@ -56,8 +49,9 @@ const ENVOY_ABILITY_LIST = [
 //additional initialization
     Init();
 }
+*/
 
-function Block_Class_Envoy_Expertise_Skills_t(class_data){
+function Block_Class_Envoy_Expertise_Skills_t(){
 //constants
 const ENVOY_EXPERTISE_SKILL_LIST = [
     SKILLS.BLUFF,
@@ -106,9 +100,9 @@ const SELECTOR_CLASS = "selector_envoy_expertise_skill";
         let skill = selector.value;
 
         if (skill == "---"){
-            m_class_data.exp_skills.Set(row, null, m_class_data.lvl);
+            //m_class_data.exp_skills.Set(row, null, m_class_data.lvl);
         }else{
-            m_class_data.exp_skills.Set(row, skill, m_class_data.lvl);
+            //m_class_data.exp_skills.Set(row, skill, m_class_data.lvl);
         }
     }
     
@@ -124,7 +118,7 @@ const SELECTOR_CLASS = "selector_envoy_expertise_skill";
         }else{
             selectors[row].value = name;
         }
-        m_class_data.exp_skills.Set(row, name, m_class_data.lvl);
+        //m_class_data.exp_skills.Set(row, name, m_class_data.lvl);
     }
 
     this.Load_From_Obj = function(obj){
@@ -139,7 +133,7 @@ const SELECTOR_CLASS = "selector_envoy_expertise_skill";
 
 //private properties
     var self = this;
-    var m_class_data = class_data;
+    //var m_class_data = class_data;
     var m_expertise_table = document.getElementById('table_class_expertise_skills');
 
 //public properties
@@ -148,6 +142,7 @@ const SELECTOR_CLASS = "selector_envoy_expertise_skill";
     Init();
 }
 
+/*
 function Block_Class_Envoy_Improv_t(class_data){
 //constants
 
@@ -298,6 +293,7 @@ function Block_Class_Envoy_Improv_t(class_data){
 //additional initialization
     Init();
 }
+*/
 
 function Block_Class_Envoy_Talents_t(class_data){
 //constants
@@ -366,21 +362,21 @@ function Block_Class_Envoy_Talents_t(class_data){
             self.Show_Info_Database);
     }
 
-    this.Set = function(row, entry){
+    this.Set = function(row, abi_name){
         let table_row = m_table.rows[row + 1]; // +1 with header
         let cell_name = table_row.cells[1];
         let cell_add_remove_button = table_row.cells[2];
         var remove_func = self.Remove.bind(null, row);
         var show_details_func = self.Show_Details.bind(null, row);
 
-        cell_name.innerHTML = entry.name;
+        cell_name.innerHTML = abi_name;
         cell_name.onclick = show_details_func;
 
         cell_add_remove_button.innerHTML = "";
         var add_remove_button = HTML_Create_Button("X", remove_func);
         cell_add_remove_button.appendChild(add_remove_button);
 
-        m_class_data.Set_Talent(row, entry);
+        //m_class_data.Set_Talent(row, entry);
 
         m_database = null;
         Popup_Database.Close();
@@ -467,26 +463,32 @@ function Block_Class_Envoy_t(){
         m_block.style.display = "none";
     }
 
-    this.Load_From_Obj = function(obj){
-        if (obj == undefined){
-            return;
-        }
-
-        m_class_expertise_skills.Load_From_Obj(obj.exp_skills);
-        m_class_improv.Load_From_Obj(obj.improvs);
-        m_class_talents.Load_From_Obj(obj.talents);
-    }
-
 //private properties
     var self = this;
     var m_block = document.getElementById("block_class_details_envoy");
-    var m_class_data = chardata.classes.class_map.get(CLASSES.ENVOY).context;
-    var m_class_abilities = new Block_Class_Envoy_Class_Abilities_t(m_class_data);
-    var m_class_expertise_skills = new Block_Class_Envoy_Expertise_Skills_t(m_class_data);
-    var m_class_improv = new Block_Class_Envoy_Improv_t(m_class_data);
-    var m_class_talents = new Block_Class_Envoy_Talents_t(m_class_data);
 
 //public properties
+//TODO: get levels properly
+    this.class_abilities = new Leveled_Abilities_Block_t(
+        document.getElementById('table_class_abilities_envoy'),
+        null,
+        [1, 1, 1, 3, 3, 20],
+        true);
+        //new Block_Class_Envoy_Class_Abilities_t(m_class_data);
+    this.expertise_skills = new Block_Class_Envoy_Expertise_Skills_t();
+    this.improvs = new Leveled_Abilities_Block_t(
+        document.getElementById('table_class_improvisations'),
+        Ability_Database_GetList(ABILITIES_DATABASE, "Класс", ["Посланник", "Импровизация посланника"], undefined, 20, true),
+        [1, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20],
+        false);
+    //new Block_Class_Envoy_Improv_t(m_class_data);
+    this.talents = new Leveled_Abilities_Block_t(
+        document.getElementById('table_class_talents'),
+        Ability_Database_GetList(ABILITIES_DATABASE, "Класс", ["Посланник", "Мастерский талант"], undefined, 20, true),
+        [3, 7, 11, 15, 19],
+        false);
+        //= new Block_Class_Envoy_Talents_t(m_class_data);
+    
 
 //additional initialization
     Init();

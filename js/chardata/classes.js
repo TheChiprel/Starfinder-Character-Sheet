@@ -59,8 +59,10 @@ function Class_Collection_t (){
         layers.maininfo.Clear_Class_Add_Buttons();
         
         CLASS_DATABASE.forEach(entry => {
+            if (entry.name == "Посланник"){//TODO: remove
             self.class_map.set (entry.name, new Class_t (entry));
             layers.maininfo.Add_Class_Add_Button(entry.name, self.SetLvl.bind(null, entry.name, 1));
+            }
         });
     }
 
@@ -207,8 +209,13 @@ function Class_Collection_t (){
         if (obj != undefined){
             obj.forEach(cl => {
                 self.SetLvl(cl.name, cl.context.lvl);
-                layers.classes.Load_From_Obj(cl.name, cl.context); //TODO: replace
-                //Find_Class_By_Name(cl.name).Load_From_Obj(cl.context);
+                if (cl.name == "Посланник"){
+                    Find_Class_By_Name(cl.name).Load_From_Obj(cl.context);
+                }else{
+                    layers.classes.Load_From_Obj(cl.name, cl.context); //TODO: replace
+                }
+                
+                
             });
         }
     }
