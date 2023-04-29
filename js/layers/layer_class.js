@@ -70,9 +70,11 @@ function Leveled_Abilities_Block_t(gui_table, database){
         m_owner = owner;
     }
 
-    this.Reset = function(owner, lvl_list){
+    this.Reset = function(owner, lvl_list, is_const_default = false){
         m_owner = owner;
         m_lvl_list = lvl_list;
+        m_is_const_list = new Array(lvl_list.length).fill(is_const_default);
+        
         while (GUI_TABLE.rows.length > 1){
             GUI_TABLE.deleteRow(1);
         }
@@ -95,7 +97,7 @@ function Leveled_Abilities_Block_t(gui_table, database){
         }
     }
 
-    this.Set = function(row, abi_name, is_const){
+    this.Set = function(row, abi_name){
         let table_row = GUI_TABLE.rows[row + 1]; // +1 with header
         let cell_name = table_row.cells[1];
         var remove_func = Proc_Remove_Event.bind(null, row);
@@ -107,12 +109,38 @@ function Leveled_Abilities_Block_t(gui_table, database){
         let cell_add_remove_button = table_row.cells[2];
         cell_add_remove_button.innerHTML = "";
         
-        if (!is_const){
+        if (!m_is_const_list[row]){
             var add_remove_button = HTML_Create_Button("X", remove_func);
             cell_add_remove_button.appendChild(add_remove_button);
         }
 
         Popup_Database.Close();
+    }
+    
+    this.Set_Row_Const_State = function(row, is_const){
+        //TODO: add safety checked
+        if (m_is_const_list[row] == is_const){
+            return;
+        }
+        
+        let table_row = GUI_TABLE.rows[row + 1];
+        
+        let cell_add_remove_button = table_row.cells[2];
+        
+        if(m_is_const_list[row] == false){
+            cell_add_remove_button.innerHTML = "";
+        }else{
+            let cell_name = table_row.cells[1];
+            var add_remove_button
+            if (cell_name.innerHTML == "---"){
+                add_remove_button = HTML_Create_Button("+", Proc_Open_Database_Event.bind(null, row));
+            }else{
+                add_remove_button = HTML_Create_Button("X", Proc_Remove_Event.bind(null, row));
+            }
+            cell_add_remove_button.appendChild(add_remove_button);
+        }
+        
+        m_is_const_list[row] = is_const;
     }
 
     this.Remove = function(row){
@@ -126,14 +154,17 @@ function Leveled_Abilities_Block_t(gui_table, database){
 
         let cell_add_remove_button = table_row.cells[2];
         cell_add_remove_button.innerHTML = "";
-        var add_remove_button = HTML_Create_Button("+", add_func);
-        cell_add_remove_button.appendChild(add_remove_button);
+        if (!m_is_const_list[row]){
+            var add_remove_button = HTML_Create_Button("+", add_func);
+            cell_add_remove_button.appendChild(add_remove_button);
+        }
     }
 
 //private properties
     var self = this;
     var m_owner = null;
     var m_lvl_list = null;
+    var m_is_const_list = null;
 
 //public properties
 

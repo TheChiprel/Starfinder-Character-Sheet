@@ -1,87 +1,57 @@
 function Block_Class_Solarion_Adept_Skills_t(class_data){
 //constants
-const ADEPT_SKILL_COUNT = 2;
-const SKILL_LIST = [
-    SKILLS.LIFE_SCIENCE,
-    SKILLS.BLUFF,
-    SKILLS.SURVIVAL,
-    SKILLS.ENGINEERING,
-    SKILLS.COMPUTERS,
-    SKILLS.CULTURE,
-    SKILLS.SLEIGHT_OF_HAND,
-    SKILLS.DISGUISE,
-    SKILLS.MEDICINE,
-    SKILLS.PILOTING,
-    SKILLS.PHYSICAL_SCIENCE
-];
 const SELECTOR_CLASS = "class_selector_solarion_adept_skill";
 
 //private methods
-    var Init = function(){
+    var Proc_Selector_OnChange = function(row, event){
+        let skill_name = event.target.value;
+
+        if (skill_name == "---"){
+            m_owner.Set(row, null);
+        }else{
+            m_owner.Set(row, skill_name);
+        }
+    }
+
+//public methods
+    this.Reset = function(owner, selector_count, skill_list){
+        m_owner = owner;
         while (m_table.rows.length > 1){
             m_table.deleteRow(1);
         }
 
-        for (let i = 0; i < ADEPT_SKILL_COUNT; i++){
+        for (let i = 0; i < selector_count; i++){
             var row = m_table.insertRow(m_table.rows.length);
 
             var cell_skill = row.insertCell(0);
 
             var selector = HTML_Create_Selector(
                 true,
-                SKILL_LIST
+                skill_list
             );
-            selector.onchange = self.Set_From_Selector.bind(null, i, selector);
+            selector.onchange = Proc_Selector_OnChange.bind(null, i);
             selector.setAttribute('class', SELECTOR_CLASS);
             cell_skill.appendChild(selector);
         }
     }
 
-//public methods
-    this.Set_From_Selector = function(row, selector){
-        let skill = selector.value;
-
-        if (skill == "---"){
-            m_class_data.adept_skills.Set(row, null);
-        }else{
-            m_class_data.adept_skills.Set(row, skill);
-        }
-    }
-    
-    this.Set_By_Name = function(row, name){
-        if ((name != null) && !(SKILL_LIST.includes(name))){
-            console.error("Inappropriate skill to be set as adept skill: '" + name + "'");
-            return;
-        }
-        
+    this.Set = function(row, skill_name){
         let selectors = document.getElementsByClassName(SELECTOR_CLASS);
-        if (name == null){
+        if (skill_name == null){
             selectors[row].value = "---";
         }else{
-            selectors[row].value = name;
-        }
-        m_class_data.adept_skills.Set(row, name);
-    }
-
-    this.Load_From_Obj = function(obj){
-        if (obj == undefined){
-            return;
-        }
-
-        for (let i = 0; i < obj.length; i++){
-            self.Set_By_Name(i, obj[i]);
+            selectors[row].value = skill_name;
         }
     }
 
 //private properties
     var self = this;
-    var m_class_data = class_data;
+    var m_owner = null;
     var m_table = document.getElementById('table_solarion_adept_skills');
 
 //public properties
 
 //additional initialization
-    Init();
 }
 
 //TODO: rework selector as database
@@ -292,7 +262,7 @@ function Block_Class_Solarion_t(){
         null,
         true);
 
-    //this.adept_skills = new Block_Class_Solarion_Adept_Skills_t(m_class_data);
+    this.adept_skills = new Block_Class_Solarion_Adept_Skills_t();
     
     this.stellar_modes = new Leveled_Abilities_Block_t(
         document.getElementById('table_solarion_stellar_modes'),

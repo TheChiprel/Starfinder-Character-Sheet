@@ -252,25 +252,31 @@ function Ability_Collection_t(
     Init(id);
 }
 
-function Leveled_Ability_List_t (id, list_name, lvl_list, id_prefix, gui_block){
+function Leveled_Ability_List_t (
+    id,
+    list_name,
+    lvl_list,
+    id_prefix,
+    gui_block,
+    is_const_default = false){
 //constants
     const GUI_BLOCK = gui_block;
 
 //private methods
-    var Init = function(){
+    var Init = function(is_const_default){
         if (GUI_BLOCK != undefined){
-            GUI_BLOCK.Reset(self, lvl_list);
+            GUI_BLOCK.Reset(self, lvl_list, is_const_default);
         }
     }
 
 //public methods
-    this.Set = function(row, entry, name_suffix = null, is_const = false){
+    this.Set = function(row, entry, name_suffix = null){
         //TODO: add safety check
         let is_active = (cur_lvl >= m_lvl_list[row]);
         m_abilities.Replace(row, m_id_prefix + row, entry, name_suffix, is_active);
         
         if (GUI_BLOCK != undefined){
-            GUI_BLOCK.Set(row, entry.name, is_const);
+            GUI_BLOCK.Set(row, entry.name);
         }
     }
     
@@ -343,7 +349,7 @@ function Leveled_Ability_List_t (id, list_name, lvl_list, id_prefix, gui_block){
 //public properties
 
 //additional initialization
-    Init();
+    Init(is_const_default);
 }
 
 function Ability_Racial_Collection_t(){

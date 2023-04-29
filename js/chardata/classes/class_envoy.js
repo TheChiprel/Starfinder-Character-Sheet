@@ -199,7 +199,7 @@ const TALENTS_LVLS = [3, 7, 11, 15, 19];
             if (ABILITY_LIST[i].length == 1){
                 let abi_name = ABILITY_LIST[i][0];
                 let abi_entry = Get_Ability_Entry_By_Name(db, abi_name);
-                self.class_abilities.Set(i, abi_entry, undefined, true);
+                self.class_abilities.Set(i, abi_entry, undefined);
             }else{
                 //TODO?
             }
@@ -245,7 +245,8 @@ const TALENTS_LVLS = [3, 7, 11, 15, 19];
         "Классовые способности (Посланник)",
         CLASS_ABILITY_LVLS,
         "envoy_class_",
-        layers.classes.Get_Block(CLASSES.ENVOY).class_abilities);
+        layers.classes.Get_Block(CLASSES.ENVOY).class_abilities,
+        true);
     this.improvs = new Leveled_Ability_List_t(
         "abi_class_envoy_improv",
         "Импровизации Посланника",

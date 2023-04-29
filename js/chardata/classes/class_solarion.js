@@ -42,19 +42,41 @@ const MODIFIER_ID = "adapt_skill";
 
 function Adapt_Skills_Collection_t (){
 //constants
-const ADAPT_SKILLS_COUNT = 2;
+const ADEPT_SKILLS_COUNT = 2;
+const SKILL_LIST = [
+    SKILLS.LIFE_SCIENCE,
+    SKILLS.BLUFF,
+    SKILLS.SURVIVAL,
+    SKILLS.ENGINEERING,
+    SKILLS.COMPUTERS,
+    SKILLS.CULTURE,
+    SKILLS.SLEIGHT_OF_HAND,
+    SKILLS.DISGUISE,
+    SKILLS.MEDICINE,
+    SKILLS.PILOTING,
+    SKILLS.PHYSICAL_SCIENCE
+];
+const GUI_BLOCK = layers.classes.Get_Block(CLASSES.SOLARION).adept_skills;
 
 //private methods
+    var Init = function(){
+        GUI_BLOCK.Reset(self, ADEPT_SKILLS_COUNT, SKILL_LIST);
+    }
 
 //public methods
     this.Set = function(row, skill_name){
-        if (row >= ADAPT_SKILLS_COUNT){
+        if (row >= ADEPT_SKILLS_COUNT){
             console.error("Attempt to set adapt skill out of bounds");
+            return;
+        }
+        
+        if ((skill_name != null) && !(SKILL_LIST.includes(skill_name))){
+            console.error("Inappropriate skill to be set as adept skill: " + skill_name);
             return;
         }
 
         if (m_skills[row] != null){
-            m_skills[row].Deactivate;
+            m_skills[row].Deactivate();
         }
 
         if (skill_name == null){
@@ -63,10 +85,12 @@ const ADAPT_SKILLS_COUNT = 2;
             m_skills[row] = new Adapt_Skill_t(skill_name);
             m_skills[row].Activate();
         }
+        
+        GUI_BLOCK.Set(row, skill_name);
     }
 
     this.Update_Lvl = function(lvl){
-        for (let i = 0; i < ADAPT_SKILLS_COUNT; i++){
+        for (let i = 0; i < ADEPT_SKILLS_COUNT; i++){
             if (m_skills[i] == null){
                 continue;
             }
@@ -90,14 +114,26 @@ const ADAPT_SKILLS_COUNT = 2;
         });
         return ret;
     }
+    
+    //TODO:
+    this.Load_From_Obj = function(obj){
+        if (obj == undefined){
+            return;
+        }
+
+        for (let i = 0; i < obj.length; i++){
+            self.Set(i, obj[i]);
+        }
+    }
 
 //private properties
     var self = this;
-    var m_skills = new Array(ADAPT_SKILLS_COUNT).fill(null);
+    var m_skills = new Array(ADEPT_SKILLS_COUNT).fill(null);
 
 //public properties
 
 //additional initialization
+    Init();
 }
 
 function Manifistation_Solar_Weapon_t(){
@@ -211,7 +247,7 @@ const MODIFIER_ID = "Звёздное оружие";
 
     this.Get_SaveData_Obj = function(){
         var ret = {
-            'selector': m_selector_value
+            'selector': m_selector_value.name
         };
         
         return ret;
@@ -472,7 +508,8 @@ const MANIFISTATION_SOLAR_ARMOR = "Звёздная броня";
             return false;
         }
 
-        return m_context.Selector_Changed(value);
+        m_context.Selector_Changed(value);
+        GUI_BLOCK.Set_Selector_Value(value);
     }
 
     this.Show_Details = function(){
@@ -499,7 +536,17 @@ const MANIFISTATION_SOLAR_ARMOR = "Звёздная броня";
         }
         
         //TODO: put smaller db here
-        self.Set(Get_Ability_Entry_By_Name(ABILITIES_DATABASE, obj));
+        self.Set(Get_Ability_Entry_By_Name(ABILITIES_DATABASE, obj.name));
+        
+        if (obj.context != undefined){
+            if (obj.context.selector != undefined){
+                self.Selector_Changed(obj.context.selector);
+            }
+            
+            if (obj.context.is_active){
+                self.Activate();
+            }
+        }
     }
 
 //private properties
@@ -545,7 +592,7 @@ const ADEPT_SKILL_COUNT = 2;
             if (ABILITY_LIST[i].length == 1){
                 let abi_name = ABILITY_LIST[i][0];
                 let abi_entry = Get_Ability_Entry_By_Name(curr_db, abi_name);
-                self.class_abilities.Set(i, abi_entry, undefined, true);
+                self.class_abilities.Set(i, abi_entry, undefined);
             }else{
                 //TODO?
             }
@@ -557,14 +604,17 @@ const ADEPT_SKILL_COUNT = 2;
             if (STELLAR_MODES_LIST[i].length == 1){
                 let abi_name = STELLAR_MODES_LIST[i][0];
                 let abi_entry = Get_Ability_Entry_By_Name(curr_db, abi_name);
-                self.stellar_modes.Set(i, abi_entry, undefined, true);
+                self.stellar_modes.Set(i, abi_entry, undefined);
             }else{
                 //TODO?
             }
         }
         
-        self.zeniths_graviton.Set(0, Get_Ability_Entry_By_Name(solarion_db, "Чёрная дыра"), undefined, true);
-        self.zeniths_photon.Set(0, Get_Ability_Entry_By_Name(solarion_db, "Сверхновая"), undefined, true);
+        self.zeniths_graviton.Set(0, Get_Ability_Entry_By_Name(solarion_db, "Чёрная дыра"), undefined);
+        self.zeniths_photon.Set(0, Get_Ability_Entry_By_Name(solarion_db, "Сверхновая"), undefined);
+        
+        layers.classes.Get_Block(CLASSES.SOLARION).zeniths_graviton.Set_Row_Const_State(0, true);
+        layers.classes.Get_Block(CLASSES.SOLARION).zeniths_photon.Set_Row_Const_State(0, true);
     }
 
 //public methods
@@ -617,13 +667,15 @@ const ADEPT_SKILL_COUNT = 2;
         "Классовые способности (Солярион)",
         CLASS_ABILITY_LVLS,
         "solarion_class_",
-        layers.classes.Get_Block(CLASSES.SOLARION).class_abilities);
+        layers.classes.Get_Block(CLASSES.SOLARION).class_abilities,
+        true);
     this.stellar_modes = new Leveled_Ability_List_t(
         "abi_class_solarion_modes",
         "Звёздные режимы",
         STELLAR_MODES_LVLS,
         "solarion_stellar_mode_",
-        layers.classes.Get_Block(CLASSES.SOLARION).stellar_modes);
+        layers.classes.Get_Block(CLASSES.SOLARION).stellar_modes,
+        true);
     this.adept_skills = new Adapt_Skills_Collection_t();
     this.revelations = new Leveled_Ability_List_t(
         "abi_class_solarion_revelations",
