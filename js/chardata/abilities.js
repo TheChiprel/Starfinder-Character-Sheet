@@ -322,7 +322,8 @@ function Leveled_Ability_List_t (id, list_name, lvl_list, id_prefix, gui_block){
         
         for (let i = 0; i < m_lvl_list.length; i++){
             if (obj[i] != null){
-                self.Set(i, Get_Ability_Entry_By_Name(obj[i]));
+                //TODO: add db, pass it to layers?
+                self.Set(i, Get_Ability_Entry_By_Name(ABILITIES_DATABASE, obj[i]));
             }
         }
     }

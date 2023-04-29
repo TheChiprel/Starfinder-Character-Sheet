@@ -58,11 +58,28 @@ const MODIFIER_BONUS_ID = "exp_skill_point";
 //additional initialization
 }
 
-function Exp_Skills_Collection_t (){
+function Exp_Skills_Collection_t (class_data){
 //constants
+const GUI_BLOCK = layers.classes.Get_Block(CLASSES.ENVOY).expertise_skills;
 const EXPERTISE_LVLS = [1, 1, 5, 9, 13, 17];
+const ENVOY_EXPERTISE_SKILL_LIST = [
+    SKILLS.BLUFF,
+    SKILLS.COMPUTERS,
+    SKILLS.CULTURE,
+    SKILLS.DIPLOMACY,
+    SKILLS.DISGUISE,
+    SKILLS.ENGINEERING,
+    SKILLS.INTIMIDATE,
+    SKILLS.MEDICINE
+];
     
 //private methods
+    var Init = function(){
+        m_skills[0] = new Exp_Skill_t(SKILLS.SENSE_MOTIVE);
+        
+        GUI_BLOCK.Reset(self, EXPERTISE_LVLS, ENVOY_EXPERTISE_SKILL_LIST);
+    }
+
     var Get_Modifier_Value = function (lvl){
         let dice = (lvl < 13) ? "1d6" : "1d8";
         let bonus = 0;
@@ -81,7 +98,15 @@ const EXPERTISE_LVLS = [1, 1, 5, 9, 13, 17];
     }
 
 //public methods
-    this.Set = function(row, skill_name, curr_lvl){
+    //TODO: instead of taking null as argument, add Remove function
+    this.Set = function(row, skill_name){
+        let curr_lvl = m_class_data.lvl;
+        
+        if ((skill_name != null) && !(ENVOY_EXPERTISE_SKILL_LIST.includes(skill_name))){
+            console.error("Inappropriate skill to be set as expertise skill: " + skill_name);
+            return;
+        }
+        
         let skill_num = row + 1;
         if (skill_num >= EXPERTISE_LVLS.length){
             console.error("Attempt to set expertise skill out of bounds");
@@ -100,6 +125,8 @@ const EXPERTISE_LVLS = [1, 1, 5, 9, 13, 17];
                 m_skills[skill_num].Activate(Get_Modifier_Value(curr_lvl));
             }
         }
+        
+        GUI_BLOCK.Set(row, skill_name);
     }
     
     this.Update_Lvl = function(lvl){
@@ -123,7 +150,7 @@ const EXPERTISE_LVLS = [1, 1, 5, 9, 13, 17];
             if (cur_skill == null){
                 ret.push(null);
             }else{
-                ret.push.Get_SaveData_Obj();
+                ret.push(cur_skill.Get_SaveData_Obj());
             }
         }
         return ret;
@@ -134,9 +161,9 @@ const EXPERTISE_LVLS = [1, 1, 5, 9, 13, 17];
             return;
         }
         
-        for (let i = 1; i < EXPERTISE_LVLS.length; i++){
-            if (obj[i-1] != null){
-                self.Set(i, obj[i-1], curr_lvl);
+        for (let i = 0; i < EXPERTISE_LVLS.length - 1; i++){
+            if (obj[i] != null){
+                self.Set(i, obj[i], curr_lvl);
             }
         }
     }
@@ -144,11 +171,12 @@ const EXPERTISE_LVLS = [1, 1, 5, 9, 13, 17];
 //private properties
     var self = this;
     var m_skills = new Array(EXPERTISE_LVLS.length).fill(null);
+    var m_class_data = class_data;
 
 //public properties
 
 //additional initialization
-    m_skills[0] = new Exp_Skill_t(SKILLS.SENSE_MOTIVE);
+    Init();
 }
 
 function Class_Envoy_t (){
@@ -230,7 +258,7 @@ const TALENTS_LVLS = [3, 7, 11, 15, 19];
         TALENTS_LVLS,
         "envoy_talent_",
         layers.classes.Get_Block(CLASSES.ENVOY).talents);
-    this.exp_skills = new Exp_Skills_Collection_t();
+    this.exp_skills = new Exp_Skills_Collection_t(self);
 
 //additional initialization
     Init();

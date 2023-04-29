@@ -208,14 +208,9 @@ function Class_Collection_t (){
     this.Load_From_Obj = function(obj){
         if (obj != undefined){
             obj.forEach(cl => {
+                let class_obj = Find_Class_By_Name(cl.name);
                 self.SetLvl(cl.name, cl.context.lvl);
-                if (cl.name == "Посланник"){
-                    Find_Class_By_Name(cl.name).Load_From_Obj(cl.context);
-                }else{
-                    layers.classes.Load_From_Obj(cl.name, cl.context); //TODO: replace
-                }
-                
-                
+                class_obj.context.Load_From_Obj(cl.context);
             });
         }
     }
