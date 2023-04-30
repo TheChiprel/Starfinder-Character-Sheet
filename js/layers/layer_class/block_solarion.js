@@ -257,29 +257,29 @@ function Block_Class_Solarion_t(){
     var m_block = document.getElementById("block_class_details_solarion");
 
 //public properties
-    this.class_abilities = new Leveled_Abilities_Block_t(
+    this.class_abilities = new Block_Ability_List_t(
         document.getElementById('table_class_abilities_solarion'),
         null,
         true);
 
     this.adept_skills = new Block_Class_Solarion_Adept_Skills_t();
     
-    this.stellar_modes = new Leveled_Abilities_Block_t(
+    this.stellar_modes = new Block_Ability_List_t(
         document.getElementById('table_solarion_stellar_modes'),
         null,
         true);
         
-    this.revelations = new Leveled_Abilities_Block_t(
+    this.revelations = new Block_Ability_List_t(
         document.getElementById('table_solarion_revelations'),
         Ability_Database_GetList(ABILITIES_DATABASE, "Класс", ["Солярион", "Звёздное откровение"], undefined, undefined, true),
         false);
         
-    this.zeniths_graviton = new Leveled_Abilities_Block_t(
+    this.zeniths_graviton = new Block_Ability_List_t(
         document.getElementById('table_solarion_zeniths_graviton'),
         Ability_Database_GetList(ABILITIES_DATABASE, "Класс", ["Солярион", "Наивысшее звёздное откровение", "Гравитонное"], 2, undefined, true),
         false);
         
-    this.zeniths_photon = new Leveled_Abilities_Block_t(
+    this.zeniths_photon = new Block_Ability_List_t(
         document.getElementById('table_solarion_zeniths_photon'),
         Ability_Database_GetList(ABILITIES_DATABASE, "Класс", ["Солярион", "Наивысшее звёздное откровение", "Фотонное"], 2, undefined, true),
         false);

@@ -28,12 +28,12 @@ function Block_Class_Technomancer_t(){
     var m_block = document.getElementById("block_class_details_technomancer");
 
 //public properties
-    this.class_abilities = new Leveled_Abilities_Block_t(
+    this.class_abilities = new Block_Ability_List_t(
         document.getElementById('table_class_abilities_technomancer'),
         null
     );
     
-    this.hacks = new Leveled_Abilities_Block_t(
+    this.hacks = new Block_Ability_List_t(
         document.getElementById('table_technomancer_hacks'),
         Ability_Database_GetList(ABILITIES_DATABASE, "Класс", ["Техномант", "Магический хак"], undefined, 20, true)
     );

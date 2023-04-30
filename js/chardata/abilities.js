@@ -57,6 +57,7 @@ function Ability_t(id, entry, name_suffix = null, is_active){
 //additional initialization
 }
 
+//TODO: combine two classes below?
 function Ability_Collection_t(
     id,
     collection_name = "???",
@@ -265,14 +266,14 @@ function Leveled_Ability_List_t (
 //private methods
     var Init = function(is_const_default){
         if (GUI_BLOCK != undefined){
-            GUI_BLOCK.Reset(self, lvl_list, is_const_default);
+            GUI_BLOCK.Reset(self, m_lvl_list, is_const_default);
         }
     }
 
 //public methods
     this.Set = function(row, entry, name_suffix = null){
         //TODO: add safety check
-        let is_active = (cur_lvl >= m_lvl_list[row]);
+        let is_active = (m_lvl_list[row] == null) || (m_lvl_list[row] <= m_cur_lvl);
         m_abilities.Replace(row, m_id_prefix + row, entry, name_suffix, is_active);
         
         if (GUI_BLOCK != undefined){
@@ -307,13 +308,10 @@ function Leveled_Ability_List_t (
                 continue;
             }
             
-            m_abilities.Set_Active_State(i, m_lvl_list[i] <= lvl);
+            let is_Active = (m_lvl_list[i] == null) || (m_lvl_list[i] <= lvl);
+            m_abilities.Set_Active_State(i, is_Active);
         }
-        cur_lvl = lvl;
-    }
-    
-    this.Get_Lvl_List = function(){
-        return m_lvl_list;
+        m_cur_lvl = lvl;
     }
     
     this.Get_SaveData_Obj = function(){
@@ -335,7 +333,7 @@ function Leveled_Ability_List_t (
 
 //private properties
     var self = this;
-    var cur_lvl = 0;
+    var m_cur_lvl = 0;
     var m_id_prefix = id_prefix;
     var m_lvl_list = lvl_list;
     //TODO: remove id, use id_prefix?
