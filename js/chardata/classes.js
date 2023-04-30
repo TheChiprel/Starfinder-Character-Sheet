@@ -59,10 +59,8 @@ function Class_Collection_t (){
         layers.maininfo.Clear_Class_Add_Buttons();
         
         CLASS_DATABASE.forEach(entry => {
-            if ((entry.name == "Посланник") || (entry.name == "Солярион")){//TODO: remove
             self.class_map.set (entry.name, new Class_t (entry));
             layers.maininfo.Add_Class_Add_Button(entry.name, self.SetLvl.bind(null, entry.name, 1));
-            }
         });
     }
 

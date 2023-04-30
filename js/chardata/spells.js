@@ -8,62 +8,6 @@ function Get_Spell_Entry_By_Name(in_database, name){
     return null;
 }
 
-function Spell_Database_GetList(
-    in_database,
-    in_class = undefined,
-    min_lvl = undefined,
-    max_lvl = undefined
-){
-    var ret = new Array(0);
-    if ((in_class == undefined) && (min_lvl == undefined) && (max_lvl == undefined)){
-        console.error("Extracting from database with no criteria set");
-        return in_database;
-    }
-
-    for (let i = 0; i < in_database.length; i++){
-        var entry = in_database[i];
-
-        if (in_class != undefined){
-            if (entry.classes == null){
-                continue;
-            }
-
-            let entry_classes = entry.classes.split(', ');
-            let valid = entry_classes.includes(in_class);
-
-            if (entry_classes.includes(in_class)){
-                continue;
-            }
-        }
-
-        if (min_lvl != undefined){
-            if (entry.lvl == null){
-                continue;
-            }
-            
-            let entry_max_lvl = parseInt(entry.lvl[entry.lvl.length - 1]);
-            if ((entry.lvl == null) || (entry_max_lvl < min_lvl)){
-                continue;
-            }
-        }
-
-        if (max_lvl != undefined){
-            if (entry.lvl == null){
-                continue;
-            }
-            
-            let entry_min_lvl = parseInt(entry.lvl[0]);
-            if ((entry.lvl == null) || (entry_min_lvl > min_lvl)){
-                continue;
-            }
-        }
-
-        ret.push(entry);
-    }
-
-    return ret;
-}
-
 function Get_Spell_Descr(entry){
     var ret = "";
     
@@ -192,6 +136,7 @@ function Spell_Collection_t(
         }else{
             m_arr = new Array(0);
         }
+        
         m_update_func = combined_collections.spells.Add(id, self);
     }
 
@@ -385,4 +330,175 @@ function Spell_Collection_t(
 
 //additional initialization
     Init(id);
+}
+
+function Spell_Book_t(
+    spells_known,
+    spells_daily,
+    abiscore,
+    abiscore_daily,
+    collection_prefix,
+    spellbook_lvl_string_prefix,
+    gui_block
+){
+//constants
+
+const SPELLS_KNOWN = spells_known;
+const SPELLS_DAILY = spells_daily;
+const ABISCORE = abiscore;
+const ABISCORE_DAILY = abiscore_daily;
+const COLLECTION_PREFIX = collection_prefix;
+const SPELLBOOK_LVL_STRING_PREFIX = spellbook_lvl_string_prefix;
+const GUI_BLOCK = gui_block;
+
+//private methods
+    var Init = function(){
+        //initiating spell lists
+        for (let i = 0; i < m_arr.length; i++){
+            m_arr[i] = new Spell_Collection_t(
+            COLLECTION_PREFIX + "_" + i,
+            Get_Spell_Level_String(i),
+            SPELLS_KNOWN[i].length,
+            false);
+        }
+        
+        GUI_BLOCK.Reset(self, SPELLS_KNOWN);
+    }
+    
+    var Get_Spell_Level_String = function(spell_lvl, daily = null, dc = null){
+        let str = SPELLBOOK_LVL_STRING_PREFIX + " " + spell_lvl + " круга";
+        if ((daily != null) && (dc != null)){
+            str += " (В день: " + daily + " , СЛ: " + dc + ")";
+        }
+        return str;
+    }
+    
+    var Update_Spell_Active_State = function(){
+        for (let spell_lvl = 0; spell_lvl < SPELLS_KNOWN.length; spell_lvl++){
+            for (let i = 0; i < SPELLS_KNOWN[i].length; i++){
+                m_arr[spell_lvl].Set_Active_State(i, (m_class_lvl >= SPELLS_KNOWN[spell_lvl][i]));
+            }
+        }
+    }
+    
+    var Update_Daily_And_DC = function(){
+        let daily_arr = new Array(m_arr.length).fill(0);
+        let base_dc = 10;
+        if (m_class_lvl > 0){
+            let abiscore_mod = (chardata.stats.abiscores.modifiers.Get_Sum(ABISCORE));
+            daily_arr[0] = SPELLS_DAILY[0];
+            for (let i = 1; i < m_arr.length; i++){
+                if (abiscore_mod < ABISCORE_DAILY.length){
+                    daily_arr[i] = SPELLS_DAILY[i][m_class_lvl - 1] + ABISCORE_DAILY[i][abiscore_mod];
+                }else{
+                    daily_arr[i] = SPELLS_DAILY[i][m_class_lvl - 1] + ABISCORE_DAILY[i][ABISCORE_DAILY.length - 1];
+                }
+            }
+            base_dc += abiscore_mod;
+        }//else NOTHING TO DO
+        
+        for (let i = 0; i < m_arr.length; i++){
+            m_arr[i].Rename_Collection(Get_Spell_Level_String(i, daily_arr[i], base_dc + i));
+        }
+        
+        GUI_BLOCK.Set_Daily_And_DC(daily_arr, base_dc);
+    }
+
+//public methods
+    this.Set = function(spell_lvl, row, entry){
+        m_arr[spell_lvl].Replace(
+            row,
+            (COLLECTION_PREFIX + "_" + spell_lvl + "_" + row),
+            entry,
+            (m_class_lvl >= SPELLS_KNOWN[spell_lvl][row])
+        );
+        
+        GUI_BLOCK.Set(spell_lvl, row, entry.name);
+    }
+
+    this.Remove = function(spell_lvl, row){
+        m_arr[spell_lvl].Remove(row);
+        GUI_BLOCK.Remove(spell_lvl, row);
+    }
+
+    this.Show_Details = function(spell_lvl, row){
+        m_arr[spell_lvl].Show_Detail_Popup(row);
+    }
+    
+    this.Update_Lvl = function(lvl){
+        if (m_class_lvl == lvl){
+            return;
+        }
+        
+        if (m_class_lvl == 0){
+            //INT -> Technomancer Daily
+            chardata.stats.abiscores.modifiers.AddRecalcFunc(
+                ABISCORE,
+                new Recalc_Function_t (COLLECTION_PREFIX, self.Update_Int));
+        }else if (lvl == 0){
+            chardata.stats.abiscores.modifiers.RemoveRecalcFunc(
+                ABISCORE,
+                COLLECTION_PREFIX);
+        }//else NOTHING TO DO
+            
+        m_class_lvl = lvl;
+        Update_Daily_And_DC();
+        Update_Spell_Active_State();
+    }
+    
+    this.Update_Int = function(){
+        Update_Daily_And_DC();
+    }
+    
+    this.Get_SaveData_Obj = function(){
+        var ret = new Array(m_arr.length);
+        for (let i = 0; i < m_arr.length; i++){
+            let spells = m_arr[i].Get_SaveData_Obj();
+            
+            ret[i] = new Array(0);
+            spells.forEach(cur_spell => {
+                if (cur_spell == null){
+                    ret[i].push(null);
+                }else{
+                    ret[i].push(cur_spell.name);
+                }
+            });
+        }
+        return ret;
+    }
+    
+    this.Get_SaveData_Obj = function(){
+        var ret = new Array(m_arr.length);
+        for (let i = 0; i < m_arr.length; i++){
+            let spells = m_arr[i].Get_SaveData_Obj();
+            
+            ret[i] = new Array(0);
+            spells.forEach(cur_spell => {
+                if (cur_spell == null){
+                    ret[i].push(null);
+                }else{
+                    ret[i].push(cur_spell.name);
+                }
+            });
+        }
+        return ret;
+    }
+    
+    this.Load_From_Obj = function(obj){
+        if (obj == undefined){
+            return;
+        }
+        
+        //TODO
+    }
+
+//private properties
+    var self = this;
+    var m_class_lvl = 0;
+    var m_arr = new Array(SPELLS_KNOWN.length);
+
+//public properties
+
+//additional initialization
+    Init();
 }
