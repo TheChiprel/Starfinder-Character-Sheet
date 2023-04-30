@@ -59,6 +59,12 @@ function Block_Ability_List_t(gui_table, database){
         }
     }
     
+    var Proc_Remove_Additional = function(row_name){
+        if (m_owner != null){
+            m_owner.Remove_Additional(row_name);
+        }
+    }
+    
     var Show_Info_Database = function(entry_num){
         let ability = BLOCK_DATABASE[entry_num];
 
@@ -67,17 +73,11 @@ function Block_Ability_List_t(gui_table, database){
     
     var Get_Cell_Name = function(row){
         let table_row = GUI_TABLE.rows[row + 1]; // +1 with header
-        if (m_lvl_list == null){
-            return table_row.cells[0];
-        }
         return table_row.cells[1];
     }
     
     var Get_Add_Remove_Cell = function(row){
         let table_row = GUI_TABLE.rows[row + 1]; // +1 with header
-        if (m_lvl_list[row] == null){
-            return table_row.cells[1];
-        }
         return table_row.cells[2];
     }
     
@@ -85,17 +85,23 @@ function Block_Ability_List_t(gui_table, database){
     this.Reset = function(owner, lvl_list = null, is_const_default = false){
         m_owner = owner;
         m_lvl_list = lvl_list;
+        m_additional_rows = new Array(0);
         m_is_const_list = new Array(m_lvl_list.length).fill(is_const_default);
         
         while (GUI_TABLE.rows.length > 1){
             GUI_TABLE.deleteRow(1);
         }
+        
+        if (m_lvl_list == null){
+            return;
+        }
 
         for (let i = 0; i < m_lvl_list.length; i++){
             var row = GUI_TABLE.insertRow(GUI_TABLE.rows.length);
             
+            var cell_lvl = row.insertCell(row.cells.length);
+            
             if (m_lvl_list[i] != null){
-                var cell_lvl = row.insertCell(row.cells.length);
                 let cur_lvl = m_lvl_list[i];
                 cell_lvl.innerHTML = cur_lvl;
             }
@@ -156,6 +162,27 @@ function Block_Ability_List_t(gui_table, database){
         
         m_is_const_list[row] = is_const;
     }
+    
+    this.Add_Row = function(id, name = null, lvl = null, can_be_removed = true){
+        var table_row = GUI_TABLE.insertRow(GUI_TABLE.rows.length);
+        table_row.name = id;
+            
+        var cell_lvl = row.insertCell(row.cells.length);
+        
+        if (lvl != null){
+            cell_lvl.innerHTML = lvl;
+        }
+        
+        var cell_ability = row.insertCell(row.cells.length);
+        cell_ability.innerHTML = name;
+        
+        var cell_add_remove_button = row.insertCell(row.cells.length);
+        if (can_be_removed){
+            var remove_func = Proc_Remove_Additional.bind(null, id);
+            var add_remove_button = HTML_Create_Button("X", remove_func);
+            cell_add_remove_button.appendChild(add_remove_button);
+        }
+    }
 
     this.Remove = function(row){
         let cell_name = Get_Cell_Name(row);
@@ -165,12 +192,27 @@ function Block_Ability_List_t(gui_table, database){
         cell_name.innerHTML = "---";
         cell_name.removeAttribute("onclick");
 
-        let cell_add_remove_button = tGet_Add_Remove_Cell(row);
+        let cell_add_remove_button = Get_Add_Remove_Cell(row);
         cell_add_remove_button.innerHTML = "";
         if (!m_is_const_list[row]){
             var add_remove_button = HTML_Create_Button("+", add_func);
             cell_add_remove_button.appendChild(add_remove_button);
         }
+    }
+    
+    this.Remove_Additional_Row = function(id){
+        let start_row = 1;
+        if (m_lvl_list != null){
+            start_row += m_lvl_list.length;
+        }
+        for (let i = start_row; i < GUI_TABLE.rows.length; i++){
+            if (GUI_TABLE.rows[i].name == id){
+                GUI_TABLE.deleteRow(i);
+                return;
+            }
+        }
+        
+        //TODO: warn
     }
 
 //private properties
@@ -178,6 +220,7 @@ function Block_Ability_List_t(gui_table, database){
     var m_owner = null;
     var m_lvl_list = null;
     var m_is_const_list = null;
+    var m_additional_rows = null;
 
 //public properties
 

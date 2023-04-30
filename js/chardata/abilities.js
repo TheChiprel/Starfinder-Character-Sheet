@@ -495,7 +495,12 @@ function Chardata_Abilities_t(){
 //private methods
 
 //public methods
-this.Get_SaveData_Obj = function(){
+    this.Update_Lvl = function(){
+        let lvl = chardata.lvl.sum;
+        self.feats.Update_Lvl(lvl);
+    }
+
+    this.Get_SaveData_Obj = function(){
         var ret = {
             feats: self.feats.Get_SaveData_Obj(),
             other: self.other.Get_SaveData_Obj(),
@@ -511,7 +516,16 @@ this.Get_SaveData_Obj = function(){
 //public properties
     this.race = new Ability_Racial_Collection_t();
     this.theme = new Ability_Theme_Collection_t();
+    /*
     this.feats = new Ability_Collection_t("abi_feats", "Черты", 10);
+    */
+    this.feats = new Leveled_Ability_List_t(
+        "abi_feats",
+        "Черты",
+        [2, 4, 6, 8, 10, 12, 14, 16, 18, 20],
+        "abi_feat_",
+        layers.abilities.feats
+    );
     this.other = new Ability_Collection_t("abi_other", "Прочие способности");
     this.spell_like = new Spell_Collection_t("spells_spelllike", "Псевдозаклинания");
     this.custom = new Ability_Custom_Collection_t();

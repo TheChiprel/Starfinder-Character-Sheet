@@ -579,7 +579,7 @@ const STELLAR_MODES_LIST = [
     ["Нейтральный режим"],
     ["Фотонный режим"]
 ];
-const STELLAR_MODES_LVLS = [null, null, null];
+const STELLAR_MODES_LVLS = [1, 1, 1];
 const ZENITHS_LVLS = [1, 9, 17];
 const ADEPT_SKILL_COUNT = 2;
 
