@@ -431,10 +431,10 @@ const GUI_BLOCK = gui_block;
         }
         
         if (m_class_lvl == 0){
-            //INT -> Technomancer Daily
+            //abiscore -> daily
             chardata.stats.abiscores.modifiers.AddRecalcFunc(
                 ABISCORE,
-                new Recalc_Function_t (COLLECTION_PREFIX, self.Update_Int));
+                new Recalc_Function_t (COLLECTION_PREFIX, self.Update_Abiscore));
         }else if (lvl == 0){
             chardata.stats.abiscores.modifiers.RemoveRecalcFunc(
                 ABISCORE,
@@ -446,7 +446,7 @@ const GUI_BLOCK = gui_block;
         Update_Spell_Active_State();
     }
     
-    this.Update_Int = function(){
+    this.Update_Abiscore = function(){
         Update_Daily_And_DC();
     }
     
@@ -489,7 +489,22 @@ const GUI_BLOCK = gui_block;
             return;
         }
         
-        //TODO
+        for (let spell_lvl = 0; spell_lvl < obj.length; spell_lvl++){
+            for (let row = 0; row < obj[spell_lvl].length; row++){
+                let spell_name = obj[spell_lvl][row];
+                if (spell_name == null){
+                    continue;
+                }
+                
+                let entry = Get_Spell_Entry_By_Name(SPELLS_DATABASE, spell_name);
+                if (entry == null){
+                    console.error("Failed to find spell: " + spell_name);
+                    continue;
+                }
+                
+                self.Set(spell_lvl, row, entry);
+            }
+        }
     }
 
 //private properties

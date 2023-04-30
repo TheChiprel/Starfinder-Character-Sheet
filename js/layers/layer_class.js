@@ -263,6 +263,7 @@ const SPELL_DATABASE = database;
 //public methods
     this.Reset = function(owner, spells_known){
         m_owner = owner;
+        m_tables = new Array(0);
         
         for (let spell_lvl = 0; spell_lvl < spells_known.length; spell_lvl++){
             var cur_table = document.getElementById(SPELL_LIST_TABLE_ID + spell_lvl);
@@ -286,7 +287,9 @@ const SPELL_DATABASE = database;
             }
             m_tables.push(cur_table);
         }
-        self.Set_Daily_And_DC(new Array(spells_known.length).fill(0));
+        self.Set_Daily_And_DC(
+            new Array(spells_known.length).fill(0),
+            );
     }
 
     this.Set = function(spell_lvl, row, spell_name){
@@ -302,17 +305,6 @@ const SPELL_DATABASE = database;
         cell_add_remove_button.innerHTML = "";
         var add_remove_button = HTML_Create_Button("X", remove_func);
         cell_add_remove_button.appendChild(add_remove_button);
-    }
-
-    //TODO move condition to chardata and remove
-    this.Set_By_Name = function(spell_lvl, row, name){
-        var entry = Get_Spell_Entry_By_Name(SPELLS_DATABASE, name);
-        if (entry == null){
-            console.error("Failed to find spell: '" + name + "'");
-            return;
-        }
-        
-        self.Set(spell_lvl, row, entry);
     }
 
     this.Remove = function(spell_lvl, row){
