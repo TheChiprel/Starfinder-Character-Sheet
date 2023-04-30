@@ -291,6 +291,7 @@ function Leveled_Ability_List_t (
     
     this.Clear = function(){
         m_abilities.Clear();
+        GUI_BLOCK.Clear();
     }
     
     this.Show_Details = function(row){
@@ -389,50 +390,6 @@ function Ability_Racial_Collection_t(){
 //additional initialization
 }
 
-function Ability_Theme_Collection_t(){
-//constants
-    const NAME_PREFIX = "Cпособности темы";
-    const THEME_ABILITIES_LVLS = [1, 6, 12, 18];
-    
-//private methods
-
-//public methods
-    this.Set_Abilities = function(theme_name, abi_arr){
-        m_collection.Clear();
-        layers.abilities.theme.Clear_Abilities();
-        
-        if (theme_name == null){
-            m_collection.Rename_List(NAME_PREFIX);
-            return;
-        }
-        
-        m_collection.Rename_List(
-            NAME_PREFIX + " (" + theme_name + ")");
-        for (let row = 0; row < abi_arr.length; row++){
-            let [abi_name, abi_suffix] = Split_Ability_Name_Suffix(abi_arr[row]);
-            let entry = Get_Ability_Entry_By_Name(ABILITIES_DATABASE, abi_name);
-            m_collection.Set(row, entry, abi_suffix);
-            layers.abilities.theme.Add_Ability(row, THEME_ABILITIES_LVLS[row], abi_arr[row]);
-        }
-    }
-    
-    this.Show_Detail_Popup = function(row){
-        m_collection.Show_Details(row);
-    }
-    
-    this.Update_Lvl = function(){
-        m_collection.Update_Lvl(chardata.lvl.sum);
-    }
-
-//private properties
-    var self = this;
-    var m_collection = new Leveled_Ability_List_t("abi_theme", NAME_PREFIX, THEME_ABILITIES_LVLS, "theme_");//TODO: add layers block here
-
-//public properties
-
-//additional initialization
-}
-
 function Ability_Custom_t(id, name, descr){
 //public methods
     this.Get_SaveData_Obj = function(){
@@ -492,12 +449,17 @@ function Ability_Custom_Collection_t(){
 }
 
 function Chardata_Abilities_t(){
+//constants
+    const FEATS_LVLS = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20];
+    const THEME_LVLS = [1, 6, 12, 18];
+    
 //private methods
 
 //public methods
     this.Update_Lvl = function(){
         let lvl = chardata.lvl.sum;
         self.feats.Update_Lvl(lvl);
+        self.theme.Update_Lvl(lvl);
     }
 
     this.Get_SaveData_Obj = function(){
@@ -515,17 +477,23 @@ function Chardata_Abilities_t(){
 
 //public properties
     this.race = new Ability_Racial_Collection_t();
-    this.theme = new Ability_Theme_Collection_t();
-    /*
-    this.feats = new Ability_Collection_t("abi_feats", "Черты", 10);
-    */
+    this.theme = new Leveled_Ability_List_t(
+        "abi_theme",
+        "Способности темы",
+        THEME_LVLS,
+        "abi_theme_",
+        layers.abilities.theme,
+        true
+    );
+
     this.feats = new Leveled_Ability_List_t(
         "abi_feats",
         "Черты",
-        [2, 4, 6, 8, 10, 12, 14, 16, 18, 20],
+        FEATS_LVLS,
         "abi_feat_",
         layers.abilities.feats
     );
+    
     this.other = new Ability_Collection_t("abi_other", "Прочие способности");
     this.spell_like = new Spell_Collection_t("spells_spelllike", "Псевдозаклинания");
     this.custom = new Ability_Custom_Collection_t();

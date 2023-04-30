@@ -152,17 +152,25 @@ function Theme_t(){
     }
     
     var Get_Entry_By_Name = function(name){
-    for (let i = 0; i < THEME_DATABASE.length; i++){
-        if (THEME_DATABASE[i].name == name){
-            return THEME_DATABASE[i];
+        for (let i = 0; i < THEME_DATABASE.length; i++){
+            if (THEME_DATABASE[i].name == name){
+                return THEME_DATABASE[i];
+            }
         }
+        
+        console.warn("Attempt to set unknown theme: " + name);
+        return null;
     }
     
-    console.warn("Attempt to set unknown theme: " + name);
-    return null;
-}
+    var Set_Abilities = function(theme_entry){
+        for (let i = 0; i < theme_entry.abilities.length; i++){
+            let abi_entry = Get_Ability_Entry_By_Name(ABILITIES_DATABASE, theme_entry.abilities[i]);
+            chardata.abilities.theme.Set(i, abi_entry);
+        }
+    }
 
 //public methods
+    //TODO: change ability collection name
     this.Set = function(theme_name){
         if ((theme_name == "---") || (theme_name == null)){
             m_entry = null;
@@ -170,15 +178,15 @@ function Theme_t(){
             m_entry = Get_Entry_By_Name(theme_name);
         }
         
+        chardata.abilities.theme.Clear();
         if (m_entry != null){
             SELECTOR_THEME.value = m_entry.name;
-            
-            chardata.abilities.theme.Set_Abilities(m_entry.name, m_entry.abilities);
+            chardata.abilities.theme.Rename_List("Способности темы (" + m_entry.name + ")");
+            Set_Abilities(m_entry);
             chardata.stats.abiscores.values.SetThemeValue(m_entry.abiscore);
         }else{
             SELECTOR_THEME.value = "---";
-            
-            chardata.abilities.theme.Set_Abilities(null, null);
+            chardata.abilities.theme.Rename_List("Способности темы");
             chardata.stats.abiscores.values.SetThemeValue(null);
         }
     }

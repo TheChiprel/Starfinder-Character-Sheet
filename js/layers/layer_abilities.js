@@ -775,11 +775,14 @@ function Layer_Abilities_t(){
 
 //public properties
     this.race = new Race_Abilities_Block_t();
-    this.theme = new Theme_Abilities_Block_t();
+    this.theme = new Block_Ability_List_t(
+        document.getElementById('table_abilities_theme'),
+        null
+    );
     this.feats = new Block_Ability_List_t(
         document.getElementById('table_abilities_feats'),
         Ability_Database_GetList(ABILITIES_DATABASE, "Черта")
-    );//new Feat_Abilities_Block();
+    );
     this.other = new Other_Abilities_Block();
     this.spell_likes = new Spell_Likes_Abilities_Block();
     this.custom_block = new Custom_Abilities_Block_t();

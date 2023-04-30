@@ -85,8 +85,32 @@ function Block_Ability_List_t(gui_table, database){
     this.Reset = function(owner, lvl_list = null, is_const_default = false){
         m_owner = owner;
         m_lvl_list = lvl_list;
-        m_additional_rows = new Array(0);
         m_is_const_list = new Array(m_lvl_list.length).fill(is_const_default);
+        self.Clear();
+    }
+
+    this.Set = function(row, abi_name){
+        let cell_name = Get_Cell_Name(row);
+        
+        var remove_func = Proc_Remove_Event.bind(null, row);
+        var show_details_func = Proc_Show_Detail_Event.bind(null, row);
+
+        cell_name.innerHTML = abi_name;
+        cell_name.onclick = show_details_func;
+
+        let cell_add_remove_button = Get_Add_Remove_Cell(row);
+        cell_add_remove_button.innerHTML = "";
+        
+        if (!m_is_const_list[row]){
+            var add_remove_button = HTML_Create_Button("X", remove_func);
+            cell_add_remove_button.appendChild(add_remove_button);
+        }
+
+        Popup_Database.Close();
+    }
+    
+    this.Clear = function(){
+        m_additional_rows = new Array(0);
         
         while (GUI_TABLE.rows.length > 1){
             GUI_TABLE.deleteRow(1);
@@ -110,32 +134,12 @@ function Block_Ability_List_t(gui_table, database){
             cell_ability.innerHTML = "---";
             
             var cell_add_remove_button = row.insertCell(row.cells.length);
-            if (!is_const_default){
+            if (!m_is_const_list[i]){
                 var add_func = Proc_Open_Database_Event.bind(null, i);
                 var add_remove_button = HTML_Create_Button("+", add_func);
                 cell_add_remove_button.appendChild(add_remove_button);
             }
         }
-    }
-
-    this.Set = function(row, abi_name){
-        let cell_name = Get_Cell_Name(row);
-        
-        var remove_func = Proc_Remove_Event.bind(null, row);
-        var show_details_func = Proc_Show_Detail_Event.bind(null, row);
-
-        cell_name.innerHTML = abi_name;
-        cell_name.onclick = show_details_func;
-
-        let cell_add_remove_button = Get_Add_Remove_Cell(row);
-        cell_add_remove_button.innerHTML = "";
-        
-        if (!m_is_const_list[row]){
-            var add_remove_button = HTML_Create_Button("X", remove_func);
-            cell_add_remove_button.appendChild(add_remove_button);
-        }
-
-        Popup_Database.Close();
     }
     
     this.Set_Row_Const_State = function(row, is_const){
