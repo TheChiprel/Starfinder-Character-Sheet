@@ -582,6 +582,10 @@ function Chardata_Abilities_t(){
         true
     );
     
-    this.spell_like = new Spell_Collection_t("spells_spelllike", "Псевдозаклинания");
+    this.spell_like = new Spell_Collection_t(
+        "spells_spelllike",
+        "Псевдозаклинания",
+        layers.abilities.spell_likes);
+    
     this.custom = new Ability_Custom_Collection_t();
 }

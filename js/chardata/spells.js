@@ -115,12 +115,17 @@ function Spell_t(id, entry, is_active, lvl = null, daily = null, dc = null){
 //additional initialization
 }
 
+//TODO: remove null checks
 function Spell_Collection_t(
     id,
     collection_name = "???",
+    gui_block = null,
     default_size = undefined,
     default_active = true
 ){
+//constants
+    const GUI_BLOCK = gui_block;
+    
 //private methods
 //TODO on change only
 //TODO add do_update option to functions
@@ -138,6 +143,10 @@ function Spell_Collection_t(
         }
         
         m_update_func = combined_collections.spells.Add(id, self);
+        
+        if (GUI_BLOCK != null){
+            GUI_BLOCK.Reset(self, collection_name, null);
+        }
     }
 
 //public methods
@@ -146,6 +155,9 @@ function Spell_Collection_t(
             m_arr.push(new Spell_t(id, entry, is_active, lvl, daily, dc));
         }else{
             m_arr.push(new Spell_t(id, entry, default_active, lvl, daily, dc));
+        }
+        if (GUI_BLOCK != null){
+            GUI_BLOCK.Add_Row(id, entry.name);
         }
         Update();
     }
@@ -163,7 +175,9 @@ function Spell_Collection_t(
             m_arr[row] = new Spell_t(id, entry, default_active, lvl, daily, dc);
         }
 
-        
+        if (GUI_BLOCK != null){
+            GUI_BLOCK.Set(row, entry.name);
+        }
         Update();
     }
 
@@ -176,14 +190,25 @@ function Spell_Collection_t(
 
         if ((m_default_size != undefined) && (row < m_default_size)){
             m_arr[row] = null;
+            if (GUI_BLOCK != null){
+                GUI_BLOCK.Remove(row, entry.name);
+            }
         }else{
+            let id = m_arr[row].id;
             m_arr.splice(row, 1);
+            if (GUI_BLOCK != null){
+                GUI_BLOCK.Remove_Additional_Row(id);
+            }
         }
+        
         Update();
     }
     
     this.Rename_Collection = function(new_name){
         m_collection_name = new_name;
+        if (GUI_BLOCK != null){
+            GUI_BLOCK.Set_Name(new_name);
+        }
         Update();
     }
     
@@ -342,7 +367,6 @@ function Spell_Book_t(
     gui_block
 ){
 //constants
-
 const SPELLS_KNOWN = spells_known;
 const SPELLS_DAILY = spells_daily;
 const ABISCORE = abiscore;
@@ -358,6 +382,7 @@ const GUI_BLOCK = gui_block;
             m_arr[i] = new Spell_Collection_t(
             COLLECTION_PREFIX + "_" + i,
             Get_Spell_Level_String(i),
+            null,//TODO: replace later
             SPELLS_KNOWN[i].length,
             false);
         }

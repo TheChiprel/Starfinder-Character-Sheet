@@ -38,7 +38,7 @@ function Block_Class_Technomancer_t(){
         Ability_Database_GetList(ABILITIES_DATABASE, "Класс", ["Техномант", "Магический хак"], undefined, 20, true)
     );
     
-    this.spells = new Block_Spell_List_t(
+    this.spells = new Block_Spell_Book_t(
         "table_spell_list_technomancer",
         Spell_Database_GetList(SPELLS_DATABASE, "Техномант")
     );

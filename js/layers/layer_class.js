@@ -66,7 +66,7 @@ function Block_Ability_List_t(gui_table, database, has_add_button = false){
         }
         
         m_owner.Add(BLOCK_DATABASE[entry_num]);
-
+        
         Popup_Database.Close();
     }
     
@@ -169,7 +169,7 @@ function Block_Ability_List_t(gui_table, database, has_add_button = false){
     }
     
     this.Clear = function(){
-        m_additional_rows = new Array(0);
+        //m_additional_rows = new Array(0);
         
         while (GUI_TABLE.rows.length > 0){
             GUI_TABLE.deleteRow(0);
@@ -293,7 +293,339 @@ function Block_Ability_List_t(gui_table, database, has_add_button = false){
     var m_owner = null;
     var m_lvl_list = null;
     var m_is_const_list = null;
-    var m_additional_rows = null;
+    //var m_additional_rows = null;
+
+//public properties
+
+//additional initialization
+}
+
+//TODO: add dc and daily fields
+function Block_Spell_List_t(gui_table, database, has_add_button = false){
+//constants
+    const GUI_TABLE = gui_table;
+    const BLOCK_DATABASE = database;
+    const HAS_ADD_BUTTON = has_add_button;
+    
+//private methods
+    var Proc_Show_Detail_Event = function(row){
+        if (m_owner != null){
+            m_owner.Show_Detail_Popup(row);
+        }
+    }
+    
+    var Proc_Open_Database_Event = function(row){
+        //TODO: let min_lvl = m_lvl_list[row];
+        //TODO: let max_lvl = m_lvl_list[row];
+        var table_data = new Array(0);
+        var filters = new Array(0);
+        let headers = [
+            "Название",
+            "Ур.",
+            "Школа",
+            "Дист.",
+            "Область",
+            "Эффект",
+            "Цель",
+            "Длит.",
+            "Испытание",
+            "УкМ",
+            "Описание",
+            "Ист."
+        ];
+        var add_func;
+        
+        if (row == null){
+            add_func = Proc_Add_Event;
+        }else{
+            add_func = Proc_Set_Event.bind(null, row);
+        }
+        
+        for (let i = 0; i < BLOCK_DATABASE.length; i++){
+            let cur_spell = BLOCK_DATABASE[i];
+
+            table_data.push([
+                cur_spell.name,
+                cur_spell.lvl,
+                cur_spell.school,
+                cur_spell.dist,
+                cur_spell.area,
+                cur_spell.effect,
+                cur_spell.target,
+                cur_spell.duration,
+                cur_spell.save,
+                cur_spell.magic_resistance,
+                cur_spell.descr,
+                cur_spell.source,
+            ]);
+        }
+
+        filters.push(new Database_Filter_Input_t(POPUP_FILTER_TYPES.FIND,    0, "Название" ));
+        filters.push(new Database_Filter_Input_t(POPUP_FILTER_TYPES.FIND,    1, "Ур."      ));
+        filters.push(new Database_Filter_Input_t(POPUP_FILTER_TYPES.FIND,    2, "Школа"   ));
+        filters.push(new Database_Filter_Input_t(POPUP_FILTER_TYPES.SELECT,  11, "Источник" ));
+
+        Popup_Database.Open(
+            table_data,
+            add_func,
+            filters,
+            headers,
+            Show_Info_Database);
+    }
+    
+    var Proc_Set_Event = function(row, entry_num){
+        if ((m_owner != null) && (entry_num != null)){
+            m_owner.Set(row, BLOCK_DATABASE[entry_num]);
+        }
+        Popup_Database.Close();
+    }
+    
+    var Proc_Add_Event = function(entry_num){
+        if (m_owner == null){
+            return;
+        }
+        
+        m_owner.Add("TBD_" + m_id, BLOCK_DATABASE[entry_num], true);
+        m_id++;
+
+        Popup_Database.Close();
+    }
+    
+    var Proc_Remove_Event = function(row){
+        if (m_owner != null){
+            m_owner.Remove(row);
+        }
+    }
+    
+    var Proc_Remove_Additional = function(id){
+        if (m_owner == null){
+            return;
+        }
+        
+        let start_row = 1;
+        if (m_lvl_list != null){
+            start_row += m_lvl_list.length;
+        }
+        for (let i = start_row; i < GUI_TABLE.rows.length; i++){
+            if (GUI_TABLE.rows[i].name == id){
+                m_owner.Remove(i-1);
+                return;
+            }
+        }
+    }
+    
+    var Proc_Show_Detail_Additional_Event = function(id){
+        if (m_owner == null){
+            return;
+        }
+        
+        let start_row = 1;
+        if (m_lvl_list != null){
+            start_row += m_lvl_list.length;
+        }
+        for (let i = start_row; i < GUI_TABLE.rows.length; i++){
+            if (GUI_TABLE.rows[i].name == id){
+                m_owner.Show_Detail_Popup(i-1);
+                return;
+            }
+        }
+    }
+    
+    var Show_Info_Database = function(entry_num){
+        let spell = BLOCK_DATABASE[entry_num];
+
+        Popup_Descr.Call(spell.name, Get_Spell_Descr(spell));
+    }
+    
+    var Get_Cell_Add_Button = function(){
+        let table_row = GUI_TABLE.rows[0];
+        return table_row.cells[2];
+    }
+    
+    var Get_Cell_Header = function(){
+        let table_row = GUI_TABLE.rows[0];
+        return table_row.cells[1];
+    }
+    
+    var Get_Cell_Name = function(row){
+        let table_row = GUI_TABLE.rows[row + 1]; // +1 with header
+        return table_row.cells[1];
+    }
+    
+    var Get_Add_Remove_Cell = function(row){
+        let table_row = GUI_TABLE.rows[row + 1]; // +1 with header
+        return table_row.cells[2];
+    }
+    
+//public methods
+    this.Reset = function(owner, name, lvl_list = null, is_const_default = false){
+        m_owner = owner;
+        m_lvl_list = lvl_list;
+        if (m_lvl_list == null){
+            m_is_const_list = null;
+        }else{
+            m_is_const_list = new Array(m_lvl_list.length).fill(is_const_default);
+        }
+        
+        self.Clear();
+        self.Set_Name(name);
+        
+        let cell_add = Get_Cell_Add_Button();
+        if (HAS_ADD_BUTTON){
+            var add_func = Proc_Open_Database_Event.bind(null, null);
+            var add_button = HTML_Create_Button("+", add_func);
+            cell_add.appendChild(add_button);
+        }else{
+            cell_add.innerHTML = "";
+        }
+    }
+
+    this.Set = function(row, abi_name){
+        let cell_name = Get_Cell_Name(row);
+        
+        var remove_func = Proc_Remove_Event.bind(null, row);
+        var show_details_func = Proc_Show_Detail_Event.bind(null, row);
+
+        cell_name.innerHTML = abi_name;
+        cell_name.onclick = show_details_func;
+
+        let cell_add_remove_button = Get_Add_Remove_Cell(row);
+        cell_add_remove_button.innerHTML = "";
+        
+        if (!m_is_const_list[row]){
+            var add_remove_button = HTML_Create_Button("X", remove_func);
+            cell_add_remove_button.appendChild(add_remove_button);
+        }
+
+        Popup_Database.Close();
+    }
+    
+    this.Clear = function(){
+        //m_additional_rows = new Array(0);
+        
+        while (GUI_TABLE.rows.length > 0){
+            GUI_TABLE.deleteRow(0);
+        }
+        var row = GUI_TABLE.insertRow(GUI_TABLE.rows.length);
+        var cell_lvl = row.insertCell(row.cells.length);
+        var cell_ability = row.insertCell(row.cells.length);
+        var cell_add_remove_button = row.insertCell(row.cells.length);
+        
+        if (m_lvl_list == null){
+            return;
+        }
+
+        for (let i = 0; i < m_lvl_list.length; i++){
+            var row = GUI_TABLE.insertRow(GUI_TABLE.rows.length);
+            
+            cell_lvl = row.insertCell(row.cells.length);
+            cell_ability = row.insertCell(row.cells.length);
+            cell_add_remove_button = row.insertCell(row.cells.length);
+            
+            if (m_lvl_list[i] != null){
+                let cur_lvl = m_lvl_list[i];
+                cell_lvl.innerHTML = cur_lvl;
+            }
+            
+            cell_ability.innerHTML = "---";
+            
+            if (!m_is_const_list[i]){
+                var add_func = Proc_Open_Database_Event.bind(null, i);
+                var add_remove_button = HTML_Create_Button("+", add_func);
+                cell_add_remove_button.appendChild(add_remove_button);
+            }
+        }
+    }
+    
+    this.Set_Name = function(name){
+        let cell_header = Get_Cell_Header();
+        cell_header.innerHTML = name;
+    }
+    
+    this.Set_Row_Const_State = function(row, is_const){
+        //TODO: add safety checked
+        if (m_is_const_list[row] == is_const){
+            return;
+        }
+        
+        let cell_add_remove_button = Get_Add_Remove_Cell(row);
+        
+        if(m_is_const_list[row] == false){
+            cell_add_remove_button.innerHTML = "";
+        }else{
+            let cell_name = Get_Cell_Name(row);
+
+            var add_remove_button
+            if (cell_name.innerHTML == "---"){
+                add_remove_button = HTML_Create_Button("+", Proc_Open_Database_Event.bind(null, row));
+            }else{
+                add_remove_button = HTML_Create_Button("X", Proc_Remove_Event.bind(null, row));
+            }
+            cell_add_remove_button.appendChild(add_remove_button);
+        }
+        
+        m_is_const_list[row] = is_const;
+    }
+    
+    this.Add_Row = function(id, name = null, lvl = null, can_be_removed = true){
+        var table_row = GUI_TABLE.insertRow(GUI_TABLE.rows.length);
+        table_row.name = id;
+            
+        var cell_lvl = table_row.insertCell(table_row.cells.length);
+        
+        if (lvl != null){
+            cell_lvl.innerHTML = lvl;
+        }
+        
+        var cell_ability = table_row.insertCell(table_row.cells.length);
+        cell_ability.innerHTML = name;
+        cell_ability.onclick = Proc_Show_Detail_Additional_Event.bind(null, id);
+        
+        var cell_add_remove_button = table_row.insertCell(table_row.cells.length);
+        if (can_be_removed){
+            var remove_func = Proc_Remove_Additional.bind(null, id);
+            var add_remove_button = HTML_Create_Button("X", remove_func);
+            cell_add_remove_button.appendChild(add_remove_button);
+        }
+    }
+
+    this.Remove = function(row){
+        let cell_name = Get_Cell_Name(row);
+        
+        var add_func = Proc_Open_Database_Event.bind(null, row);
+
+        cell_name.innerHTML = "---";
+        cell_name.removeAttribute("onclick");
+
+        let cell_add_remove_button = Get_Add_Remove_Cell(row);
+        cell_add_remove_button.innerHTML = "";
+        if (!m_is_const_list[row]){
+            var add_remove_button = HTML_Create_Button("+", add_func);
+            cell_add_remove_button.appendChild(add_remove_button);
+        }
+    }
+    
+    this.Remove_Additional_Row = function(id){
+        let start_row = 1;
+        if (m_lvl_list != null){
+            start_row += m_lvl_list.length;
+        }
+        for (let i = start_row; i < GUI_TABLE.rows.length; i++){
+            if (GUI_TABLE.rows[i].name == id){
+                GUI_TABLE.deleteRow(i);
+                return;
+            }
+        }
+        
+        //TODO: warn
+    }
+
+//private properties
+    var self = this;
+    var m_owner = null;
+    var m_lvl_list = null;
+    var m_is_const_list = null;
+    var m_id = 0; //TODO: remove, set id in owner
 
 //public properties
 
@@ -301,7 +633,7 @@ function Block_Ability_List_t(gui_table, database, has_add_button = false){
 }
 
 //TODO: create tables in Reset
-function Block_Spell_List_t(spell_list_table_id, database){
+function Block_Spell_Book_t(spell_list_table_id, database){
 //constants
 
 const SPELL_LIST_TABLE_ID = spell_list_table_id;
