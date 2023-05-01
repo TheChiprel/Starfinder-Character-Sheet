@@ -759,16 +759,6 @@ function Custom_Abilities_Block_t(){
 
 function Layer_Abilities_t(){
 //public methods
-    this.Load_From_Obj = function(obj){
-        if (obj == undefined){
-            return;
-        }
-        
-        self.feats.Load_From_Obj(obj.feats);
-        self.other.Load_From_Obj(obj.other);
-        self.spell_likes.Load_From_Obj(obj.spell_like);
-        self.custom_block.Load_From_Obj(obj.custom);
-    }
 
 //private properties
     var self = this;
@@ -793,6 +783,8 @@ function Layer_Abilities_t(){
         ABILITIES_DATABASE,
         true
     );//= new Other_Abilities_Block();
+    
     this.spell_likes = new Spell_Likes_Abilities_Block();
+    
     this.custom_block = new Custom_Abilities_Block_t();
 }

@@ -376,10 +376,17 @@ function Leveled_Ability_List_t (
             return;
         }
         
-        for (let i = 0; i < m_lvl_list.length; i++){
-            if (obj[i] != null){
+        let fixed_rows = (m_lvl_list == null) ? 0 : m_lvl_list.length;
+        for (let i = 0; i < obj.length; i++){
+            if (obj[i] == null){
+                continue;
+            }
+            
+            if (i < fixed_rows){
                 //TODO: add db, pass it to layers?
                 self.Set(i, Get_Ability_Entry_By_Name(ABILITIES_DATABASE, obj[i]));
+            }else{
+                self.Add(Get_Ability_Entry_By_Name(ABILITIES_DATABASE, obj[i]));
             }
         }
     }
@@ -523,6 +530,17 @@ function Chardata_Abilities_t(){
             custom: self.custom.Get_SaveData_Obj()
         };
         return ret;
+    }
+    
+    this.Load_From_Obj = function(obj){
+        if (obj == undefined){
+            return;
+        }
+        
+        self.feats.Load_From_Obj(obj.feats);
+        self.other.Load_From_Obj(obj.other);
+        layers.abilities.spell_likes.Load_From_Obj(obj.spell_like);
+        layers.abilities.custom_block.Load_From_Obj(obj.custom);
     }
 
 //private properties
