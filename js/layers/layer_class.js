@@ -1,7 +1,10 @@
-function Block_Ability_List_t(gui_table, database){
+//TODO: rename methods
+//TODO: rework additional as separate table?
+function Block_Ability_List_t(gui_table, database, has_add_button = false){
 //constants
     const GUI_TABLE = gui_table;
     const BLOCK_DATABASE = database;
+    const HAS_ADD_BUTTON = has_add_button;
     
 //private methods
     var Proc_Show_Detail_Event = function(row){
@@ -11,19 +14,23 @@ function Block_Ability_List_t(gui_table, database){
     }
     
     var Proc_Open_Database_Event = function(row){
-        let max_lvl = m_lvl_list[row];
-
+        //TODO: let max_lvl = m_lvl_list[row];
         var table_data = new Array(0);
         var filters = new Array(0);
-        var add_func = Proc_Set_Event.bind(null, row);
-
         let headers = [
             "Название",
             "Ур.",
             "Описание",
             "Ист."
         ];
-
+        var add_func;
+        
+        if (row == null){
+            add_func = Proc_Add_Event;
+        }else{
+            add_func = Proc_Set_Event.bind(null, row);
+        }
+        
         for (let i = 0; i < BLOCK_DATABASE.length; i++){
             let cur_ability = BLOCK_DATABASE[i];
 
@@ -50,7 +57,17 @@ function Block_Ability_List_t(gui_table, database){
         if ((m_owner != null) && (entry_num != null)){
             m_owner.Set(row, BLOCK_DATABASE[entry_num]);
         }
-        Popup_Descr.Close();
+        Popup_Database.Close();
+    }
+    
+    var Proc_Add_Event = function(entry_num){
+        if (m_owner == null){
+            return;
+        }
+        
+        m_owner.Add(BLOCK_DATABASE[entry_num]);
+
+        Popup_Database.Close();
     }
     
     var Proc_Remove_Event = function(row){
@@ -65,10 +82,37 @@ function Block_Ability_List_t(gui_table, database){
         }
     }
     
+    var Proc_Show_Detail_Additional_Event = function(id){
+        if (m_owner == null){
+            return;
+        }
+        
+        let start_row = 1;
+        if (m_lvl_list != null){
+            start_row += m_lvl_list.length;
+        }
+        for (let i = start_row; i < GUI_TABLE.rows.length; i++){
+            if (GUI_TABLE.rows[i].name == id){
+                m_owner.Show_Details(i-1);
+                return;
+            }
+        }
+    }
+    
     var Show_Info_Database = function(entry_num){
         let ability = BLOCK_DATABASE[entry_num];
 
         Popup_Descr.Call(ability.name, ability.descr);
+    }
+    
+    var Get_Cell_Add_Button = function(){
+        let table_row = GUI_TABLE.rows[0];
+        return table_row.cells[2];
+    }
+    
+    var Get_Cell_Header = function(){
+        let table_row = GUI_TABLE.rows[0];
+        return table_row.cells[1];
     }
     
     var Get_Cell_Name = function(row){
@@ -82,11 +126,26 @@ function Block_Ability_List_t(gui_table, database){
     }
     
 //public methods
-    this.Reset = function(owner, lvl_list = null, is_const_default = false){
+    this.Reset = function(owner, name, lvl_list = null, is_const_default = false){
         m_owner = owner;
         m_lvl_list = lvl_list;
-        m_is_const_list = new Array(m_lvl_list.length).fill(is_const_default);
+        if (m_lvl_list == null){
+            m_is_const_list = null;
+        }else{
+            m_is_const_list = new Array(m_lvl_list.length).fill(is_const_default);
+        }
+        
         self.Clear();
+        self.Set_Name(name);
+        
+        let cell_add = Get_Cell_Add_Button();
+        if (HAS_ADD_BUTTON){
+            var add_func = Proc_Open_Database_Event.bind(null, null);
+            var add_button = HTML_Create_Button("+", add_func);
+            cell_add.appendChild(add_button);
+        }else{
+            cell_add.innerHTML = "";
+        }
     }
 
     this.Set = function(row, abi_name){
@@ -112,9 +171,13 @@ function Block_Ability_List_t(gui_table, database){
     this.Clear = function(){
         m_additional_rows = new Array(0);
         
-        while (GUI_TABLE.rows.length > 1){
-            GUI_TABLE.deleteRow(1);
+        while (GUI_TABLE.rows.length > 0){
+            GUI_TABLE.deleteRow(0);
         }
+        var row = GUI_TABLE.insertRow(GUI_TABLE.rows.length);
+        var cell_lvl = row.insertCell(row.cells.length);
+        var cell_ability = row.insertCell(row.cells.length);
+        var cell_add_remove_button = row.insertCell(row.cells.length);
         
         if (m_lvl_list == null){
             return;
@@ -123,23 +186,28 @@ function Block_Ability_List_t(gui_table, database){
         for (let i = 0; i < m_lvl_list.length; i++){
             var row = GUI_TABLE.insertRow(GUI_TABLE.rows.length);
             
-            var cell_lvl = row.insertCell(row.cells.length);
+            cell_lvl = row.insertCell(row.cells.length);
+            cell_ability = row.insertCell(row.cells.length);
+            cell_add_remove_button = row.insertCell(row.cells.length);
             
             if (m_lvl_list[i] != null){
                 let cur_lvl = m_lvl_list[i];
                 cell_lvl.innerHTML = cur_lvl;
             }
             
-            var cell_ability = row.insertCell(row.cells.length);
             cell_ability.innerHTML = "---";
             
-            var cell_add_remove_button = row.insertCell(row.cells.length);
             if (!m_is_const_list[i]){
                 var add_func = Proc_Open_Database_Event.bind(null, i);
                 var add_remove_button = HTML_Create_Button("+", add_func);
                 cell_add_remove_button.appendChild(add_remove_button);
             }
         }
+    }
+    
+    this.Set_Name = function(name){
+        let cell_header = Get_Cell_Header();
+        cell_header.innerHTML = name;
     }
     
     this.Set_Row_Const_State = function(row, is_const){
@@ -171,16 +239,17 @@ function Block_Ability_List_t(gui_table, database){
         var table_row = GUI_TABLE.insertRow(GUI_TABLE.rows.length);
         table_row.name = id;
             
-        var cell_lvl = row.insertCell(row.cells.length);
+        var cell_lvl = table_row.insertCell(table_row.cells.length);
         
         if (lvl != null){
             cell_lvl.innerHTML = lvl;
         }
         
-        var cell_ability = row.insertCell(row.cells.length);
+        var cell_ability = table_row.insertCell(table_row.cells.length);
         cell_ability.innerHTML = name;
+        cell_ability.onclick = Proc_Show_Detail_Additional_Event.bind(null, id);
         
-        var cell_add_remove_button = row.insertCell(row.cells.length);
+        var cell_add_remove_button = table_row.insertCell(table_row.cells.length);
         if (can_be_removed){
             var remove_func = Proc_Remove_Additional.bind(null, id);
             var add_remove_button = HTML_Create_Button("X", remove_func);

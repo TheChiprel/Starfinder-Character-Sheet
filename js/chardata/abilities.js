@@ -264,16 +264,67 @@ function Leveled_Ability_List_t (
     const GUI_BLOCK = gui_block;
 
 //private methods
-    var Init = function(is_const_default){
+    var Init = function(list_name, is_const_default){
         if (GUI_BLOCK != undefined){
-            GUI_BLOCK.Reset(self, m_lvl_list, is_const_default);
+            GUI_BLOCK.Reset(self, list_name, m_lvl_list, is_const_default);
         }
+    }
+    
+    var Find_Free_ID = function(){
+        for (let id_enum = 0; id_enum < 100; id_enum++){
+            let found = false;
+            let cur_id = m_id_prefix + "add_" + id_enum;
+            for (let i = 0; i < m_additional_ids.length; i++){
+                if (m_additional_ids[i] == cur_id){
+                    found = true;
+                    break;
+                }
+                //else NOTHING TO DO
+            }
+
+            if (!found){
+                return cur_id;
+            }
+            //else NOTHING TO DO
+        }
+        
+        return null;
     }
 
 //public methods
+    this.Add = function(entry){
+        let id = Find_Free_ID();
+        if (id == null){
+            //TODO: warn user
+            return;
+        }
+        
+        m_abilities.Add(id, entry, null, true);
+        GUI_BLOCK.Add_Row(id, entry.name);
+        m_additional_ids.push(id);
+    }
+    
+    this.Remove_Additional = function(id){
+        for (let i = 0; i < m_additional_ids.length; i++){
+            if(m_additional_ids[i] == id){
+                let row = i;
+                if (lvl_list != null){
+                    row += lvl_list.length;
+                }
+                m_abilities.Remove(row);
+                GUI_BLOCK.Remove_Additional_Row(id);
+                m_additional_ids.splice(i, 1);
+                return;
+            }
+        }
+        
+        //TODO: warn user
+        return;
+    }
+    
     this.Set = function(row, entry, name_suffix = null){
         //TODO: add safety check
-        let is_active = (m_lvl_list[row] == null) || (m_lvl_list[row] <= m_cur_lvl);
+        let is_active = (m_lvl_list == null) || (m_lvl_list[row] == null) || (m_lvl_list[row] <= m_cur_lvl);
         m_abilities.Replace(row, m_id_prefix + row, entry, name_suffix, is_active);
         
         if (GUI_BLOCK != undefined){
@@ -283,7 +334,7 @@ function Leveled_Ability_List_t (
     
     this.Remove = function(row){
         //TODO: add safety check
-        m_abilities.Remove(row, m_id_prefix + row);
+        m_abilities.Remove(row);
         if (GUI_BLOCK != undefined){
             GUI_BLOCK.Remove(row);
         }
@@ -301,6 +352,7 @@ function Leveled_Ability_List_t (
     
     this.Rename_List = function(new_name){
         m_abilities.Rename_Collection(new_name);
+        GUI_BLOCK.Set_Name(new_name);
     }
     
     this.Update_Lvl = function(lvl){
@@ -309,7 +361,7 @@ function Leveled_Ability_List_t (
                 continue;
             }
             
-            let is_Active = (m_lvl_list[i] == null) || (m_lvl_list[i] <= lvl);
+            let is_Active = (m_lvl_list == null) || (m_lvl_list[i] == null) || (m_lvl_list[i] <= lvl);
             m_abilities.Set_Active_State(i, is_Active);
         }
         m_cur_lvl = lvl;
@@ -341,14 +393,15 @@ function Leveled_Ability_List_t (
     var m_abilities = new Ability_Collection_t(
         id,
         list_name,
-        m_lvl_list.length,
+        (m_lvl_list == null) ? 0 : m_lvl_list.length,
         false
     );
+    var m_additional_ids = new Array(0);
 
 //public properties
 
 //additional initialization
-    Init(is_const_default);
+    Init(list_name, is_const_default);
 }
 
 function Ability_Racial_Collection_t(){
@@ -476,7 +529,15 @@ function Chardata_Abilities_t(){
     var self = this;
 
 //public properties
-    this.race = new Ability_Racial_Collection_t();
+    this.race = new Leveled_Ability_List_t(
+        "abi_race",
+        "Способности расы",
+        null,
+        "abi_race_",
+        layers.abilities.race,
+        true
+    );
+    
     this.theme = new Leveled_Ability_List_t(
         "abi_theme",
         "Способности темы",
@@ -494,7 +555,15 @@ function Chardata_Abilities_t(){
         layers.abilities.feats
     );
     
-    this.other = new Ability_Collection_t("abi_other", "Прочие способности");
+    this.other = new Leveled_Ability_List_t(
+        "abi_other",
+        "Прочие способности",
+        null,
+        "abi_other_",
+        layers.abilities.other,
+        true
+    );
+    
     this.spell_like = new Spell_Collection_t("spells_spelllike", "Псевдозаклинания");
     this.custom = new Ability_Custom_Collection_t();
 }

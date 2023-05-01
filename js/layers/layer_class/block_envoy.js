@@ -89,20 +89,20 @@ function Block_Class_Envoy_t(){
 //TODO: get levels properly
     this.class_abilities = new Block_Ability_List_t(
         document.getElementById('table_class_abilities_envoy'),
-        null,
-        true);
+        null
+    );
 
     this.expertise_skills = new Block_Class_Envoy_Expertise_Skills_t();
     
     this.improvs = new Block_Ability_List_t(
         document.getElementById('table_class_improvisations'),
-        Ability_Database_GetList(ABILITIES_DATABASE, "Класс", ["Посланник", "Импровизация посланника"], undefined, 20, true),
-        false);
+        Ability_Database_GetList(ABILITIES_DATABASE, "Класс", ["Посланник", "Импровизация посланника"], undefined, 20, true)
+    );
 
     this.talents = new Block_Ability_List_t(
         document.getElementById('table_class_talents'),
-        Ability_Database_GetList(ABILITIES_DATABASE, "Класс", ["Посланник", "Мастерский талант"], undefined, 20, true),
-        false);
+        Ability_Database_GetList(ABILITIES_DATABASE, "Класс", ["Посланник", "Мастерский талант"], undefined, 20, true)
+    );
 
 //additional initialization
     Init();

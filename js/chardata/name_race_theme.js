@@ -66,15 +66,22 @@ function Race_t(){
     }
     
     var Get_Entry_By_Name = function(name){
-    for (let i = 0; i < RACE_DATABASE.length; i++){
-        if (RACE_DATABASE[i].name == name){
-            return RACE_DATABASE[i];
+        for (let i = 0; i < RACE_DATABASE.length; i++){
+            if (RACE_DATABASE[i].name == name){
+                return RACE_DATABASE[i];
+            }
         }
+    
+        console.warn("Attempt to set unknown race: " + name);
+        return null;
     }
     
-    console.warn("Attempt to set unknown race: " + name);
-    return null;
-}
+    var Set_Abilities = function(abilities){
+        for (let i = 0; i < abilities.length; i++){
+            let abi_entry = Get_Ability_Entry_By_Name(ABILITIES_DATABASE, abilities[i]);
+            chardata.abilities.race.Add(abi_entry);
+        }
+    }
 
 //public methods
     this.Set = function(race_name){
@@ -84,6 +91,7 @@ function Race_t(){
             m_entry = Get_Entry_By_Name(race_name);
         }
         
+        chardata.abilities.race.Clear();
         if (m_entry != null){
             SELECTOR_RACE.value = m_entry.name;
             OUTFIELD_SIZE.value = m_entry.size;
@@ -92,7 +100,8 @@ function Race_t(){
             chardata.stats.abiscores.values.SetRaceValues(m_entry.abiscores, m_entry.plus2);
             chardata.stats.speeds.land.Set_Base_Value(m_entry.speed, m_entry.name);
             chardata.stats.hp.Set_Race_Mod(m_entry.name, m_entry.hp);
-            chardata.abilities.race.Set_Abilities(m_entry.name, m_entry.abilities);
+            chardata.abilities.race.Rename_List("Способности расы (" + m_entry.name + ")");
+            Set_Abilities(m_entry.abilities);
         }else{
             SELECTOR_RACE.value = "---";
             OUTFIELD_SIZE.value = "---";
@@ -101,7 +110,7 @@ function Race_t(){
             chardata.stats.abiscores.values.SetRaceValues([0, 0, 0, 0, 0, 0], false);
             chardata.stats.speeds.land.Set_Base_Value(0, null);
             chardata.stats.hp.Set_Race_Mod(null, 0);
-            chardata.abilities.race.Set_Abilities(null, null);
+            chardata.abilities.race.Rename_List("Способности расы");
         }
     }
     
@@ -162,9 +171,9 @@ function Theme_t(){
         return null;
     }
     
-    var Set_Abilities = function(theme_entry){
-        for (let i = 0; i < theme_entry.abilities.length; i++){
-            let abi_entry = Get_Ability_Entry_By_Name(ABILITIES_DATABASE, theme_entry.abilities[i]);
+    var Set_Abilities = function(abilities){
+        for (let i = 0; i < abilities.length; i++){
+            let abi_entry = Get_Ability_Entry_By_Name(ABILITIES_DATABASE, abilities[i]);
             chardata.abilities.theme.Set(i, abi_entry);
         }
     }
@@ -182,7 +191,7 @@ function Theme_t(){
         if (m_entry != null){
             SELECTOR_THEME.value = m_entry.name;
             chardata.abilities.theme.Rename_List("Способности темы (" + m_entry.name + ")");
-            Set_Abilities(m_entry);
+            Set_Abilities(m_entry.abilities);
             chardata.stats.abiscores.values.SetThemeValue(m_entry.abiscore);
         }else{
             SELECTOR_THEME.value = "---";
