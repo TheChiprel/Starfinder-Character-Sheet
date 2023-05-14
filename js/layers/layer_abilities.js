@@ -411,6 +411,7 @@ function Layer_Abilities_t(){
     this.spell_likes = new Block_Spell_List_t(
         document.getElementById('table_spell_likes'),
         SPELLS_DATABASE,
+        true,
         true
     );//= new Spell_Likes_Abilities_Block();
     

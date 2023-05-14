@@ -539,7 +539,7 @@ function Chardata_Abilities_t(){
         
         self.feats.Load_From_Obj(obj.feats);
         self.other.Load_From_Obj(obj.other);
-        layers.abilities.spell_likes.Load_From_Obj(obj.spell_like);
+        self.spell_like.Load_From_Obj(obj.spell_like);
         layers.abilities.custom_block.Load_From_Obj(obj.custom);
     }
 

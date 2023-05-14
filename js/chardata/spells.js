@@ -116,6 +116,7 @@ function Spell_t(id, entry, is_active, lvl = null, daily = null, dc = null){
 }
 
 //TODO: remove null checks
+//TODO: assign id here, don't take as argument from outside
 function Spell_Collection_t(
     id,
     collection_name = "???",
@@ -157,7 +158,7 @@ function Spell_Collection_t(
             m_arr.push(new Spell_t(id, entry, default_active, lvl, daily, dc));
         }
         if (GUI_BLOCK != null){
-            GUI_BLOCK.Add_Row(id, entry.name);
+            GUI_BLOCK.Add_Row(id, entry.name, lvl, daily, dc);
         }
         Update();
     }
@@ -295,6 +296,9 @@ function Spell_Collection_t(
         //else NOTHING TO DO
         
         m_arr[row].daily = value;
+        if (GUI_BLOCK != null){
+            GUI_BLOCK.Set_Daily(row, value);
+        }
         Update();
     }
     
@@ -316,6 +320,9 @@ function Spell_Collection_t(
         //else NOTHING TO DO
         
         m_arr[row].dc = value;
+        if (GUI_BLOCK != null){
+            GUI_BLOCK.Set_DC(row, value);
+        }
         Update();
     }
 
@@ -341,6 +348,39 @@ function Spell_Collection_t(
             }
         });
         return ret;
+    }
+    
+    this.Load_From_Obj = function(obj){
+        if (obj == undefined){
+            return;
+        }
+        
+        for (let i = 0; i < obj.length; i++){
+            let cur_entry = null;
+            if (obj[i].name != null){
+                cur_entry = Get_Spell_Entry_By_Name(SPELLS_DATABASE, obj[i].name);
+            }
+            if ((m_default_size != undefined) && (i < m_default_size)){
+                self.Replace(
+                    i,
+                    "load_id_" + i,
+                    cur_entry,
+                    is_active = undefined,
+                    obj[i].lvl,
+                    obj[i].daily,
+                    obj[i].dc
+                );
+            }else if (cur_entry != null){
+                self.Add(
+                    "load_id_" + i,
+                    cur_entry,
+                    true,
+                    obj[i].lvl,
+                    obj[i].daily,
+                    obj[i].dc
+                );
+            }//else TODO: warn
+        }
     }
 
 //private properties

@@ -300,14 +300,33 @@ function Block_Ability_List_t(gui_table, database, has_add_button = false){
 //additional initialization
 }
 
-//TODO: add dc and daily fields
-function Block_Spell_List_t(gui_table, database, has_add_button = false){
+function Block_Spell_List_t(
+    gui_table,
+    database,
+    has_add_button = false,
+    has_custom_dc_and_daily = false
+){
 //constants
     const GUI_TABLE = gui_table;
     const BLOCK_DATABASE = database;
     const HAS_ADD_BUTTON = has_add_button;
+    const HAS_CUSTOM_DC_AND_DAILY = has_custom_dc_and_daily;
     
 //private methods
+    var Find_Row_Num_By_ID = function(id){
+        let start_row = 1;
+        if (m_lvl_list != null){
+            start_row += m_lvl_list.length;
+        }
+        
+        for (let i = start_row; i < GUI_TABLE.rows.length; i++){
+            if (GUI_TABLE.rows[i].name == id){
+                return i;
+            }
+        }
+        return null;
+    }
+
     var Proc_Show_Detail_Event = function(row){
         if (m_owner != null){
             m_owner.Show_Detail_Popup(row);
@@ -431,6 +450,50 @@ function Block_Spell_List_t(gui_table, database, has_add_button = false){
         }
     }
     
+    // var Proc_Change_Lvl_Event = function(id, event){
+    //    TODO
+    // }
+    
+    var Proc_Change_DC_Event = function(id, event){
+        let table_row_num = Find_Row_Num_By_ID(id);
+        
+        if ((m_owner == null) || (table_row_num == null)){
+            return;
+        }
+
+        let new_value = event.target.value;
+        if (isNaN(new_value)){
+            let dc_to_set = m_owner.Get_DC(table_row_num-1);
+            if (dc_to_set == null){
+                event.target.value = "";
+            }else{
+                event.target.value = dc_to_set;
+            }
+            return;
+        }
+        m_owner.Set_DC((table_row_num-1), parseInt(new_value));
+    }
+    
+    var Proc_Change_Daily_Event = function(id, event){
+        let table_row_num = Find_Row_Num_By_ID(id);
+        
+        if ((m_owner == null) || (table_row_num == null)){
+            return;
+        }
+
+        let new_value = event.target.value;
+        if (isNaN(new_value)){
+            let dc_to_set = m_owner.Get_Daily(table_row_num-1);
+            if (dc_to_set == null){
+                event.target.value = "";
+            }else{
+                event.target.value = dc_to_set;
+            }
+            return;
+        }
+        m_owner.Set_Daily((table_row_num-1), parseInt(new_value));
+    }
+    
     var Show_Info_Database = function(entry_num){
         let spell = BLOCK_DATABASE[entry_num];
 
@@ -439,6 +502,10 @@ function Block_Spell_List_t(gui_table, database, has_add_button = false){
     
     var Get_Cell_Add_Button = function(){
         let table_row = GUI_TABLE.rows[0];
+        if (HAS_CUSTOM_DC_AND_DAILY){
+            return table_row.cells[4];
+        }
+            
         return table_row.cells[2];
     }
     
@@ -454,7 +521,23 @@ function Block_Spell_List_t(gui_table, database, has_add_button = false){
     
     var Get_Add_Remove_Cell = function(row){
         let table_row = GUI_TABLE.rows[row + 1]; // +1 with header
+        if (HAS_CUSTOM_DC_AND_DAILY){
+            return table_row.cells[4];
+        }
+        
         return table_row.cells[2];
+    }
+    
+    var Get_DC_Infield = function(row){
+        let table_row = GUI_TABLE.rows[row + 1]; // +1 with header
+        let table_cell = table_row.cells[2];
+        return table_cell.childNodes[0];
+    }
+    
+    var Get_Daily_Infield = function(row){
+        let table_row = GUI_TABLE.rows[row + 1]; // +1 with header
+        let table_cell = table_row.cells[3];
+        return table_cell.childNodes[0];
     }
     
 //public methods
@@ -509,6 +592,14 @@ function Block_Spell_List_t(gui_table, database, has_add_button = false){
         var row = GUI_TABLE.insertRow(GUI_TABLE.rows.length);
         var cell_lvl = row.insertCell(row.cells.length);
         var cell_ability = row.insertCell(row.cells.length);
+        
+        if (HAS_CUSTOM_DC_AND_DAILY){
+            var cell_dc = row.insertCell(row.cells.length);
+            var cell_daily = row.insertCell(row.cells.length);
+            cell_dc.innerHTML = "СЛ";
+            cell_daily.innerHTML = "В день";
+        }
+        
         var cell_add_remove_button = row.insertCell(row.cells.length);
         
         if (m_lvl_list == null){
@@ -567,7 +658,14 @@ function Block_Spell_List_t(gui_table, database, has_add_button = false){
         m_is_const_list[row] = is_const;
     }
     
-    this.Add_Row = function(id, name = null, lvl = null, can_be_removed = true){
+    this.Add_Row = function(
+        id,
+        name = null,
+        lvl = null,
+        daily = null,
+        dc = null,
+        can_be_removed = true)
+    {
         var table_row = GUI_TABLE.insertRow(GUI_TABLE.rows.length);
         table_row.name = id;
             
@@ -580,6 +678,37 @@ function Block_Spell_List_t(gui_table, database, has_add_button = false){
         var cell_ability = table_row.insertCell(table_row.cells.length);
         cell_ability.innerHTML = name;
         cell_ability.onclick = Proc_Show_Detail_Additional_Event.bind(null, id);
+        
+        if (HAS_CUSTOM_DC_AND_DAILY){
+            var cell_dc = table_row.insertCell(table_row.cells.length);
+            var cell_daily = table_row.insertCell(table_row.cells.length);
+            let print_dc = dc;
+            let print_daily = daily;
+            
+            if (print_dc == null){
+                print_dc = 0;
+            }
+            
+            if (print_daily == null){
+                print_daily = 1;
+            }
+            
+            var dc_input = HTML_Create_Input_Number(
+                print_dc,
+                0,
+                100,
+                Proc_Change_DC_Event.bind(null, id)
+            );
+            var daily_input = HTML_Create_Input_Number(
+                print_daily,
+                1,
+                100,
+                Proc_Change_Daily_Event.bind(null, id)
+            );
+            
+            cell_dc.appendChild(dc_input);
+            cell_daily.appendChild(daily_input);
+        }
         
         var cell_add_remove_button = table_row.insertCell(table_row.cells.length);
         if (can_be_removed){
@@ -603,6 +732,24 @@ function Block_Spell_List_t(gui_table, database, has_add_button = false){
             var add_remove_button = HTML_Create_Button("+", add_func);
             cell_add_remove_button.appendChild(add_remove_button);
         }
+    }
+    
+    this.Set_DC = function(row, value){
+        if (!HAS_CUSTOM_DC_AND_DAILY){
+            return;
+        }
+        
+        let dc_infield = Get_DC_Infield(row);
+        dc_infield.value = value;
+    }
+    
+    this.Set_Daily = function(row, value){
+        if (!HAS_CUSTOM_DC_AND_DAILY){
+            return;
+        }
+        
+        let infield = Get_Daily_Infield(row);
+        infield.value = value;
     }
     
     this.Remove_Additional_Row = function(id){
