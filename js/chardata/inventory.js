@@ -604,7 +604,6 @@ function Grenade_Collection_t(gui_block){
     }
 
 //public methods
-    //TODO: remove row
     this.Add = function(database_entry, in_count = 1, custom_id = null){
         let id = (custom_id == null) ? database_entry.name : custom_id;
         var item = Get_By_ID(id);
@@ -935,30 +934,64 @@ function Augment_t(database_entry){
     this.entry = database_entry;
 }
 
-function Augment_Collection_t(){
+function Augment_Collection_t(gui_block){
+//constants
+    const GUI_BLOCK = gui_block;
+    
 //private methods
+    var Init = function(){
+        m_update_func = combined_collections.equipment.Add("augments", self);
+        GUI_BLOCK.Reset(self);
+    }
+    
     var Update = function(){
         if (m_update_func != null){
             m_update_func();
         }
     }
     
+    var Get_By_ID = function(id){
+        if (m_map.has(id)){
+            return m_map.get(id);
+        }
+        return null;
+    }
+    
 //public methods
-    this.Add = function(database_entry){
-        var len = m_arr.push(new Augment_t (database_entry));
+    this.Add = function(database_entry, custom_id = null){
+        let id = custom_id;
+        if (id == null){
+            id = database_entry.name;
+        }
+        
+        if (m_map.has(id)){
+            alert("Эта аугментация уже добавлена.");
+            return;
+        }
+        
+        var item = new Augment_t (database_entry);
+        m_map.set(id, item);
+        GUI_BLOCK.Add(id, item);
+        
         Update();
         return true;
     }
 
-    this.Remove = function(table_row){
-        m_arr.splice(table_row, 1);
+    this.Remove = function(id){
+        if (!m_map.has(id)){
+            //TODO: warn user
+            return;
+        }
+        
+        m_map.delete(id);
+        GUI_BLOCK.Remove(id);
         Update();
     }
     
     this.Get_Equip_List = function(){
         let item_list = new Array(0);
         
-        m_arr.forEach(item => {
+        m_map.forEach((item, key) => {
             if ((item != null) && (item.entry.name != "")){
                 let str = item.entry.name;
                 item_list.push({
@@ -979,31 +1012,46 @@ function Augment_Collection_t(){
         return item_list;
     }
 
-    this.Open_Descr_Tooltip = function(in_name){
-        for (let i = 0; i < m_arr.length; i++){
-            var augment = m_arr[i];
-            if (augment.entry.name == in_name){
-                m_arr[i].Show_Descr();
-                return;
-            }
+    this.Open_Descr_Tooltip = function(id){
+        let item = Get_By_ID(id);
+        if (item == null){
+            //TODO: warn user
+            return;
         }
+        
+        item.Show_Descr();
     }
 
     this.Get_SaveData_Obj = function(){
         var ret = new Array(0);
-        m_arr.forEach(augment => {
+        m_map.forEach((augment, key) => {
             ret.push(augment.Get_SaveData_Obj());
         });
         return ret;
     }
+    
+    this.Load_From_Obj = function(obj){
+        if (obj == undefined){
+            return;
+        }
+        
+        obj.forEach(item => {
+            let entry = Find_Entry_By_Name(item.name, AUGMENT_DATABASE);
+            if (entry != null){
+                self.Add(entry);
+            }else{
+                //TODO: warn user
+            }
+        });
+    }
 
 //private properties
     var self = this;
-    var m_arr = new Array(0);
+    var m_map = new Map();
     var m_update_func = null;
     
 //additional initialization
-    m_update_func = combined_collections.equipment.Add("augments", self);
+    Init();
 }
 
 function Equipment_t(entry, in_count = 1){
@@ -1669,9 +1717,10 @@ function Inventory_t (){
         self.weapons.Load_From_Obj(obj.weapons);
         self.grenades.Load_From_Obj(obj.grenades);
         
-        //layers.inventory.grenade_block.Load_From_Obj(obj.grenades);
         layers.inventory.armor_block.Load_From_Obj(obj.armor);
-        layers.inventory.augment_block.Load_From_Obj(obj.augments);
+        
+        self.augments.Load_From_Obj(obj.augments);
+        
         layers.inventory.equipment_block.Load_From_Obj(obj.equipment);
         layers.inventory.ammo_block.Load_From_Obj(obj.ammo);
         layers.inventory.other_items_block.Load_From_Obj(obj.other);
@@ -1690,7 +1739,7 @@ function Inventory_t (){
     );
     this.grenades = new Grenade_Collection_t(layers.inventory.grenade_block);
     this.armor = new Armor_t();
-    this.augments = new Augment_Collection_t();
+    this.augments = new Augment_Collection_t(layers.inventory.augment_block);
     this.equipment = new Equipment_Collection_t();
     this.ammo = new Ammo_Collection_t();
     this.other = new Custom_Item_Collection_t();

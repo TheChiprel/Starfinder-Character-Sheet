@@ -911,51 +911,62 @@ const armor_outfields_t = {
 
 function Augment_Block_t(){
 //private methods
-    var Reset = function(){
+    var Get_Row_Num_By_Name = function(name){
+        for (let i = 1; i < m_table.rows.length; i++){
+            var row = m_table.rows[i];
+            if(row.name == name){
+                return i;
+            }
+        }
+
+        return null;
+    }
+
+    var Proc_Event_Add = function(entry_num){
+        if (m_owner == null){
+            return;
+        }
+        
+        m_owner.Add(AUGMENT_DATABASE[entry_num]);
+    }
+    
+    var Proc_Event_Remove = function(id){
+        if (m_owner == null){
+            return;
+        }
+        
+        m_owner.Remove(id);
+    }
+
+//public methods
+    this.Reset = function(owner){
+        m_owner = owner;
         m_table.style.display = "none";
         while(m_table.rows.length > 1){
             m_table.deleteRow(1);
         }
     }
 
-//public methods
-    this.Add = function(num){
-        var row;
-        var entry = AUGMENT_DATABASE[num];
-
-        //checking weapons with same name
-        var row_name = entry.name;
-
-        //if armor already in table, alert and do nothing
-        for (let i = 0; i < m_table.rows.length; i++){
-            if (m_table.rows[i].name == row_name){
-                alert("Эта аугментация уже добавлена.")
-                return;
-            }
-
-            //TODO: check body part
-            //else NOTHING TO DO
-        }
-
-        row = m_table.insertRow(m_table.rows.length);
-        row.name = row_name;
-
+    this.Add = function(id, item){
+        var row = m_table.insertRow(m_table.rows.length);
+        row.name = id;
+        
         for (let i = 0; i < 3; i++){    //TODO: magic
             var cell = row.insertCell(i);
             var func;
             switch (i){
                 case 0:
-                    cell.innerHTML = entry.name;
-                    func = self.Show_Popup.bind(null, row.name);
+                    cell.innerHTML = item.entry.name;
+                    func = item.Show_Descr;
                     cell.onclick = func;
                     break;
 
                 case 1:
-                    cell.innerHTML = entry.body_part;
+                    cell.innerHTML = item.entry.body_part;
                     break;
 
                 case 2:
-                    func = self.Remove.bind(null, row.name);
+                    func = Proc_Event_Remove.bind(null, id);
                     var button_remove = HTML_Create_Button("X", func);
                     cell.appendChild(button_remove);
                     break;
@@ -966,40 +977,17 @@ function Augment_Block_t(){
             }
         }
         m_table.style.display = "block";
-
-        chardata.inventory.augments.Add(entry);
     }
 
     this.Remove = function(id){
-        for (let i = 0; i < m_table.rows.length - 1; i++){
-            var row = m_table.rows[i + 1];
-            if(row.name == id){
-                chardata.inventory.augments.Remove(i);
-                m_table.deleteRow(i + 1);
-                break;
-            }
-        }
+        var row_num = Get_Row_Num_By_Name(id);
+        if (row_num != null){
+            m_table.deleteRow(row_num);
+        }//else TODO
 
-        if (m_table.rows.length == 1){ //only header: hide
+        if (m_table.rows.length == 1){ //only header: remove
             m_table.style.display = "none";
         }
-    }
-
-    this.Load_From_Obj = function(obj){
-        if (obj == undefined){
-            return;
-        }
-        
-        obj.forEach(item => {
-            for (let i = 0; i < AUGMENT_DATABASE.length; i++){
-                let entry = AUGMENT_DATABASE[i];
-                if (item.name == entry.name){
-                    self.Add(i);
-                    break;
-                }
-                //else NOTHING TO DO
-            }
-        });
     }
 
     this.Open_Database = function(){
@@ -1038,7 +1026,7 @@ function Augment_Block_t(){
         filters.push(new Database_Filter_Input_t(POPUP_FILTER_TYPES.SELECT,  4,  "Часть тела" ));
         filters.push(new Database_Filter_Input_t(POPUP_FILTER_TYPES.SELECT,  6,  "Источник"   ));
 
-        Popup_Database.Open(table_data, self.Add, filters, headers, self.Show_Info_Database);
+        Popup_Database.Open(table_data, Proc_Event_Add, filters, headers, self.Show_Info_Database);
     }
 
     this.Show_Info_Database = function(entry_num){
@@ -1058,16 +1046,11 @@ function Augment_Block_t(){
         Popup_Descr.Call(entry.name, descr);
     }
 
-    this.Show_Popup = function(name){
-        chardata.inventory.augments.Open_Descr_Tooltip(name);
-    }
-
 //private properties
     var m_table = document.getElementById("table_inventory_augments");
     var self = this;
 
 //additional initialization
-    Reset();
 }
 
 function Equipment_Block_t (){
