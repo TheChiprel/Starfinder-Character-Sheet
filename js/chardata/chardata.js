@@ -42,9 +42,7 @@ function Chardata_t(){
         self.stats.abiscores.Load_From_Obj(obj.abiscores);
         self.skills.Load_From_Obj(obj.skills);
         self.classes.Load_From_Obj(obj.classes);
-
-        layers.inventory.Load_From_Obj(obj.inventory);
-        
+        self.inventory.Load_From_Obj(obj.inventory);
         self.abilities.Load_From_Obj(obj.abilities);
         self.stats.custom_mods.Load_From_Obj(obj.custom);
         self.current_state.Load_From_Obj(obj.current_state);

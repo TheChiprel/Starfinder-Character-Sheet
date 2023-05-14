@@ -45,13 +45,7 @@ function Layers_t (){
 //public methods
     this.Reset = function(){
         self.maininfo.Reset();  //TODO: rework, remove
-        //self.maininfo = new Layer_MainInfo_t();
-        self.inventory = new Layer_Inventory_t();
-        //self.classes = new Layer_Classes_t();
-        //self.abilities = new Layer_Abilities_t();
-        //self.face = new Layer_Face_t();
         self.custom.Reset();
-        //self.custom = new Layer_Custom_t();
     }
     
 
@@ -84,7 +78,7 @@ function Layers_t (){
     this.maininfo = new Layer_MainInfo_t();
     this.abiscores = new Layer_Abiscores_t();
     this.skills = new Layer_Skills_t();
-    this.inventory;
+    this.inventory = new Layer_Inventory_t();
     this.classes = new Layer_Classes_t();
     this.abilities = new Layer_Abilities_t();
     this.face = new Layer_Face_t();

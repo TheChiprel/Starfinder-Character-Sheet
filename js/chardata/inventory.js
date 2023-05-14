@@ -257,13 +257,49 @@ function Weapon_t(database_entry, id, is_from_database = true){
     this.Recalc_Damage_Mod();
 }
 
-function Weapon_Collection_t(){
+function Weapon_Collection_t(gui_block_inv, gui_block_face){
+//constants
+    const GUI_BLOCK_INV = gui_block_inv;
+    const GUI_BLOCK_FACE = gui_block_face;
+    
 //private methods
-    var Add_Weapon_To_Recalc_Func = function(weapon_num){
-        //getting the weapon
-        var weapon = m_arr[weapon_num];
+    var Init = function(){
+        GUI_BLOCK_INV.Reset(self);
+        GUI_BLOCK_FACE.Reset();
+    }
+    
+    var Get_Weapon_By_ID = function(id){
+        if (m_map.has(id)){
+            return m_map.get(id);
+        }
+        return null;
+    }
 
+    var Find_Free_ID = function (weapon_name){
+        for (let id_enum = 0; id_enum < 100; id_enum++){
+            let found = false;
+            let cur_id = weapon_name + "_" + id_enum;
+            if (!m_map.has(cur_id)){
+                return cur_id;
+            }
+        }
+        
+        return null;
+    }
+    
+    var Find_Weapon_In_Database_By_Name = function(weapon_name, database_arr = WEAPON_DATABASE){
+        for (let i = 0; i < database_arr.length; i++){
+            var entry = database_arr[i];
+            if (entry.name == weapon_name){
+                return entry;
+            }
+            //else NOTHING TO DO
+        }
 
+        return null;
+    }
+
+    var Add_Weapon_To_Recalc_Func = function(weapon){
         var recalc_mod = new Recalc_Function_t (weapon.id + "_mod", weapon.Recalc_Hit_Mod);
         var recalc_dmg = new Recalc_Function_t (weapon.id + "_dmg", weapon.Recalc_Damage_Mod);
 
@@ -280,8 +316,7 @@ function Weapon_Collection_t(){
         //else NOTHING TO DO
     }
 
-    var Remove_Weapon_From_Recalc_Func = function(weapon_num){
-        var weapon = m_arr[weapon_num];
+    var Remove_Weapon_From_Recalc_Func = function(weapon){
         var recalc_mod_id = weapon.id + "_mod";
         var recalc_dmg_id = weapon.id + "_dmg";
 
@@ -298,57 +333,120 @@ function Weapon_Collection_t(){
     }
 
 //public methods
-    this.Add = function(database_entry, id, is_from_database){
-        var new_weapon = new Weapon_t (database_entry, id, is_from_database)
-        var len = m_arr.push(new_weapon);
-        Add_Weapon_To_Recalc_Func(len - 1);
-        chardata.inventory.weight.Add_Item(id, database_entry.weight, database_entry.name, count = 1);
-        layers.face.block_inventory.weapons.Add(new_weapon);
-        return true;
+    this.Add = function(database_entry, custom_id = null, is_from_database = true){
+        let weapon_id = custom_id;
+        if (weapon_id == null){
+            weapon_id = Find_Free_ID(database_entry.name);
+            if (weapon_id == null){
+                console.warn("More than 100 weapons with name '" + database_entry.name + "', can't add more!");
+                return;
+            }
+        }
+        
+        var new_weapon = new Weapon_t (database_entry, weapon_id, is_from_database)
+        m_map.set(weapon_id, new_weapon);
+        Add_Weapon_To_Recalc_Func(new_weapon);
+        chardata.inventory.weight.Add_Item(weapon_id, database_entry.weight, database_entry.name, count = 1);
+        
+        GUI_BLOCK_INV.Add(new_weapon, weapon_id, is_from_database);
+        GUI_BLOCK_FACE.Add(new_weapon, weapon_id);
+        return;
     }
 
-    this.Remove = function(table_row){
-        Remove_Weapon_From_Recalc_Func(table_row);
-        chardata.inventory.weight.Remove_Item(m_arr[table_row].id);
-        m_arr.splice(table_row, 1);
-        layers.face.block_inventory.weapons.Remove(table_row);
+    this.Remove = function(weapon_id){
+        let weapon = Get_Weapon_By_ID(weapon_id);
+        if (weapon == null){
+            //TODO: warn user
+            return;
+        }
+        
+        Remove_Weapon_From_Recalc_Func(weapon);
+        chardata.inventory.weight.Remove_Item(weapon_id);
+        m_map.delete(weapon_id);
+        
+        GUI_BLOCK_INV.Remove(weapon_id);
+        GUI_BLOCK_FACE.Remove(weapon_id);
     }
     
-    this.Set_Crystal = function(table_row, entry){
-        m_arr[table_row].Set_Crystal(entry);
+    this.Set_Crystal = function(weapon_id, entry){
+        let weapon = Get_Weapon_By_ID(weapon_id);
+        if (weapon == null){
+            //TODO: warn user
+            return;
+        }
+        
+        weapon.Set_Crystal(entry);
     }
     
-    this.Remove_Crystal = function(table_row){
-        m_arr[table_row].Remove_Crystal();
+    this.Remove_Crystal = function(weapon_id){
+        let weapon = Get_Weapon_By_ID(weapon_id);
+        if (weapon == null){
+            //TODO: warn user
+            return;
+        }
+        
+        weapon.Remove_Crystal();
     }
     
-    this.Change_Base_Damage = function(table_row, new_value){
-        m_arr[table_row].Change_Base_Damage(new_value);
+    this.Change_Base_Damage = function(weapon_id, new_value){
+        let weapon = Get_Weapon_By_ID(weapon_id);
+        if (weapon == null){
+            //TODO: warn user
+            return;
+        }
+        
+        weapon.Change_Base_Damage(new_value);
     }
 
-    this.Show_Hit_Detail_Popup = function(table_row){
-        m_arr[table_row].Show_Hit_Detail_Popup();
+    this.Show_Hit_Detail_Popup = function(weapon_id){
+        let weapon = Get_Weapon_By_ID(weapon_id);
+        if (weapon == null){
+            //TODO: warn user
+            return;
+        }
+        
+        weapon.Show_Hit_Detail_Popup();
     }
 
-    this.Show_Damage_Detail_Popup = function(table_row){
-        return m_arr[table_row].Show_Damage_Detail_Popup();
+    this.Show_Damage_Detail_Popup = function(weapon_id){
+        let weapon = Get_Weapon_By_ID(weapon_id);
+        if (weapon == null){
+            //TODO: warn user
+            return;
+        }
+        
+        weapon.Show_Damage_Detail_Popup();
     }
 
     this.Get_SaveData_Obj = function(){
         var ret = new Array(0);
-        m_arr.forEach(weapon => {
+        m_map.forEach(weapon => {
             if (weapon.is_from_database){
                 ret.push(weapon.Get_SaveData_Obj());
             }
         });
         return ret;
     }
+    
+    this.Load_From_Obj = function(obj){
+        obj.forEach(weapon => {
+            let entry = Find_Weapon_In_Database_By_Name(weapon.name);
+            if (entry != null){
+                self.Add(entry);
+            }else{
+                //TODO: warn user
+            }
+        });
+    }
 
 //public properties
 
 //private properties
     var self = this;
-    var m_arr = new Array(0);
+    var m_map = new Map();
+    
+//additional initialization
+    Init();
 }
 
 function Grenade_t(database_entry, in_count = 1, row){
@@ -1491,12 +1589,34 @@ function Inventory_t (){
         };
         return ret;
     }
+    
+    this.Load_From_Obj = function(obj){
+        if (obj == undefined){
+            return;
+        }
+        
+        self.weapons.Load_From_Obj(obj.weapons);
+        //layers.inventory.weapon_block.Load_From_Obj(obj.weapons);
+        
+        layers.inventory.grenade_block.Load_From_Obj(obj.grenades);
+        layers.inventory.armor_block.Load_From_Obj(obj.armor);
+        layers.inventory.augment_block.Load_From_Obj(obj.augments);
+        layers.inventory.equipment_block.Load_From_Obj(obj.equipment);
+        layers.inventory.ammo_block.Load_From_Obj(obj.ammo);
+        layers.inventory.other_items_block.Load_From_Obj(obj.other);
+
+        layers.inventory.resourses_block.Set_Credits(obj.credits, true);
+        layers.inventory.resourses_block.Set_UPB(obj.upb, true);
+    }
 
 //private properties
     var self = this;
 
 //public properties
-    this.weapons = new Weapon_Collection_t();
+    this.weapons = new Weapon_Collection_t(
+        layers.inventory.weapon_block, 
+        layers.face.block_inventory.weapons
+    );
     this.grenades = new Grenade_Collection_t();
     this.armor = new Armor_t();
     this.augments = new Augment_Collection_t();

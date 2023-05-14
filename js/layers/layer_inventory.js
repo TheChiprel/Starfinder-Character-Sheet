@@ -4,16 +4,9 @@ function Weapon_Block_t(){
     const CLASS_WEAPON_OUTFIELD_PREFIX_DMG = "class_outfield_weapon_dmg_";
     
 //private methods
-    var Reset = function(){
-        m_table.style.display = "none";
-        while(m_table.rows.length > 1){
-            m_table.deleteRow(1);
-        }
-    }
-
-    var Get_Weapon_Row_Num_By_Name = function(name){
-        for (let i = 0; i < m_table.rows.length - 1; i++){
-            var row = m_table.rows[i + 1];
+     var Get_Weapon_Row_Num_By_Name = function(name){
+        for (let i = 1; i < m_table.rows.length; i++){
+            var row = m_table.rows[i];
             if(row.name == name){
                 return i;
             }
@@ -21,88 +14,88 @@ function Weapon_Block_t(){
 
         return null;
     }
+    
+    var Proc_Event_Remove = function(id){
+        if (m_owner == null){
+            return;
+        }
+        
+        m_owner.Remove(id);
+    }
 
 //public methods
-    this.Add_By_Entry = function(entry, is_from_database = true){
-//checking weapons with same name
-        var row_name;
-        for (let id_enum = 0; id_enum < 100; id_enum++){
-            let found = false;
-            let cur_name = entry.name + "_" + id_enum;
-            for (let i = 0; i < m_table.rows.length; i++){
-                if (m_table.rows[i].name == cur_name){
-                    found = true;
-                    break;
-                }
-                //else NOTHING TO DO
-            }
-
-            if (!found){
-                row_name = cur_name;
-                break;
-            }
-            //else NOTHING TO DO
+    this.Reset = function(owner){
+        m_owner = owner;
+        m_table.style.display = "none";
+        while(m_table.rows.length > 1){
+            m_table.deleteRow(1);
         }
-
-        if (row_name == undefined){
-            console.log("More than 100 weapons with name '" + entry.name + "', can't add more!");
-            return null;
+    }
+    
+    this.Proc_Event_Add = function(entry_num){
+        if (m_owner == null){
+            return;
         }
-        //else NOTHING TO DO
+        
+        m_owner.Add(WEAPON_DATABASE[entry_num]);
+    }
 
-        row = m_table.insertRow(m_table.rows.length);
-        row.name = row_name;
-
+    this.Add = function(weapon, id, can_user_remove = true){
+        var row = m_table.insertRow(m_table.rows.length);
+        row.name = id;
+        
         for (let i = 0; i < 11; i++){
             var cell = row.insertCell(i);
             var outfield;
             var func;
             switch (i){
                 case 0:
-                    cell.innerHTML = entry.name;
+                    cell.innerHTML = weapon.entry.name;
                     break;
 
                 case 1:
-                    func = self.Show_Hit_Detail_Popup.bind(null, row.name);
+                    func = weapon.Show_Hit_Detail_Popup;
                     outfield = HTML_Create_Output(
-                        0,
-                        func,
+                        GetModifierStr(weapon.hit_mod),
                         undefined,
-                        CLASS_WEAPON_OUTFIELD_PREFIX_HIT_MOD + row_name)
+                        undefined,
+                        CLASS_WEAPON_OUTFIELD_PREFIX_HIT_MOD + id)
+                    cell.onclick = func;
                     cell.appendChild(outfield);
                     break;
 
                 case 2:
-                    func = self.Show_Damage_Detail_Popup.bind(null, row.name);
+                    func = weapon.Show_Damage_Detail_Popup;
                     outfield = HTML_Create_Output(
-                        entry.damage + " " + entry.damage_type,
-                        func,
+                        weapon.damage,
                         undefined,
-                        CLASS_WEAPON_OUTFIELD_PREFIX_DMG + row_name)
+                        undefined,
+                        CLASS_WEAPON_OUTFIELD_PREFIX_DMG + id)
+                    cell.onclick = func;
                     cell.appendChild(outfield);
                     break;
 
                 case 3:
-                    if (entry.dist == null){
+                    if (weapon.entry.dist == null){
                         cell.innerHTML = "---";
                     }else{
-                        cell.innerHTML = entry.dist + " ф.";
+                        cell.innerHTML = weapon.entry.dist + " ф.";
                     }
                     break;
 
                 case 4:
-                    if (entry.usage == null){
+                    if (weapon.entry.usage == null){
                         cell.innerHTML = "---";
                     }else{
-                        cell.innerHTML = entry.usage;
+                        cell.innerHTML = weapon.entry.usage;
                     }
                     break;
 
                 case 5:
-                    if (entry.capacity == null){
+                    if (weapon.entry.capacity == null){
                         cell.innerHTML = "---";
                     }else{
-                        cell.innerHTML = entry.capacity;
+                        cell.innerHTML = weapon.entry.capacity;
                     }
                     break;
 
@@ -110,33 +103,33 @@ function Weapon_Block_t(){
                 //    break;
 
                 case 7:
-                    if (entry.crit_effect == null){
+                    if (weapon.entry.crit_effect == null){
                         cell.innerHTML = "---";
                     }else{
-                        cell.innerHTML = entry.crit_effect;
+                        cell.innerHTML = weapon.entry.crit_effect;
                     }
                     break;
 
                 case 8:
-                    if (entry.special == null){
+                    if (weapon.entry.special == null){
                         cell.innerHTML = "---";
                     }else{
-                        cell.innerHTML = entry.special;
+                        cell.innerHTML = weapon.entry.special;
                     }
                     break;
 
                 case 9:
-                    if (entry.additional_info == null){
+                    if (weapon.entry.additional_info == null){
                         cell.innerHTML = "---";
                     }else{
-                        cell.innerHTML = entry.additional_info;
+                        cell.innerHTML = weapon.entry.additional_info;
                     }
                     break;
 
                 case 10:
-                    func = self.Remove.bind(null, row.name);
+                    func = Proc_Event_Remove.bind(null, id);
                     var button_remove = HTML_Create_Button("X", func);
-                    if (!is_from_database){
+                    if (!can_user_remove){
                         button_remove.disabled = true;
                     }
                     cell.appendChild(button_remove);
@@ -147,22 +140,16 @@ function Weapon_Block_t(){
                     break;
             }
         }
+
         m_table.style.display = "block";
 
-        chardata.inventory.weapons.Add(entry, row_name, is_from_database);
-        return row.name;
-    }
-    
-    this.Add_By_Entry_Num = function(num){
-        var entry = WEAPON_DATABASE[num];
-        return self.Add_By_Entry(entry);
+        return;
     }
 
     this.Remove = function(row_name){
         var row_num = Get_Weapon_Row_Num_By_Name(row_name);
         if (row_num != null){
-            chardata.inventory.weapons.Remove(row_num);
-            m_table.deleteRow(row_num + 1);
+            m_table.deleteRow(row_num);
         }//else TODO
 
         if (m_table.rows.length == 1){ //only header: remove
@@ -170,12 +157,15 @@ function Weapon_Block_t(){
         }
     }
 
+    //TODO: ???
+    /*
     this.Change_Base_Damage = function(row_name, new_value){
         var row_num = Get_Weapon_Row_Num_By_Name(row_name);
         if (row_num != null){
             chardata.inventory.weapons.Change_Base_Damage(row_num, new_value);
         }
     }
+    
     
     this.Set_Crystal = function(row_name, entry){
         var row_num = Get_Weapon_Row_Num_By_Name(row_name);
@@ -189,24 +179,7 @@ function Weapon_Block_t(){
         if (row_num != null){
             chardata.inventory.weapons.Remove_Crystal(row_num);
         }
-    }
-
-    this.Load_From_Obj = function(obj){
-        if (obj == undefined){
-            return;
-        }
-        
-        obj.forEach(item => {
-            for (let i = 0; i < WEAPON_DATABASE.length; i++){
-                let entry = WEAPON_DATABASE[i];
-                if (item.name == entry.name){
-                    self.Add_By_Entry_Num(i);
-                    break;
-                }
-                //else NOTHING TO DO
-            }
-        });
-    }
+    }*/
 
     this.Open_Database = function(){
         var table_data = new Array(0);
@@ -250,7 +223,7 @@ function Weapon_Block_t(){
         filters.push(new Database_Filter_Input_t(POPUP_FILTER_TYPES.RANGE,   5, "Цена"         ));
         filters.push(new Database_Filter_Input_t(POPUP_FILTER_TYPES.SELECT, 16, "Источник"     ));
 
-        Popup_Database.Open(table_data, self.Add_By_Entry_Num, filters, headers, self.Show_Info_Database);
+        Popup_Database.Open(table_data, self.Proc_Event_Add, filters, headers, self.Show_Info_Database);
     }
 
     this.Show_Info_Database = function(entry_num){
@@ -313,27 +286,12 @@ function Weapon_Block_t(){
         Popup_Descr.Call(entry.name, descr);
     }
 
-    this.Show_Hit_Detail_Popup = function(row_name){
-        var row_num = Get_Weapon_Row_Num_By_Name(row_name);
-        if (row_num != null){
-            chardata.inventory.weapons.Show_Hit_Detail_Popup(row_num);
-        }//else TODO
-
-    }
-
-    this.Show_Damage_Detail_Popup = function(row_name){
-        var row_num = Get_Weapon_Row_Num_By_Name(row_name);
-        if (row_num != null){
-            chardata.inventory.weapons.Show_Damage_Detail_Popup(row_num);
-        }//else TODO
-    }
-
 //private properties
     var self = this;
     var m_table = document.getElementById("table_inventory_weapons");
+    var m_owner = null;
 
 //additional initialization
-    Reset();
 }
 
 function Grenade_Block_t(){
@@ -1776,22 +1734,6 @@ function Resources_Block_t(){
 
 function Layer_Inventory_t (){
 //public methods
-    this.Load_From_Obj = function(obj){
-        if (obj == undefined){
-            return;
-        }
-        
-        self.weapon_block.Load_From_Obj(obj.weapons);
-        self.grenade_block.Load_From_Obj(obj.grenades);
-        self.armor_block.Load_From_Obj(obj.armor);
-        self.augment_block.Load_From_Obj(obj.augments);
-        self.equipment_block.Load_From_Obj(obj.equipment);
-        self.ammo_block.Load_From_Obj(obj.ammo);
-        self.other_items_block.Load_From_Obj(obj.other);
-
-        self.resourses_block.Set_Credits(obj.credits, true);
-        self.resourses_block.Set_UPB(obj.upb, true);
-    }
 
 //private properties
     var self = this;

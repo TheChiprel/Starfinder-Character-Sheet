@@ -135,17 +135,26 @@ function Block_Face_Weapons(){
     const CLASS_WEAPON_OUTFIELD_PREFIX_DMG = "class_outfield_weapon_dmg_";
     
 //private methods
-    var Init = function(){
+    var Find_Weapon_Start_Row = function(id){
+        for (let i = 0; i < m_table.rows.length; i += ROWS_PER_ENTRY){
+            if (m_table.rows[i].name == id){
+                return i;
+            }
+        }
+        
+        return null;
+    }
+
+//public methods
+    this.Reset = function(){
         while (m_table.rows.length > 0){
             m_table.deleteRow(0);
         }
     }
 
-//public methods
-    this.Add = function(weapon_obj){
-        m_arr.push(weapon_obj);
-        
+    this.Add = function(weapon_obj, id){
         let row_name = m_table.insertRow(m_table.rows.length);
+        row_name.name = id;
         if (m_table.rows.length != 1){
             row_name.style.borderTop = "2px solid #ccc";
         }
@@ -248,26 +257,30 @@ function Block_Face_Weapons(){
         }
     }
     
-    this.Remove = function(row){
-        let start_table_row = ROWS_PER_ENTRY * row
+    this.Remove = function(id){
+        let start_table_row = Find_Weapon_Start_Row(id);
+        if (id == null){
+            //TODO: warn user
+            return;
+        }
+        
         for (let i = 0; i < ROWS_PER_ENTRY; i++){
             m_table.deleteRow(start_table_row);
         }
     }
     
     this.Update = function(row){
-        //TODO: update by class
+        //TODO
     }
 
 //private properties
     var self = this;
     var m_table = document.getElementById("table_face_weapons");
-    var m_arr = new Array(0);
 
 //public properties
 
 //additional initialization
-    Init();
+
 }
 
 function Block_Face_Equipment(){
