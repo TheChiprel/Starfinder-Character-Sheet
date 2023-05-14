@@ -1,3 +1,15 @@
+function Find_Entry_By_Name(name, database){
+    for (let i = 0; i < database.length; i++){
+        var entry = database[i];
+        if (entry.name == name){
+            return entry;
+        }
+        //else NOTHING TO DO
+    }
+
+    return null;
+}
+
 function Weapon_t(database_entry, id, is_from_database = true){
     const BASIC_HIT_MOD_ID_T = Object.freeze(
         {
@@ -286,18 +298,6 @@ function Weapon_Collection_t(gui_block_inv, gui_block_face){
         
         return null;
     }
-    
-    var Find_Weapon_In_Database_By_Name = function(weapon_name, database_arr = WEAPON_DATABASE){
-        for (let i = 0; i < database_arr.length; i++){
-            var entry = database_arr[i];
-            if (entry.name == weapon_name){
-                return entry;
-            }
-            //else NOTHING TO DO
-        }
-
-        return null;
-    }
 
     var Add_Weapon_To_Recalc_Func = function(weapon){
         var recalc_mod = new Recalc_Function_t (weapon.id + "_mod", weapon.Recalc_Hit_Mod);
@@ -429,8 +429,12 @@ function Weapon_Collection_t(gui_block_inv, gui_block_face){
     }
     
     this.Load_From_Obj = function(obj){
+        if (obj == undefined){
+            return;
+        }
+        
         obj.forEach(weapon => {
-            let entry = Find_Weapon_In_Database_By_Name(weapon.name);
+            let entry = Find_Entry_By_Name(weapon.name, WEAPON_DATABASE);
             if (entry != null){
                 self.Add(entry);
             }else{
@@ -449,7 +453,7 @@ function Weapon_Collection_t(gui_block_inv, gui_block_face){
     Init();
 }
 
-function Grenade_t(database_entry, in_count = 1, row){
+function Grenade_t(database_entry, in_count = 1){
 const BASIC_MOD_ID_T = Object.freeze(
         {
             "BASE_DC": 'BASE_DC',
@@ -459,10 +463,6 @@ const BASIC_MOD_ID_T = Object.freeze(
     );
 
 //private methods
-    var Set_DC_Field_Values = function(){
-       self.row.cells[1].innerHTML = self.dc; //TODO: magic!
-    }
-
     var Update_Mod_Map = function(){
         //updating AGI modifier
         self.dc_modifier_map.Change_Value(
@@ -477,17 +477,34 @@ const BASIC_MOD_ID_T = Object.freeze(
         let new_sum = self.dc_modifier_map.Get_Sum();
         if (new_sum != self.dc){
             self.dc = new_sum;
-            Set_DC_Field_Values();
+            if (gui_dc_cell != null){
+                gui_dc_cell.innerHTML = self.dc;
+            }
         }
     }
 
     this.Show_DC_Detail_Popup = function(){
         Popup_Stat_Details.Call("СЛ гранаты (" + self.entry.name + ")", self.dc, self.dc_modifier_map.Get_Mod_Map(), false);
     }
+    
+    this.Change_Count = function(value){
+        self.count = value;
+        if (gui_count_field != null){
+            gui_count_field.value = self.count;
+        }
+    }
+
+    this.Set_GUI_Count_Field = function(gui_field){
+        gui_count_field = gui_field;
+    }
+    
+    this.Set_GUI_DC_Cell = function(gui_field){
+        gui_dc_cell = gui_field;
+    }
 
     this.Get_SaveData_Obj = function(){
         var ret = {
-            name: self.entry.name, //m_name,
+            name: self.entry.name,
             count: self.count
         }
         return ret;
@@ -503,14 +520,13 @@ const BASIC_MOD_ID_T = Object.freeze(
 
 //private properties
     var self = this;
-    // var m_dc_mod_map;
-    //var m_name = database_entry.name;
     this.dc_modifier_map = new Modifier_Map_t(this.Recalc_DC);
+    
+    var gui_count_field = null;
+    var gui_dc_cell = null;
 
 //public properties
-    //this.lvl = database_entry.lvl;
     this.dc; //value set later later
-    this.row = row;
     this.count = in_count;
     this.entry = database_entry;
 
@@ -527,9 +543,9 @@ const BASIC_MOD_ID_T = Object.freeze(
     this.Recalc_DC();
 }
 
-function Grenade_Collection_t(){
+function Grenade_Collection_t(gui_block){
 //constants
-const ID_PREFIX = "grenade_";
+    const GUI_BLOCK = gui_block;
 
     const BASIC_MOD_ID_T = Object.freeze(
         {
@@ -550,6 +566,14 @@ const ID_PREFIX = "grenade_";
             new Modifier_t(-4, "Отсутствие владения типом оружия", WEAPON_TYPES.GRENADE));
 
         m_update_func = combined_collections.equipment.Add("grenades", self);
+        GUI_BLOCK.Reset(self);
+    }
+    
+    var Get_By_ID = function(id){
+        if (m_map.has(id)){
+            return m_map.get(id);
+        }
+        return null;
     }
 
     var Update = function(){
@@ -580,34 +604,66 @@ const ID_PREFIX = "grenade_";
     }
 
 //public methods
-    this.Add = function(database_entry, in_count = 1, row){
-        var len = m_arr.push(new Grenade_t (database_entry, in_count, row));
+    //TODO: remove row
+    this.Add = function(database_entry, in_count = 1, custom_id = null){
+        let id = (custom_id == null) ? database_entry.name : custom_id;
+        var item = Get_By_ID(id);
+        if (item != null){
+            //change count instead
+            self.Change_Count(id, item.count + in_count);
+            return;
+        }
+        
+        item = new Grenade_t (database_entry, in_count)
+        m_map.set(id, item);
+        
         chardata.inventory.weight.Add_Item(
-            ID_PREFIX + row.name,
+            id,
             database_entry.weight,
             database_entry.name,
             in_count);
+            
+        GUI_BLOCK.Add(id, item);
         Update();
-        return true;
+        
+        return;
     }
 
-    this.Remove = function(table_row){
-        chardata.inventory.weight.Remove_Item(ID_PREFIX + m_arr[table_row].row.name);
-        m_arr.splice(table_row, 1);
-        Update();
+    this.Remove = function(id){
+        if (m_map.has(id)){
+            m_map.delete(id);
+            chardata.inventory.weight.Remove_Item(id);
+            
+            GUI_BLOCK.Remove(id);
+            Update();
+        }//else TODO: warn user
     }
 
-    this.Change_Count = function(num, value){
-        let cur_grenade = m_arr[num];
-        cur_grenade.count = value;
-        chardata.inventory.weight.Change_Count(ID_PREFIX + cur_grenade.row.name, value);
+    this.Change_Count = function(id, value){
+        let item = Get_By_ID(id);
+        if (item == null){
+            //TODO: warn user
+            return;
+        }
+        item.Change_Count(value);
+        
+        chardata.inventory.weight.Change_Count(id, value);
         Update();
+    }
+    
+    this.Get_Count = function(id){
+        let item = Get_By_ID(id);
+        if (item == null){
+            return null;
+        }
+        
+        return item.count;
     }
     
     this.Get_Equip_List = function(){
         let item_list = new Array(0);
         
-        m_arr.forEach(item => {
+        m_map.forEach((item, key) => {
             if ((item != null) && (item.entry.name != "")){
                 let str = item.entry.name;
                 if (item.count != 1){
@@ -633,7 +689,7 @@ const ID_PREFIX = "grenade_";
     }
 
     this.Recalc_All_DC = function(){
-        m_arr.forEach(grenade => {
+        m_map.forEach(item, key => {
             grenade.Recalc_DC();
         });
         Update();
@@ -654,32 +710,47 @@ const ID_PREFIX = "grenade_";
     }
 
     this.Show_DC_Detail_Popup = function(row){
-        m_arr[row].Show_DC_Detail_Popup();
+        let item = Get_By_ID(id);
+        item.Show_DC_Detail_Popup();
     }
     
     this.Open_Descr_Tooltip = function(row){
-        m_arr[row].Show_Descr();
+        let item = Get_By_ID(id);
+        item.Show_Descr();
     }
 
     this.Get_SaveData_Obj = function(){
         var ret = new Array(0);
-        m_arr.forEach(grenade => {
+        m_map.forEach(grenade => {
             ret.push(grenade.Get_SaveData_Obj());
         });
         return ret;
+    }
+    
+    this.Load_From_Obj = function(obj){
+        if (obj == undefined){
+            return;
+        }
+        
+        obj.forEach(item => {
+            let entry = Find_Entry_By_Name(item.name, GRENADE_DATABASE);
+            if (entry != null){
+                self.Add(entry, item.count);
+            }else{
+                //TODO: warn user
+            }
+        });
     }
 
 //private properties
     var self = this;
     var outfield_throw_mod = document.getElementById("outfield_grenade_mod");
-    var m_arr = new Array(0);
     var m_update_func = null;
-    /* var m_throw_mod_map; */
+    var m_map = new Map();
 
 //public properties
     this.throw_mod = -4;
     this.throw_modifier_map = new Modifier_Map_t(this.Recalc);
-    /* this.throw_mod_other = new Other_Mod_Collection_t (); */
 
 //additional initialization
     Init();
@@ -1596,9 +1667,9 @@ function Inventory_t (){
         }
         
         self.weapons.Load_From_Obj(obj.weapons);
-        //layers.inventory.weapon_block.Load_From_Obj(obj.weapons);
+        self.grenades.Load_From_Obj(obj.grenades);
         
-        layers.inventory.grenade_block.Load_From_Obj(obj.grenades);
+        //layers.inventory.grenade_block.Load_From_Obj(obj.grenades);
         layers.inventory.armor_block.Load_From_Obj(obj.armor);
         layers.inventory.augment_block.Load_From_Obj(obj.augments);
         layers.inventory.equipment_block.Load_From_Obj(obj.equipment);
@@ -1617,7 +1688,7 @@ function Inventory_t (){
         layers.inventory.weapon_block, 
         layers.face.block_inventory.weapons
     );
-    this.grenades = new Grenade_Collection_t();
+    this.grenades = new Grenade_Collection_t(layers.inventory.grenade_block);
     this.armor = new Armor_t();
     this.augments = new Augment_Collection_t();
     this.equipment = new Equipment_Collection_t();
