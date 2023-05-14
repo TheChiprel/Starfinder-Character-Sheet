@@ -226,15 +226,6 @@ function Spell_Likes_Abilities_Block(){
 
 function Custom_Abilities_Block_t(){
 //private methods
-    var Reset = function(){
-        m_table.style.display = "none";
-        while(m_table.rows.length > 1){
-            m_table.deleteRow(1);
-        }
-
-        m_outfield_map = new Map();
-    }
-
     var Get_Item_Row_Num_By_Name = function(name){
         for (let i = 0; i < m_table.rows.length - 1; i++){
             var row = m_table.rows[i + 1];
@@ -245,13 +236,8 @@ function Custom_Abilities_Block_t(){
 
         return null;
     }
-
-//public methods
-    this.Add_Row = function(){
-        var row;
-
-        //checking for free id
-        var row_name;
+    
+    var Get_Free_ID = function(){
         for (let id_enum = 0; id_enum < 100; id_enum++){
             let found = false;
             let cur_name = "ability_custom_" + id_enum;
@@ -264,31 +250,71 @@ function Custom_Abilities_Block_t(){
             }
 
             if (!found){
-                row_name = cur_name;
-                break;
+                return cur_name;
             }
             //else NOTHING TO DO
         }
-
-        if (row_name == undefined){
-            console.log("More than 100 custom abilities '" + entry.name + "', can't add more!");
+        
+        return undefined;
+    }
+    
+    var Proc_Remove_Row_Event = function(row_name, event){
+        let table_row_num = Get_Item_Row_Num_By_Name(row_name);
+        if ((m_owner == null) || (table_row_num == null)){
             return;
         }
-        //else NOTHING TO DO
+        
+        m_owner.Remove(table_row_num);
+    }
+    
+    var Proc_Change_Name_Event = function(row_name, event){
+        let table_row_num = Get_Item_Row_Num_By_Name(row_name);
+        if ((m_owner == null) || (table_row_num == null)){
+            return;
+        }
+        
+        m_owner.Change_Name(table_row_num, event.target.value);
+    }
+    
+    var Proc_Change_Descr_Event = function(row_name, event){
+        let table_row_num = Get_Item_Row_Num_By_Name(row_name);
+        if ((m_owner == null) || (table_row_num == null)){
+            return;
+        }
+        
+        m_owner.Change_Descr(table_row_num, event.target.value);
+    }
 
+//public methods
+    this.Reset = function(owner){
+        m_owner = owner;
+        m_table.style.display = "none";
+        while(m_table.rows.length > 1){
+            m_table.deleteRow(1);
+        }
+    }
+    
+    this.Proc_Add_Row_Event = function(){
+        let id = Get_Free_ID();
+        if ((m_owner == null) || (id == null)){
+            return;
+        }
+        
+        m_owner.Add(id);
+    }
+
+    this.Add_Row = function(row_name, name = "", descr = ""){
         row = m_table.insertRow(m_table.rows.length);
         row.name = row_name;
         
         var outfield_name = HTML_Create_Input_Text(
-            "",
-            onchange_elem = "layers.abilities.custom_block.Change_Name('" + row.name + "', event.target.value)",
-            id = undefined,
-            class_elem = undefined);
+            name,
+            Proc_Change_Name_Event.bind(null, row.name)
+        );
         var outfield_descr = HTML_Create_Input_Text(
-            "",
-            onchange_elem = "layers.abilities.custom_block.Change_Descr('" + row.name + "', event.target.value)",
-            id = undefined,
-            class_elem = undefined);
+            descr,
+            Proc_Change_Descr_Event.bind(null, row.name)
+        );
 
         for (let i = 0; i < 3; i++){
             var cell = row.insertCell(i);
@@ -302,7 +328,7 @@ function Custom_Abilities_Block_t(){
                     break;
 
                 case 2:
-                    var remove_func = self.Remove_Row.bind(null, row.name);
+                    var remove_func = Proc_Remove_Row_Event.bind(null, row.name);
                     var button_remove = HTML_Create_Button("X", remove_func);
                     cell.appendChild(button_remove);
                     break;
@@ -313,73 +339,38 @@ function Custom_Abilities_Block_t(){
             }
         }
         m_table.style.display = "block";
-
-        m_outfield_map.set(row_name, {
-           "name": outfield_name,
-           "descr": outfield_descr
-        });
-
-        chardata.abilities.custom.Add(row_name);
-        return row_name;
     }
 
-    this.Remove_Row = function(id){
-        let row_num = Get_Item_Row_Num_By_Name(id);
+    this.Remove_Row = function(row_num){
         if (row_num != null){
-            chardata.abilities.custom.Remove(row_num);
             m_table.deleteRow(row_num + 1);
         }
 
         if (m_table.rows.length == 1){ //only header: remove
             m_table.style.display = "none";
         }
-
-        m_outfield_map.delete(id);
     }
 
-    this.Change_Name = function(id, value, update_outfield = false){
-        let row_num = Get_Item_Row_Num_By_Name(id);
-        if (row_num != null){
-            chardata.abilities.custom.Change_Name(row_num, value);
-            if (update_outfield){
-               m_outfield_map.get(id).name.value = value;
-            }
-            //else NOTHING TO DO
-        }
-        //else NOTHING TO DO
+    this.Change_Name = function(row_num, value){
+        let table_row = m_table.rows[row_num + 1];
+        let table_cell = table_row.cells[0];
+        let infield = table_cell.childNodes[0];
+        infield.value = value;
     }
 
-    this.Change_Descr = function(id, value, update_outfield = false){
-        let row_num = Get_Item_Row_Num_By_Name(id);
-        if (row_num != null){
-            chardata.abilities.custom.Change_Descr(row_num, value);
-            if (update_outfield){
-               m_outfield_map.get(id).descr.value = value;
-            }
-            //else NOTHING TO DO
-        }
-        //else NOTHING TO DO
-    }
-
-    this.Load_From_Obj = function(obj){
-        if (obj == undefined){
-            return;
-        }
-        
-        obj.forEach(item => {
-            let id = self.Add_Row();
-            self.Change_Name(id, item.name, true);
-            self.Change_Descr(id, item.descr, true);
-        });
+    this.Change_Descr = function(row_num, value){
+        let table_row = m_table.rows[row_num + 1];
+        let table_cell = table_row.cells[1];
+        let infield = table_cell.childNodes[0];
+        infield.value = value;
     }
 
 //private properties
     var m_table = document.getElementById("table_abilities_custom");
-    var m_outfield_map;
     var self = this;
+    var m_owner = null;
 
 //additional initialization
-    Reset();
 }
 
 function Layer_Abilities_t(){
@@ -413,7 +404,7 @@ function Layer_Abilities_t(){
         SPELLS_DATABASE,
         true,
         true
-    );//= new Spell_Likes_Abilities_Block();
+    );
     
     this.custom_block = new Custom_Abilities_Block_t();
 }

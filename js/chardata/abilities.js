@@ -469,7 +469,15 @@ function Ability_Custom_t(id, name, descr){
     this.descr = descr;
 }
 
-function Ability_Custom_Collection_t(){
+function Ability_Custom_Collection_t(gui_block){
+//constants
+    const GUI_BLOCK = gui_block;
+    
+//private methods
+    var Init = function(){
+        GUI_BLOCK.Reset(self);
+    }
+    
 //public methods
     this.Add = function(id, name = "", descr = ""){
         var pseudo_entry = {
@@ -483,22 +491,36 @@ function Ability_Custom_Collection_t(){
             source: null
         }
         m_collection.Add(id, pseudo_entry);
+        GUI_BLOCK.Add_Row(id, name, descr);
     }
 
     this.Remove = function(num){
         m_collection.Remove(num);
+        GUI_BLOCK.Remove_Row(num);
     }
 
     this.Change_Name = function(num, value){
         m_collection.Set_Ability_Name(num, value);
+        GUI_BLOCK.Change_Name(num, value);
     }
 
     this.Change_Descr = function(num, value){
         m_collection.Set_Ability_Descr(num, value);
+        GUI_BLOCK.Change_Descr(num, value);
     }
 
     this.Get_SaveData_Obj = function(){
         return m_collection.Get_SaveData_Obj_Custom();
+    }
+    
+    this.Load_From_Obj = function(obj){
+        if (obj == undefined){
+            return;
+        }
+        
+        for (let i = 0; i < obj.length; i++){
+            self.Add("load_" + i, obj[i].name, obj[i].descr);
+        }
     }
 
 //private properties
@@ -506,6 +528,9 @@ function Ability_Custom_Collection_t(){
     var m_collection = new Ability_Collection_t(
         "abi_custom",
         collection_name = "Пользовательские способности");
+        
+//additional initialization
+    Init();
 }
 
 function Chardata_Abilities_t(){
@@ -540,7 +565,7 @@ function Chardata_Abilities_t(){
         self.feats.Load_From_Obj(obj.feats);
         self.other.Load_From_Obj(obj.other);
         self.spell_like.Load_From_Obj(obj.spell_like);
-        layers.abilities.custom_block.Load_From_Obj(obj.custom);
+        self.custom.Load_From_Obj(obj.custom);
     }
 
 //private properties
@@ -587,5 +612,5 @@ function Chardata_Abilities_t(){
         "Псевдозаклинания",
         layers.abilities.spell_likes);
     
-    this.custom = new Ability_Custom_Collection_t();
+    this.custom = new Ability_Custom_Collection_t(layers.abilities.custom_block);
 }
