@@ -942,7 +942,7 @@ function Armor_t(gui_block){
         }
         
         if (obj.name != null){
-            let entry = Find_Entry_By_Name(upgr, ARMOR_DATABASE);
+            let entry = Find_Entry_By_Name(obj.name, ARMOR_DATABASE);
             self.Set(entry);
         }
          
