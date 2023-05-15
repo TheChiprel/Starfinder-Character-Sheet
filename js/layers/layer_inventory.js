@@ -353,7 +353,7 @@ function Grenade_Block_t(){
     }
     
     this.Add = function(id, item){
-        row = m_table.insertRow(m_table.rows.length);
+        var row = m_table.insertRow(m_table.rows.length);
         row.name = id;
         
         for (let i = 0; i < 5; i++){
@@ -1036,16 +1036,9 @@ function Augment_Block_t(){
 
 function Equipment_Block_t (){
 //private methods
-    var Reset = function(){
-        m_table.style.display = "none";
-        while(m_table.rows.length > 1){
-            m_table.deleteRow(1);
-        }
-    }
-
-    var Get_Item_Row_Num_By_Name = function(name){
-        for (let i = 0; i < m_table.rows.length - 1; i++){
-            var row = m_table.rows[i + 1];
+var Get_Row_Num_By_Name = function(name){
+        for (let i = 1; i < m_table.rows.length; i++){
+            var row = m_table.rows[i];
             if(row.name == name){
                 return i;
             }
@@ -1053,52 +1046,80 @@ function Equipment_Block_t (){
 
         return null;
     }
-
-    this.Add = function(num, in_count = 1){
-        var row;
-        var entry = ITEMS_DATABASE[num];
-
-        //if item already in table, increase its amount by 1 instead of adding
-        for (let i = 0; i < m_table.rows.length; i++){
-            if (m_table.rows[i].name == entry.name){
-                var in_field = document.getElementById("infield_" + entry.name);
-                var new_count = Number(in_field.value) + in_count;
-                in_field.value = new_count;
-                chardata.inventory.equipment.Change_Count(entry.name, new_count);
-                return;
-            }
-            //else NOTHING TO DO
+    
+    var Proc_Event_Add = function(entry_num){
+        if (m_owner == null){
+            return;
         }
+        
+        m_owner.Add(ITEMS_DATABASE[entry_num]);
+    }
+    
+    var Proc_Event_Remove = function(id){
+        if (m_owner == null){
+            return;
+        }
+        
+        m_owner.Remove(id);
+    }
+    
+    var Proc_Event_Change_Count = function(id, event){
+        if (m_owner == null){
+            return;
+        }
+        
+        let new_value = event.target.value;
+        if (isNaN(new_value)){
+            let count_to_set = m_owner.Get_Count(id);
+            if (count_to_set == null){
+                event.target.value = "";
+            }else{
+                event.target.value = count_to_set;
+            }
+            return;
+        }
+        m_owner.Change_Count(id, parseInt(new_value));
+    }
 
-        row = m_table.insertRow(m_table.rows.length);
-        row.name = entry.name;
+//public methods
+    this.Reset = function(owner){
+        m_owner = owner;
+        
+        m_table.style.display = "none";
+        while(m_table.rows.length > 1){
+            m_table.deleteRow(1);
+        }
+    }
+
+    this.Add = function(id, item){
+        var row = m_table.insertRow(m_table.rows.length);
+        row.name = id;
 
         for (let i = 0; i < 4; i++){
             var cell = row.insertCell(i);
-            var func;
             switch (i){
                 case 0:
-                    cell.innerHTML = entry.name;
-                    func = self.Show_Popup.bind(null, row.name);
-                    cell.onclick = func;
+                    cell.innerHTML = item.entry.name;
+                    cell.onclick = item.Show_Descr;
                     break;
 
                 case 1:
-                    cell.innerHTML = entry.weight;
+                    cell.innerHTML = item.entry.weight;
                     break;
 
                 case 2:
                     var count = HTML_Create_Input_Number(
-                        value = in_count,
-                        min = 1,
-                        max = 100,
-                        "layers.inventory.equipment_block.Change_Count(event, '" + row.name + "')",
-                        "infield_" + entry.name);
+                        item.count,
+                        1,
+                        99,
+                        Proc_Event_Change_Count.bind(null, id)
+                    );
                     cell.appendChild(count);
+                    item.Set_GUI_Count_Field(count);
                     break;
 
                 case 3:
-                    func = self.Remove.bind(null, row.name);
+                    var func = Proc_Event_Remove.bind(null, id);
                     var button_remove = HTML_Create_Button("X", func);
                     cell.appendChild(button_remove);
                     break;
@@ -1109,44 +1130,17 @@ function Equipment_Block_t (){
             }
         }
         m_table.style.display = "block";
-
-        chardata.inventory.equipment.Add(entry, in_count);
     }
 
     this.Remove = function(id){
-        let row_num = Get_Item_Row_Num_By_Name(id);
+        var row_num = Get_Row_Num_By_Name(id);
         if (row_num != null){
-            chardata.inventory.equipment.Remove(row_num);
-            m_table.deleteRow(row_num + 1);
-        }
+            m_table.deleteRow(row_num);
+        }//else TODO
 
         if (m_table.rows.length == 1){ //only header: remove
             m_table.style.display = "none";
         }
-    }
-
-    this.Change_Count = function(event, id){
-        let row_num = Get_Item_Row_Num_By_Name(id);
-        if (row_num != null){
-            chardata.inventory.equipment.Change_Count(row_num, Number(event.currentTarget.value));
-        }
-    }
-
-    this.Load_From_Obj = function(obj){
-        if (obj == undefined){
-            return;
-        }
-        
-        obj.forEach(item => {
-            for (let i = 0; i < ITEMS_DATABASE.length; i++){
-                let entry = ITEMS_DATABASE[i];
-                if (item.name == entry.name){
-                    self.Add(i, item.count);
-                    break;
-                }
-                //else NOTHING TO DO
-            }
-        });
     }
 
     this.Open_Database = function(){
@@ -1184,7 +1178,7 @@ function Equipment_Block_t (){
         filters.push(new Database_Filter_Input_t(POPUP_FILTER_TYPES.SELECT,  3,  "Тип"        ));
         filters.push(new Database_Filter_Input_t(POPUP_FILTER_TYPES.SELECT,  6,  "Источник"   ));
 
-        Popup_Database.Open(table_data, self.Add, filters, headers, self.Show_Info_Database);
+        Popup_Database.Open(table_data, Proc_Event_Add, filters, headers, self.Show_Info_Database);
     }
 
     this.Show_Info_Database = function(entry_num){
@@ -1210,10 +1204,10 @@ function Equipment_Block_t (){
 
 //private properties
     var self = this;
+    var m_owner = null;
     var m_table = document.getElementById("table_inventory_equipment");
 
 //additional initialization
-    Reset();
 }
 
 function Ammo_Block_t (){
