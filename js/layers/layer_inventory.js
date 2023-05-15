@@ -1,3 +1,4 @@
+//TODO: remove unnececcary events, replace with direct call to owner function
 function Weapon_Block_t(){
 //constants
     const CLASS_WEAPON_OUTFIELD_PREFIX_HIT_MOD = "class_outfield_weapon_mod_";
@@ -485,7 +486,29 @@ function Grenade_Block_t(){
 
 function Armor_Upgr_Block_t(){
 //private methods
-    var Reset = function(){
+    var Get_Row_Num_By_Name = function(name){
+        for (let i = 1; i < m_table.rows.length; i++){
+            var row = m_table.rows[i];
+            if(row.name == name){
+                return i;
+            }
+        }
+
+        return null;
+    }
+
+    var Proc_Add_Event = function(entry_num){
+        if (m_owner == null){
+            return;
+        }
+        
+        m_owner.Add_Armor_Upgr(ARMOR_UPGR_DATABASE[entry_num]);
+    }
+
+//public methods
+    this.Reset = function(owner){
+        m_owner = owner;
+        
         m_table.style.display = "none";
         while(m_table.rows.length > 1){
             m_table.deleteRow(1);
@@ -494,25 +517,9 @@ function Armor_Upgr_Block_t(){
         m_outfield_max_slots.value = 0;
     }
 
-//public methods
-    this.Add = function(num){
-        var row;
-        var entry = ARMOR_UPGR_DATABASE[num];
-
-        //checking weapons with same name
-        var row_name = entry.name;
-
-        //if armor already in table, alert and do nothing
-        for (let i = 0; i < m_table.rows.length; i++){
-            if (m_table.rows[i].name == row_name){
-                alert("Это улучшение брони уже добавлено.")
-                return;
-            }
-            //else NOTHING TO DO
-        }
-
-        row = m_table.insertRow(m_table.rows.length);
-        row.name = row_name;
+    this.Add = function(id, entry){
+        var row = m_table.insertRow(m_table.rows.length);
+        row.name = id;
 
         for (let i = 0; i < 4; i++){    //TODO: magic
             var cell = row.insertCell(i);
@@ -520,7 +527,7 @@ function Armor_Upgr_Block_t(){
             switch (i){
                 case 0:
                     cell.innerHTML = entry.name;
-                    func = self.Show_Popup.bind(null, row.name);
+                    func = m_owner.Open_Descr_Tooltip.bind(null, id);
                     cell.onclick = func;
                     break;
 
@@ -533,7 +540,7 @@ function Armor_Upgr_Block_t(){
                     break;
 
                 case 3:
-                    func = self.Remove.bind(null, row.name);
+                    func = m_owner.Remove_Armor_Upgr.bind(null, id);
                     var button_remove = HTML_Create_Button("X", func);
                     cell.appendChild(button_remove);
                     break;
@@ -544,40 +551,17 @@ function Armor_Upgr_Block_t(){
             }
         }
         m_table.style.display = "block";
-
-        chardata.inventory.armor.Add_Armor_Upgr(entry);
     }
 
     this.Remove = function(id){
-        for (let i = 0; i < m_table.rows.length - 1; i++){
-            var row = m_table.rows[i + 1];
-            if(row.name == id){
-                chardata.inventory.armor.Remove_Armor_Upgr(i);
-                m_table.deleteRow(i + 1);
-                break;
-            }
-        }
+        var row_num = Get_Row_Num_By_Name(id);
+        if (row_num != null){
+            m_table.deleteRow(row_num);
+        }//else TODO
 
         if (m_table.rows.length == 1){ //only header: remove
             m_table.style.display = "none";
         }
-    }
-
-    this.Load_From_Obj = function(obj){
-        if (obj == undefined){
-            return;
-        }
-        
-        obj.forEach(item => {
-            for (let i = 0; i < ARMOR_UPGR_DATABASE.length; i++){
-                let entry = ARMOR_UPGR_DATABASE[i];
-                if (item == entry.name){
-                    self.Add(i);
-                    break;
-                }
-                //else NOTHING TO DO
-            }
-        });
     }
 
     this.Open_Database = function(){
@@ -617,7 +601,7 @@ function Armor_Upgr_Block_t(){
         filters.push(new Database_Filter_Input_t(POPUP_FILTER_TYPES.SELECT,  5,  "Тип брони" ));
         filters.push(new Database_Filter_Input_t(POPUP_FILTER_TYPES.SELECT,  7,  "Источник"  ));
 
-        Popup_Database.Open(table_data, self.Add, filters, headers, self.Show_Info_Database);
+        Popup_Database.Open(table_data, Proc_Add_Event, filters, headers, self.Show_Info_Database);
     }
 
     this.Show_Info_Database = function(entry_num){
@@ -650,13 +634,13 @@ function Armor_Upgr_Block_t(){
     }
 
 //private properties
+    var m_owner = null;
     var m_table = document.getElementById("table_inventory_armor_upgr");
     var m_outfield_used_slots = document.getElementById("outfield_armor_upgrades_used");
     var m_outfield_max_slots = document.getElementById("outfield_armor_upgrades_max");
     var self = this;
 
 //additional initialization
-    Reset();
 }
 
 function Armor_Block_t(){
@@ -679,7 +663,7 @@ const armor_outfields_t = {
 }
 
 //private methods
-    var Reset = function(){
+    var Set_No_Armor_Values = function(){
         m_outfields.name.value = "Без брони";
         m_outfields.eac.value = 0;
         m_outfields.kac.value = 0;
@@ -689,75 +673,72 @@ const armor_outfields_t = {
         m_outfields.additional.value = "---";
         pow_attributes_block.style.display = "none";
     }
+    
+    var Proc_Set_Armor_Event = function(entry_num){
+        if (m_owner == null){
+            return;
+        }
+        
+        m_owner.Set(ARMOR_DATABASE[entry_num]);
+    }
+    
+    var Proc_Remove_Armor_Event = function(){
+        if (m_owner == null){
+            return;
+        }
+        
+        m_owner.Remove();
+    }
 
 //public methods
-    this.Add = function(num){
-        var armor = ARMOR_DATABASE[num];
-        m_outfields.name.value = armor.name;
-        m_outfields.eac.value = armor.eac;
-        m_outfields.kac.value = armor.kac;
-        m_outfields.max_agi.value = armor.max_agi;
+    this.Reset = function(owner){
+        m_owner = owner;
+        self.upgrades.Reset(owner);
+        Set_No_Armor_Values();
+    }
 
-        if (armor.penalty == null){
+    this.Set = function(entry){
+        m_outfields.name.value = entry.name;
+        m_outfields.eac.value = entry.eac;
+        m_outfields.kac.value = entry.kac;
+        m_outfields.max_agi.value = entry.max_agi;
+
+        if (entry.penalty == null){
             m_outfields.skill_penalty.value = 0;
         }else{
-            m_outfields.skill_penalty.value = armor.penalty;
+            m_outfields.skill_penalty.value = entry.penalty;
         }
 
-        if (armor.speed == null){
+        if (entry.speed == null){
             m_outfields.speed.value = 0;
         }else{
-            m_outfields.speed.value = armor.speed;
+            m_outfields.speed.value = entry.speed;
         }
 
-        if (armor.additional_info == null){
+        if (entry.additional_info == null){
             m_outfields.additional.value = "---";
         }else{
-            m_outfields.additional.value = armor.additional_info;
+            m_outfields.additional.value = entry.additional_info;
         }
 
-        if (armor.type == "Силовая"){
+        if (entry.type == "Силовая"){
             pow_attributes_block.style.display = "block";
-            m_outfields.pow_max_weapon.value = armor.max_weapons;
-            m_outfields.pow_capacity.value = armor.capacity;
-            m_outfields.pow_usage.value = armor.usage;
-            m_outfields.pow_str.value = armor.str;
-            m_outfields.pow_damage.value = armor.damage;
-            m_outfields.pow_size.value = armor.size;
+            m_outfields.pow_max_weapon.value = entry.max_weapons;
+            m_outfields.pow_capacity.value = entry.capacity;
+            m_outfields.pow_usage.value = entry.usage;
+            m_outfields.pow_str.value = entry.str;
+            m_outfields.pow_damage.value = entry.damage;
+            m_outfields.pow_size.value = entry.size;
 
         }else{
             pow_attributes_block.style.display = "none";
         }
 
-
-        chardata.inventory.armor.Set(armor);
-
         Popup_Database.Close();
     }
 
     this.Remove = function(){
-        Reset();
-        chardata.inventory.armor.Remove();
-    }
-
-    this.Load_From_Obj = function(obj){
-        if (obj == undefined){
-            return;
-        }
-        
-        if (obj.name != null){
-            for (let i = 0; i < ARMOR_DATABASE.length; i++){
-                let entry = ARMOR_DATABASE[i];
-                if (obj.name == entry.name){
-                    self.Add(i);
-                    break;
-                }
-                //else NOTHING TO DO
-            }
-        }
-        //else NOTHING TO DO
-
-        self.upgrades.Load_From_Obj(obj.upgrades);
+        Set_No_Armor_Values();
     }
 
     this.Open_Database = function(){
@@ -818,7 +799,7 @@ const armor_outfields_t = {
         filters.push(new Database_Filter_Input_t(POPUP_FILTER_TYPES.RANGE,   3,  "Цена"      ));
         filters.push(new Database_Filter_Input_t(POPUP_FILTER_TYPES.SELECT,  18, "Источник"  ));
 
-        Popup_Database.Open(table_data, self.Add, filters, headers, self.Show_Info_Database);
+        Popup_Database.Open(table_data, Proc_Set_Armor_Event, filters, headers, self.Show_Info_Database);
     }
 
     this.Show_Info_Database = function(entry_num){
@@ -898,6 +879,7 @@ const armor_outfields_t = {
     }
 
 //private properties
+    var m_owner = null;
     var m_outfields = new Object(armor_outfields_t);
     var pow_attributes_block = document.getElementById("div_armor_power_attributes");
     var self = this;
@@ -906,7 +888,6 @@ const armor_outfields_t = {
     this.upgrades = new Armor_Upgr_Block_t();
 
 //additional initialization
-    Reset();
 }
 
 function Augment_Block_t(){

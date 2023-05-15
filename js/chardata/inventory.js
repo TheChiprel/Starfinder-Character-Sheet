@@ -755,12 +755,27 @@ function Grenade_Collection_t(gui_block){
     Init();
 }
 
-function Armor_t(){
+function Armor_t(gui_block){
+//constants
+    const GUI_BLOCK = gui_block;
+    
 //private methods
+    var Init = function(){
+        m_update_func = combined_collections.equipment.Add("ArmorUpgr", self);
+        GUI_BLOCK.Reset(self);
+    }
+
     var Update = function(){
         if (m_update_func != null){
             m_update_func();
         }
+    }
+    
+    var Get_Upgr_By_ID = function(id){
+        if (m_upgr_map.has(id)){
+            return m_upgr_map.get(id);
+        }
+        return null;
     }
 
     var Clean_Prof_Recalc_Functions = function(){
@@ -774,10 +789,10 @@ function Armor_t(){
 
     var Recalc_Armor_Upgr_Slots_Cur = function(){
         var slots_used = 0;
-        for (let i = 0; i < self.upgrades.length; i++){
-            slots_used += self.upgrades[i].slots;
-        }
-        layers.inventory.armor_block.upgrades.Update_Slots_Used(slots_used);
+        m_upgr_map.forEach ((upgr, key) => {
+            slots_used += upgr.slots;
+        });
+        GUI_BLOCK.upgrades.Update_Slots_Used(slots_used);
     }
 
 //public methods
@@ -791,7 +806,7 @@ function Armor_t(){
             entry.type,
             new Recalc_Function_t ('kac', chardata.stats.defense.kac.Recalc));
 
-        self.entry = entry;
+        self.armor_entry = entry;
         chardata.stats.defense.eac.Set_Armor_Value(entry.name, entry.eac);
         chardata.stats.defense.kac.Set_Armor_Value(entry.name, entry.kac);
         chardata.stats.defense.armor_limit_agi.Set_Armor_Value(entry.max_agi);
@@ -799,13 +814,14 @@ function Armor_t(){
         chardata.stats.speeds.Set_Armor_Penalty(entry.name, entry.speed);
 
         chardata.inventory.weight.Change_Weight("armor", entry.weight);
-        layers.inventory.armor_block.upgrades.Update_Slots_Max(entry.upgrades);
+        GUI_BLOCK.Set(entry);
+        GUI_BLOCK.upgrades.Update_Slots_Max(entry.upgrades);
     }
 
     this.Remove = function(){
         Clean_Prof_Recalc_Functions();
 
-        this.entry = null;
+        self.armor_entry = null;
         chardata.stats.defense.eac.Set_Armor_Value("Без брони", 0);
         chardata.stats.defense.kac.Set_Armor_Value("Без брони", 0);
         chardata.stats.defense.armor_limit_agi.Set_Armor_Value(Infinity);
@@ -813,21 +829,22 @@ function Armor_t(){
         chardata.stats.speeds.Set_Armor_Penalty("Без брони", 0);
 
         chardata.inventory.weight.Change_Weight("armor", 0);
-        layers.inventory.armor_block.upgrades.Update_Slots_Max(0);
+        GUI_BLOCK.Remove();
+        GUI_BLOCK.upgrades.Update_Slots_Max(0);
     }
 
     this.Get_Armor_Type = function(){
-        if (self.entry == null){
+        if (self.armor_entry == null){
             return ARMOR_TYPES.NONE;
         }
         //else NOTHING TO DO
 
-        switch (self.entry.type){
+        switch (self.armor_entry.type){
             case ARMOR_TYPES.NONE:
             case ARMOR_TYPES.LIGHT:
             case ARMOR_TYPES.HEAVY:
             case ARMOR_TYPES.POWER:
-                return self.entry.type;
+                return self.armor_entry.type;
 
             default:
                 break;
@@ -835,36 +852,52 @@ function Armor_t(){
         return ARMOR_TYPES.UNKNOWN;
     }
 
-    this.Add_Armor_Upgr = function(entry){
-        self.upgrades.push(entry);
-        chardata.inventory.weight.Add_Item("armor_upgr_" + entry.name, entry.weight, entry.name);
-
-        Recalc_Armor_Upgr_Slots_Cur();
-        Update();
-    }
-
-    this.Remove_Armor_Upgr = function(row){
-        chardata.inventory.weight.Remove_Item("armor_upgr_" + self.upgrades[row].name);
-        self.upgrades.splice(row, 1);
-
-        Recalc_Armor_Upgr_Slots_Cur();
-        Update();
-    }
-
-    this.Open_Descr_Tooltip = function(in_name){
-        for (let i = 0; i < self.upgrades.length; i++){
-            armor_upgr = self.upgrades[i];
-            if (armor_upgr.name == in_name){
-                Popup_Descr.Call(in_name, armor_upgr.descr);
-                return;
-            }
+    this.Add_Armor_Upgr = function(entry, custom_id = null){
+        let id = custom_id;
+        if (id == null){
+            id = entry.name;
         }
+        
+        if (m_upgr_map.has(id)){
+            alert("Это улучшение брони уже добавлено.");
+            return;
+        }
+        
+        m_upgr_map.set(id, entry);
+        chardata.inventory.weight.Add_Item(id, entry.weight, entry.name);
+        GUI_BLOCK.upgrades.Add(id, entry);
+
+        Recalc_Armor_Upgr_Slots_Cur();
+        Update();
+    }
+
+    this.Remove_Armor_Upgr = function(id){
+        if (!m_upgr_map.has(id)){
+            //TODO: warn user, return
+        }
+        
+        chardata.inventory.weight.Remove_Item(id);
+        m_upgr_map.delete(id);
+        GUI_BLOCK.upgrades.Remove(id);
+
+        Recalc_Armor_Upgr_Slots_Cur();
+        Update();
+    }
+
+    this.Open_Descr_Tooltip = function(id){
+        let item = Get_Upgr_By_ID(id);
+        if (item == null){
+            //TODO: warn user
+            return;
+        }
+        
+        Popup_Descr.Call(item.name, item.descr);
     }
     
     this.Get_Equip_List = function(){
         let item_list = new Array(0);
         
-        self.upgrades.forEach(item => {
+        m_upgr_map.forEach((item, key) => {
             if ((item != null) && (item.name != "")){
                 let str = item.name;
                 item_list.push({
@@ -891,27 +924,48 @@ function Armor_t(){
             upgrades: new Array(0)
         };
 
-        if (self.entry != null){
-            ret.name = self.entry.name;
+        if (self.armor_entry != null){
+            ret.name = self.armor_entry.name;
         }
         //else NOTHING TO DO
 
-        self.upgrades.forEach(upgr => {
+        m_upgr_map.forEach(upgr => {
             ret.upgrades.push(upgr.name);
         });
         return ret;
+    }
+    
+    //TODO
+    this.Load_From_Obj = function(obj){
+        if (obj == undefined){
+            return;
+        }
+        
+        if (obj.name != null){
+            let entry = Find_Entry_By_Name(upgr, ARMOR_DATABASE);
+            self.Set(entry);
+        }
+         
+        obj.upgrades.forEach(upgr => {
+            let entry = Find_Entry_By_Name(upgr, ARMOR_UPGR_DATABASE);
+            if (entry != null){
+                self.Add_Armor_Upgr(entry);
+            }else{
+                //TODO: warn user
+            }
+        });
     }
 
 //private properties
     var self = this;
     var m_update_func = null;
+    var m_upgr_map = new Map();
 
 //public properties
-    this.entry = null;
-    this.upgrades = new Array(0);   //for now it is collection of entries
+    this.armor_entry = null;
     
 //additional initialization
-    m_update_func = combined_collections.equipment.Add("ArmorUpgr", self);
+    Init();
 }
 
 function Augment_t(database_entry){
@@ -1716,9 +1770,7 @@ function Inventory_t (){
         
         self.weapons.Load_From_Obj(obj.weapons);
         self.grenades.Load_From_Obj(obj.grenades);
-        
-        layers.inventory.armor_block.Load_From_Obj(obj.armor);
-        
+        self.armor.Load_From_Obj(obj.armor);
         self.augments.Load_From_Obj(obj.augments);
         
         layers.inventory.equipment_block.Load_From_Obj(obj.equipment);
@@ -1738,7 +1790,7 @@ function Inventory_t (){
         layers.face.block_inventory.weapons
     );
     this.grenades = new Grenade_Collection_t(layers.inventory.grenade_block);
-    this.armor = new Armor_t();
+    this.armor = new Armor_t(layers.inventory.armor_block);
     this.augments = new Augment_Collection_t(layers.inventory.augment_block);
     this.equipment = new Equipment_Collection_t();
     this.ammo = new Ammo_Collection_t();
