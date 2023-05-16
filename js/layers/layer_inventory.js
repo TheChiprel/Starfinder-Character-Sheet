@@ -1587,6 +1587,7 @@ function Other_Items_t(){
 //additional initialization
 }
 
+//TODO: unused, remove?
 function Resources_Block_t(){
 //private methods
     var Reset = function(){
@@ -1636,5 +1637,5 @@ function Layer_Inventory_t (){
     this.equipment_block = new Equipment_Block_t();
     this.ammo_block = new Ammo_Block_t();
     this.other_items_block = new Other_Items_t();
-    this.resourses_block = new Resources_Block_t();
+    //this.resourses_block = new Resources_Block_t();
 }

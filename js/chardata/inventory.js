@@ -2058,9 +2058,14 @@ function Inventory_t (){
         self.equipment.Load_From_Obj(obj.equipment);
         self.ammo.Load_From_Obj(obj.ammo);
         self.other.Load_From_Obj(obj.other);
-
-        layers.inventory.resourses_block.Set_Credits(obj.credits, true);
-        layers.inventory.resourses_block.Set_UPB(obj.upb, true);
+        
+        if (obj.credits != undefined){
+            self.credits.Set(obj.credits);
+        }
+        
+        if (obj.upb != undefined){
+            self.upb.Set(obj.upb);
+        }
     }
 
 //private properties
@@ -2078,8 +2083,8 @@ function Inventory_t (){
     this.ammo = new Ammo_Collection_t(layers.inventory.ammo_block);
     this.other = new Custom_Item_Collection_t(layers.inventory.other_items_block);
     this.weight = new Weight_t();
-    this.credits = new Credits_t();
-    this.upb = new Upb_t();
+    this.credits = new Credits_t(layers.inventory.resourses_block);
+    this.upb = new Upb_t(layers.inventory.resourses_block);
 
 //additional initialization
 
