@@ -1212,16 +1212,9 @@ var Get_Row_Num_By_Name = function(name){
 
 function Ammo_Block_t (){
 //private methods
-    var Reset = function(){
-        m_table.style.display = "none";
-        while(m_table.rows.length > 1){
-            m_table.deleteRow(1);
-        }
-    }
-
-    var Get_Ammo_Row_Num_By_Name = function(name){
-        for (let i = 0; i < m_table.rows.length - 1; i++){
-            var row = m_table.rows[i + 1];
+    var Get_Row_Num_By_Name = function(name){
+        for (let i = 1; i < m_table.rows.length; i++){
+            var row = m_table.rows[i];
             if(row.name == name){
                 return i;
             }
@@ -1229,77 +1222,85 @@ function Ammo_Block_t (){
 
         return null;
     }
-
-//public methods
-    this.Add = function(num, in_count = undefined){
-        var row;
-        var entry = AMMO_DATABASE[num];
-
-        let temp_count = entry.capacity;
-        if (in_count != undefined){
-            temp_count = in_count;
-        }
-        //else NOTHING TO DO
-
-        //checking weapons with same name
-        var row_name = entry.name;
-
-        //checking ammo with same name
-        var row_name;
-        for (let id_enum = 0; id_enum < 100; id_enum++){
-            let found = false;
-            let cur_name = entry.name + "_" + id_enum;
-            for (let i = 0; i < m_table.rows.length; i++){
-                if (m_table.rows[i].name == cur_name){
-                    found = true;
-                    break;
-                }
-                //else NOTHING TO DO
-            }
-
-            if (!found){
-                row_name = cur_name;
-                break;
-            }
-            //else NOTHING TO DO
-        }
-
-        if (row_name == undefined){
-            console.log("More than 100 ammo with name '" + entry.name + "', can't add more!");
+    
+        
+    var Proc_Event_Add = function(entry_num){
+        if (m_owner == null){
             return;
         }
-        //else NOTHING TO DO
+        
+        m_owner.Add(AMMO_DATABASE[entry_num]);
+    }
+    
+    var Proc_Event_Remove = function(id){
+        if (m_owner == null){
+            return;
+        }
+        
+        m_owner.Remove(id);
+    }
+    
+    var Proc_Event_Change_Count = function(id, event){
+        if (m_owner == null){
+            return;
+        }
+        
+        let new_value = event.target.value;
+        if (isNaN(new_value)){
+            let count_to_set = m_owner.Get_Count(id);
+            if (count_to_set == null){
+                event.target.value = "";
+            }else{
+                event.target.value = count_to_set;
+            }
+            return;
+        }
+        m_owner.Change_Count(id, parseInt(new_value));
+    }
 
-        row = m_table.insertRow(m_table.rows.length);
-        row.name = row_name;
+//public methods
+    this.Reset = function(owner){
+        m_owner = owner;
+        
+        m_table.style.display = "none";
+        while(m_table.rows.length > 1){
+            m_table.deleteRow(1);
+        }
+    }
+
+    this.Add = function(id, item){
+        var row = m_table.insertRow(m_table.rows.length);
+        row.name = id;
 
         for (let i = 0; i < 4; i++){
             var cell = row.insertCell(i);
             switch (i){
                 case 0:
-                    cell.innerHTML = entry.name;
+                    cell.innerHTML = item.entry.name;
                     break;
 
                 case 1:
-                    if (entry.special == null){
+                    if (item.entry.special == null){
                         cell.innerHTML = "---";
                     }else{
-                        cell.innerHTML = entry.special;
+                        cell.innerHTML = item.entry.special;
                     }
                     break;
 
 
                 case 2:
                     var count = HTML_Create_Input_Number(
-                        value = temp_count,
-                        min = 0, max = entry.capacity,
-                        "layers.inventory.ammo_block.Change_Count(event, '" + row.name + "')",
-                        "infield_" + row_name);
+                        value = item.count,
+                        0,
+                        item.entry.capacity,
+                        Proc_Event_Change_Count.bind(null, id)
+                    );
                     cell.appendChild(count);
+                    item.Set_GUI_Count_Field(count);
                     break;
 
                 case 3:
-                    var func = self.Remove.bind(null, row.name);
+                    var func = m_owner.Remove.bind(null, id);
                     var button_remove = HTML_Create_Button("X", func);
                     cell.appendChild(button_remove);
                     break;
@@ -1310,44 +1311,17 @@ function Ammo_Block_t (){
             }
         }
         m_table.style.display = "block";
-
-        chardata.inventory.ammo.Add(row_name, temp_count, entry);
     }
 
     this.Remove = function(id){
-        let row_num = Get_Ammo_Row_Num_By_Name(id);
+        var row_num = Get_Row_Num_By_Name(id);
         if (row_num != null){
-            chardata.inventory.ammo.Remove(row_num);
-            m_table.deleteRow(row_num + 1);
-        }
+            m_table.deleteRow(row_num);
+        }//else TODO
 
         if (m_table.rows.length == 1){ //only header: remove
             m_table.style.display = "none";
         }
-    }
-
-    this.Change_Count = function(event, id){
-        let row_num = Get_Ammo_Row_Num_By_Name(id);
-        if (row_num != null){
-            chardata.inventory.ammo.Change_Count(row_num, Number(event.currentTarget.value));
-        }
-    }
-
-    this.Load_From_Obj = function(obj){
-        if (obj == undefined){
-            return;
-        }
-        
-        obj.forEach(item => {
-            for (let i = 0; i < AMMO_DATABASE.length; i++){
-                let entry = AMMO_DATABASE[i];
-                if (item.name == entry.name){
-                    self.Add(i, item.count);
-                    break;
-                }
-                //else NOTHING TO DO
-            }
-        });
     }
 
     this.Open_Database = function(){
@@ -1387,7 +1361,7 @@ function Ammo_Block_t (){
         filters.push(new Database_Filter_Input_t(POPUP_FILTER_TYPES.SELECT,  3,  "Тип"        ));
         filters.push(new Database_Filter_Input_t(POPUP_FILTER_TYPES.SELECT,  7,  "Источник"   ));
 
-        Popup_Database.Open(table_data, self.Add, filters, headers, self.Show_Info_Database);
+        Popup_Database.Open(table_data, Proc_Event_Add, filters, headers, self.Show_Info_Database);
     }
     
     this.Show_Info_Database = function(entry_num){
@@ -1418,10 +1392,10 @@ function Ammo_Block_t (){
 
 //private properties
     var m_table = document.getElementById("table_inventory_ammo");
+    var m_owner = null;
     var self = this;
 
 //additional initialization
-    Reset();
 }
 
 function Other_Items_t(){
