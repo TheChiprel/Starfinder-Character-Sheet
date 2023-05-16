@@ -1400,13 +1400,83 @@ function Ammo_Block_t (){
 
 function Other_Items_t(){
 //private methods
-    var Reset = function(){
-        m_table.style.display = "none";
-        while(m_table.rows.length > 1){
-            m_table.deleteRow(1);
+    var Get_Row_Num_By_Name = function(name){
+        for (let i = 1; i < m_table.rows.length; i++){
+            var row = m_table.rows[i];
+            if(row.name == name){
+                return i;
+            }
         }
 
-        m_outfield_map = new Map();
+        return null;
+    }
+    
+    var Proc_Event_Remove = function(id){
+        if (m_owner == null){
+            return;
+        }
+        
+        m_owner.Remove(id);
+    }
+    
+    var Proc_Event_Change_Count = function(id, event){
+        if (m_owner == null){
+            return;
+        }
+        
+        let new_value = event.target.value;
+        if (isNaN(new_value)){
+            let count_to_set = m_owner.Get_Count(id);
+            if (count_to_set == null){
+                event.target.value = "";
+            }else{
+                event.target.value = count_to_set;
+            }
+            return;
+        }
+        m_owner.Change_Count(id, parseInt(new_value));
+    }
+    
+    var Proc_Event_Change_Name = function(id, event){
+        if (m_owner == null){
+            return;
+        }
+        
+        m_owner.Change_Name(id, event.target.value);
+    }
+    
+    var Proc_Event_Change_Descr = function(id, event){
+        if (m_owner == null){
+            return;
+        }
+        
+        m_owner.Change_Descr(id, event.target.value);
+    }
+    
+    var Proc_Event_Change_Weight = function(id, event){
+        if (m_owner == null){
+            return;
+        }
+        
+        m_owner.Change_Weight(id, event.target.value);
+    }
+    
+    var Proc_Event_Change_Count = function(id, event){
+        if (m_owner == null){
+            return;
+        }
+        
+        let new_value = event.target.value;
+        if (isNaN(new_value)){
+            let count_to_set = m_owner.Get_Count(id);
+            if (count_to_set == null){
+                event.target.value = "";
+            }else{
+                event.target.value = count_to_set;
+            }
+            return;
+        }
+        m_owner.Change_Count(id, parseInt(new_value));
     }
 
     var Get_Item_Row_Num_By_Name = function(name){
@@ -1421,60 +1491,49 @@ function Other_Items_t(){
     }
 
 //public methods
-    this.Add_Row = function(){
-        var row;
-
-        //checking for free id
-        var row_name;
-        for (let id_enum = 0; id_enum < 100; id_enum++){
-            let found = false;
-            let cur_name = "other_" + id_enum;
-            for (let i = 0; i < m_table.rows.length; i++){
-                if (m_table.rows[i].name == cur_name){
-                    found = true;
-                    break;
-                }
-                //else NOTHING TO DO
-            }
-
-            if (!found){
-                row_name = cur_name;
-                break;
-            }
-            //else NOTHING TO DO
+    this.Reset = function(owner){
+        m_owner = owner;
+        
+        m_table.style.display = "none";
+        while(m_table.rows.length > 1){
+            m_table.deleteRow(1);
         }
-
-        if (row_name == undefined){
-            console.log("More than 100 custom items '" + entry.name + "', can't add more!");
+    }
+    
+    this.Proc_Event_Add = function(entry_num){
+        if (m_owner == null){
             return;
         }
-        //else NOTHING TO DO
-
-        row = m_table.insertRow(m_table.rows.length);
-        row.name = row_name;
+        
+        m_owner.Add();
+    }
+    
+    this.Add = function(id, item){
+        var row = m_table.insertRow(m_table.rows.length);
+        row.name = id;
 
         var outfield_name = HTML_Create_Input_Text(
-            "",
-            onchange_elem = "layers.inventory.other_items_block.Change_Name('" + row.name + "', event.target.value)",
-            id = undefined,
-            class_elem = undefined);
+            item.name,
+            Proc_Event_Change_Name.bind(null, id)
+        );
+        item.Set_Outfield_Name(outfield_name);
         var outfield_descr = HTML_Create_Input_Text(
-            "",
-            onchange_elem = "layers.inventory.other_items_block.Change_Descr('" + row.name + "', event.target.value)",
-            id = undefined,
-            class_elem = undefined);
-            var outfield_weight = HTML_Create_Input_Text(
-                "-",
-                onchange_elem = "layers.inventory.other_items_block.Change_Weight('" + row.name + "', event.target.value)",
-                id = undefined,
-                class_elem = undefined); //TODO
+            item.descr,
+            Proc_Event_Change_Descr.bind(null, id)
+        );
+        item.Set_Outfield_Descr(outfield_descr);
+        var outfield_weight = HTML_Create_Input_Text(
+            item.weight,
+            Proc_Event_Change_Weight.bind(null, id)
+        );
+        item.Set_Outfield_Weight(outfield_weight);
         var outfield_count = HTML_Create_Input_Number(
-                        value = 1,
-                        min = 1,
-                        max = 100,
-                        onchange_elem = "layers.inventory.other_items_block.Change_Count('" + row.name + "', Number(event.target.value))",
-                        id = undefined,
-                        class_elem = undefined); //TODO
+            item.count,
+            1,
+            99,
+            Proc_Event_Change_Count.bind(null, id)
+        );
+        item.Set_Outfield_Count(outfield_count);
 
         for (let i = 0; i < 5; i++){
             var cell = row.insertCell(i);
@@ -1496,7 +1555,7 @@ function Other_Items_t(){
                     break;
 
                 case 4:
-                    var func = self.Remove_Row.bind(null, row.name);
+                    var func = Proc_Event_Remove.bind(null, id);
                     var button_remove = HTML_Create_Button("X", func);
                     cell.appendChild(button_remove);
                     break;
@@ -1507,106 +1566,25 @@ function Other_Items_t(){
             }
         }
         m_table.style.display = "block";
-
-        m_outfield_map.set(row_name, {
-           "name": outfield_name,
-           "descr": outfield_descr,
-           "weight": outfield_weight,
-           "count": outfield_count
-        });
-
-        chardata.inventory.other.Add(row_name);
-        return row_name;
     }
 
-    this.Remove_Row = function(id){
-        let row_num = Get_Item_Row_Num_By_Name(id);
+    this.Remove = function(id){
+        var row_num = Get_Row_Num_By_Name(id);
         if (row_num != null){
-            chardata.inventory.other.Remove(row_num);
-            m_table.deleteRow(row_num + 1);
-        }
+            m_table.deleteRow(row_num);
+        }//else TODO
 
         if (m_table.rows.length == 1){ //only header: remove
             m_table.style.display = "none";
         }
-
-        m_outfield_map.delete(id);
-    }
-
-    this.Change_Name = function(id, value, update_outfield = false){
-        let row_num = Get_Item_Row_Num_By_Name(id);
-        if (row_num != null){
-            chardata.inventory.other.Change_Name(row_num, value);
-            if (update_outfield){
-               m_outfield_map.get(id).name.value = value;
-            }
-            //else NOTHING TO DO
-        }
-        //else NOTHING TO DO
-    }
-
-    this.Change_Descr = function(id, value, update_outfield = false){
-        let row_num = Get_Item_Row_Num_By_Name(id);
-        if (row_num != null){
-            chardata.inventory.other.Change_Descr(row_num, value);
-            if (update_outfield){
-               m_outfield_map.get(id).descr.value = value;
-            }
-            //else NOTHING TO DO
-        }
-        //else NOTHING TO DO
-    }
-
-    this.Change_Count = function(id, value, update_outfield = false){
-        let row_num = Get_Item_Row_Num_By_Name(id);
-        if (row_num != null){
-            chardata.inventory.other.Change_Count(row_num, value);
-            if (update_outfield){
-               m_outfield_map.get(id).count.value = value;
-            }
-            //else NOTHING TO DO
-        }
-        //else NOTHING TO DO
-    }
-
-    this.Change_Weight = function(id, value, update_outfield = false){
-        let row_num = Get_Item_Row_Num_By_Name(id);
-        if (row_num != null){
-            let weight = value;
-            if (isNaN(weight)){
-                chardata.inventory.other.Change_Weight(row_num, weight);
-            }else{
-                chardata.inventory.other.Change_Weight(row_num, Number(weight));
-            }
-            if (update_outfield){
-               m_outfield_map.get(id).weight.value = value;
-            }
-            //else NOTHING TO DO
-        }
-        //else NOTHING TO DO
-    }
-
-    this.Load_From_Obj = function(obj){
-        if (obj == undefined){
-            return;
-        }
-        
-        obj.forEach(item => {
-            let id = self.Add_Row();
-            self.Change_Name(id, item.name, true);
-            self.Change_Descr(id, item.descr, true);
-            self.Change_Weight(id, item.weight, true);
-            self.Change_Count(id, item.count, true);
-        });
     }
 
 //private properties
+    var m_owner = null;
     var m_table = document.getElementById("table_inventory_other");
-    var m_outfield_map;
     var self = this;
 
 //additional initialization
-    Reset();
 }
 
 function Resources_Block_t(){

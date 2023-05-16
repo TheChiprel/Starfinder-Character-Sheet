@@ -1472,10 +1472,54 @@ function Ammo_Collection_t(gui_block){
     Init();
 }
 
-function Custom_Item_t(id, name, descr, weight, count){
+function Custom_Item_t(name, descr, weight, count){
 //public methods
     this.Show_Descr = function(){
         Popup_Descr.Call(self.name, self.descr);
+    }
+    
+    this.Change_Name = function(value){
+        self.name = value;
+        if (m_outfield_name != null){
+            m_outfield_name.value = value; 
+        }
+    }
+    
+    this.Change_Descr = function(value){
+        self.descr = value;
+        if (m_outfield_descr != null){
+            m_outfield_descr.value = value; 
+        }
+    }
+    
+    this.Change_Weight = function(value){
+        self.weight = value;
+        if (m_outfield_weight != null){
+            m_outfield_weight.value = value; 
+        }
+    }
+    
+    this.Change_Count = function(value){
+        self.count = value;
+        if (m_outfield_count != null){
+            m_outfield_count.value = value; 
+        }
+    }
+    
+    this.Set_Outfield_Name = function(outfield){
+        m_outfield_name = outfield;
+    }
+    
+    this.Set_Outfield_Descr = function(outfield){
+        m_outfield_descr = outfield;
+    }
+    
+    this.Set_Outfield_Weight = function(outfield){
+        m_outfield_weight = outfield;
+    }
+    
+    this.Set_Outfield_Count = function(outfield){
+        m_outfield_count = outfield;
     }
 
     this.Get_SaveData_Obj = function(){
@@ -1490,58 +1534,131 @@ function Custom_Item_t(id, name, descr, weight, count){
 
 //private properties
     var self = this;
+    var m_outfield_name = null;
+    var m_outfield_descr = null;
+    var m_outfield_weight = null;
+    var m_outfield_count = null;
 
 //public properties
-    this.id = id;
     this.name = name;
     this.descr = descr;
     this.weight = weight;
     this.count = count;
 }
 
-function Custom_Item_Collection_t(){
+function Custom_Item_Collection_t(gui_block){
+//constants
+    const GUI_BLOCK = gui_block;
+    const ID_PREFIX = "custom"
+    
 //private methods
+    var Init = function(){
+        m_update_func = combined_collections.equipment.Add("other", self);
+        GUI_BLOCK.Reset(self);
+    }
+
     var Update = function(){
         if (m_update_func != null){
             m_update_func();
         }
     }
     
+    var Get_By_ID = function(id){
+        if (m_map.has(id)){
+            return m_map.get(id);
+        }
+        return null;
+    }
+    
+    var Find_Free_ID = function (){
+        for (let id_enum = 0; id_enum < 100; id_enum++){
+            let found = false;
+            let cur_id = ID_PREFIX + "_" + id_enum;
+            if (!m_map.has(cur_id)){
+                return cur_id;
+            }
+        }
+        
+        return null;
+    }
+    
 //public methods
-    this.Add = function(id, name = "", descr = "", weight = "", count = 1){
-        m_arr.push(new Custom_Item_t(id, name, descr, weight, count));
-        chardata.inventory.weight.Add_Item(id, 0, "");
+    this.Add = function(name = "", descr = "", weight = "-", count = 1, custom_id = null){
+        let id = (custom_id == null) ? Find_Free_ID() : custom_id;
+        if (id == null){
+            console.log("More than 100 custom items '" + entry.name + "', can't add more!");
+            return;
+        }
+        
+        var item = new Custom_Item_t(name, descr, weight, count);
+        m_map.set(id, item);
+        
+        chardata.inventory.weight.Add_Item(id, weight, name, count);
+        GUI_BLOCK.Add(id, item);
         Update();
     }
 
-    this.Remove = function(num){
-        chardata.inventory.weight.Remove_Item(m_arr[num].id);
-        m_arr.splice(num, 1);
+    this.Remove = function(id){
+        if (m_map.has(id)){
+            m_map.delete(id);
+            chardata.inventory.weight.Remove_Item(id);
+            
+            GUI_BLOCK.Remove(id);
+            Update();
+        }//else TODO: warn user
+    }
+
+    this.Change_Name = function(id, value){
+        let item = Get_By_ID(id);
+        if (item == null){
+            //TODO: warn user
+            return;
+        }
+        item.Change_Name(value);
+        chardata.inventory.weight.Change_Name(id, value);
+        
         Update();
     }
 
-    this.Change_Name = function(num, value){
-        let cur_item = m_arr[num];
-        cur_item.name = value;
-        chardata.inventory.weight.Change_Name(cur_item.id, value);
+    this.Change_Descr = function(id, value){
+        let item = Get_By_ID(id);
+        if (item == null){
+            //TODO: warn user
+            return;
+        }
+        item.Change_Descr(value);
+        
         Update();
     }
 
-    this.Change_Descr = function(num, value){
-        m_arr[num].descr = value;
-    }
-
-    this.Change_Count = function(num, value){
-        let cur_item = m_arr[num];
-        cur_item.count = value;
-        chardata.inventory.weight.Change_Count(cur_item.id, value);
+    this.Change_Count = function(id, value){
+        let item = Get_By_ID(id);
+        if (item == null){
+            //TODO: warn user
+            return;
+        }
+        
+        item.Change_Count(value);
+        chardata.inventory.weight.Change_Count(id, value);
+        
         Update();
+    }
+    
+    this.Change_Weight = function (id, value){
+        let item = Get_By_ID(id);
+        if (item == null){
+            //TODO: warn user
+            return;
+        }
+        
+        item.Change_Weight(value);
+        chardata.inventory.weight.Change_Weight(id, value);
     }
     
     this.Get_Equip_List = function(){
         let item_list = new Array(0);
         
-        m_arr.forEach(item => {
+        m_map.forEach((item, key) => {
             if ((item != null) && (item.name != "")){
                 let str = item.name;
                 if (item.count != 1){
@@ -1565,27 +1682,32 @@ function Custom_Item_Collection_t(){
         return item_list;
     }
 
-    this.Change_Weight = function (num, value){
-        let cur_item = m_arr[num];
-        cur_item.weight = value;
-        chardata.inventory.weight.Change_Weight(cur_item.id, value);
-    }
 
     this.Get_SaveData_Obj = function(){
         var ret = new Array(0);
-        m_arr.forEach(item => {
+        m_map.forEach((item, key) => {
             ret.push(item.Get_SaveData_Obj());
         });
         return ret;
     }
+    
+    this.Load_From_Obj = function(obj){
+        if (obj == undefined){
+            return;
+        }
+        
+        obj.forEach(item => {
+            self.Add(item.name, item.descr, item.weight, item.count);
+        });
+    }
 
 //private properties
     var self = this;
-    var m_arr = new Array(0);
+    var m_map = new Map();
     var m_update_func = null;
     
 //additional initialization
-    m_update_func = combined_collections.equipment.Add("other", self);
+    Init();
 }
 
 function Weight_Entry_t(id, weight, name, count){
@@ -1934,9 +2056,8 @@ function Inventory_t (){
         self.armor.Load_From_Obj(obj.armor);
         self.augments.Load_From_Obj(obj.augments);
         self.equipment.Load_From_Obj(obj.equipment);
-        
         self.ammo.Load_From_Obj(obj.ammo);
-        layers.inventory.other_items_block.Load_From_Obj(obj.other);
+        self.other.Load_From_Obj(obj.other);
 
         layers.inventory.resourses_block.Set_Credits(obj.credits, true);
         layers.inventory.resourses_block.Set_UPB(obj.upb, true);
@@ -1955,7 +2076,7 @@ function Inventory_t (){
     this.augments = new Augment_Collection_t(layers.inventory.augment_block);
     this.equipment = new Equipment_Collection_t(layers.inventory.equipment_block);
     this.ammo = new Ammo_Collection_t(layers.inventory.ammo_block);
-    this.other = new Custom_Item_Collection_t();
+    this.other = new Custom_Item_Collection_t(layers.inventory.other_items_block);
     this.weight = new Weight_t();
     this.credits = new Credits_t();
     this.upb = new Upb_t();
