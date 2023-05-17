@@ -17,6 +17,14 @@ function CS_Init(){
             })
         );
     }
+    
+    Load_Session_Storage();
+    
+    document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "hidden") {
+            Save_Session_Storage();
+        }
+    });
 }
 
 function Reset(){
