@@ -689,8 +689,8 @@ function Grenade_Collection_t(gui_block){
     }
 
     this.Recalc_All_DC = function(){
-        m_map.forEach(item, key => {
-            grenade.Recalc_DC();
+        m_map.forEach((item, key) => {
+            item.Recalc_DC();
         });
         Update();
     }
