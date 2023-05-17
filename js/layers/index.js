@@ -42,11 +42,11 @@ function Load_Character_From_File(event) {
 function Save_Session_Storage(){
     let obj = chardata.Get_SaveData_Obj();
     let text = JSON.stringify(obj);
-    sessionStorage.setItem("temp_save", text);
+    localStorage.setItem("temp_save", text);
 }
 
 function Load_Session_Storage(){
-    let temp_save = sessionStorage.getItem("temp_save");
+    let temp_save = localStorage.getItem("temp_save");
     if (temp_save){
         chardata.Load_From_Obj(JSON.parse(temp_save));
     }
