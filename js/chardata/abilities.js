@@ -14,19 +14,13 @@ function Split_Ability_Name_Suffix(name){
 }
 
 function Get_Ability_Entry_By_Name(in_database, name){
-    //const regex = / \(.+\)/;
-    //let name_to_search = name.replace(regex, "");
-     
     for (let i = 0; i < in_database.length; i++){
-        //if (in_database[i].name == name_to_search){
-        //    return in_database[i];
-        //}
         if (in_database[i].name == name){
             return in_database[i];
         }
     }
     
-    return null;
+    return [name_to_search, suffix];
 }
 
 function Ability_t(id, entry, name_suffix = null, is_active){
@@ -34,16 +28,23 @@ function Ability_t(id, entry, name_suffix = null, is_active){
 
 //public methods
     this.Show_Descr = function(){
-        Popup_Descr.Call(self.entry.name, self.entry.descr);
+        Popup_Descr.Call(self.Get_Full_Name(), self.entry.descr);
     }
     
     this.Set_Active_State = function(state){
         //TODO
         this.is_active = state;
     }
+    
+    this.Get_Full_Name = function(){
+        if (self.name_suffix == null){
+            return self.entry.name;
+        }
+        return (self.entry.name + " (" + self.name_suffix + ")");
+    }
 
     this.Change_Name_Suffix = function(name_suffix){
-        this.name_suffix = name_suffix;
+        self.name_suffix = name_suffix;
     }
 //private properties
     var self = this;
@@ -84,12 +85,16 @@ function Ability_Collection_t(
 
 //public methods
     this.Add = function(id, entry, name_suffix = null, is_active = undefined){
+        var ability;
         if (is_active != undefined){
-            m_arr.push(new Ability_t(id, entry, name_suffix, is_active));
+            ability = new Ability_t(id, entry, name_suffix, is_active);
+            
         }else{
-            m_arr.push(new Ability_t(id, entry, name_suffix, default_active));
+            ability = new Ability_t(id, entry, name_suffix, default_active);
         }
+        m_arr.push(ability);
         Update();
+        return ability;
     }
 
     this.Replace = function(row, id, entry, name_suffix = null, is_active = undefined){
@@ -105,6 +110,7 @@ function Ability_Collection_t(
             m_arr[row] = new Ability_t(id, entry, name_suffix, default_active);
         }
         Update();
+        return m_arr[row];
     }
 
     this.Remove = function(row){
@@ -152,17 +158,15 @@ function Ability_Collection_t(
         let abi_list = new Array(0);
         
         m_arr.forEach(ability => {
-            if (ability != null){
-                if ((ability.is_active) && (ability.entry.name != "")){
-                    let str = ability.entry.name;
-                    if (ability.name_suffix != null){
-                        str += " (" + ability.name_suffix + ")"
-                    }
-                    abi_list.push({
-                        name: str,
-                        descr_func: ability.Show_Descr
-                    });
+            if ((ability != null) && (ability.is_active) && (ability.entry.name != "")){
+                let str = ability.entry.name;
+                if (ability.name_suffix != null){
+                    str += " (" + ability.name_suffix + ")"
                 }
+                abi_list.push({
+                    name: str,
+                    descr_func: ability.Show_Descr
+                });
             }
         });
         
@@ -294,15 +298,15 @@ function Leveled_Ability_List_t (
     }
 
 //public methods
-    this.Add = function(entry){
+    this.Add = function(entry, name_suffix = null){
         let id = Find_Free_ID();
         if (id == null){
             //TODO: warn user
             return;
         }
         
-        m_abilities.Add(id, entry, null, true);
-        GUI_BLOCK.Add_Row(id, entry.name);
+        let ability = m_abilities.Add(id, entry, name_suffix, true);
+        GUI_BLOCK.Add_Row(id, ability.Get_Full_Name());
         m_additional_ids.push(id);
     }
     
@@ -327,10 +331,10 @@ function Leveled_Ability_List_t (
     this.Set = function(row, entry, name_suffix = null){
         //TODO: add safety check
         let is_active = (m_lvl_list == null) || (m_lvl_list[row] == null) || (m_lvl_list[row] <= m_cur_lvl);
-        m_abilities.Replace(row, m_id_prefix + row, entry, name_suffix, is_active);
+        let ability = m_abilities.Replace(row, m_id_prefix + row, entry, name_suffix, is_active);
         
         if (GUI_BLOCK != undefined){
-            GUI_BLOCK.Set(row, entry.name);
+            GUI_BLOCK.Set(row, ability.Get_Full_Name());
         }
     }
     
@@ -384,11 +388,13 @@ function Leveled_Ability_List_t (
                 continue;
             }
             
+            let [abi_name, abi_suffix] = Split_Ability_Name_Suffix(obj[i]);
+            let abi_entry = Get_Ability_Entry_By_Name(ABILITIES_DATABASE, abi_name);
             if (i < fixed_rows){
                 //TODO: add db, pass it to layers?
-                self.Set(i, Get_Ability_Entry_By_Name(ABILITIES_DATABASE, obj[i]));
+                self.Set(i, abi_entry, abi_suffix);
             }else{
-                self.Add(Get_Ability_Entry_By_Name(ABILITIES_DATABASE, obj[i]));
+                self.Add(abi_entry, abi_suffix);
             }
         }
     }
@@ -432,9 +438,10 @@ function Ability_Racial_Collection_t(){
         m_collection.Rename_Collection(
             NAME_PREFIX + " (" + race_name + ")");
         for (let row = 0; row < abi_arr.length; row++){
-            let [abi_name, abi_suffix] = Split_Ability_Name_Suffix(abi_arr[row]);
-            let entry = Get_Ability_Entry_By_Name(ABILITIES_DATABASE, abi_name);
-            m_collection.Add("abi_racial" + row, entry, abi_suffix);
+            let [abi_name, abi_suffix] = Split_Ability_Name_Suffix(race_name);
+            let abi_entry = Get_Ability_Entry_By_Name(ABILITIES_DATABASE, abi_name);
+            
+            m_collection.Add("abi_racial" + row, abi_entry, abi_suffix);
             layers.abilities.race.Add_Ability(abi_arr[row]);
         }
     }

@@ -531,12 +531,15 @@ const MANIFISTATION_SOLAR_ARMOR = "Звёздная броня";
     }
     
     this.Load_From_Obj = function(obj){
-        if (obj == undefined){
+        if ((obj == undefined) || obj.name == null){
             return;
         }
         
+        //TODO: suffix unused here
+        let [abi_name, abi_suffix] = Split_Ability_Name_Suffix(obj.name);
         //TODO: put smaller db here
-        self.Set(Get_Ability_Entry_By_Name(ABILITIES_DATABASE, obj.name));
+        let abi_entry = Get_Ability_Entry_By_Name(ABILITIES_DATABASE, abi_name);
+        self.Set(abi_entry);
         
         if (obj.context != undefined){
             if (obj.context.selector != undefined){
@@ -590,9 +593,10 @@ const ADEPT_SKILL_COUNT = 2;
         let curr_db = Ability_Database_GetList(solarion_db, undefined, ["Способность класса"]);
         for (let i = 0; i < ABILITY_LIST.length; i++){
             if (ABILITY_LIST[i].length == 1){
-                let abi_name = ABILITY_LIST[i][0];
+                let abi_name_full = ABILITY_LIST[i][0];
+                let [abi_name, abi_suffix] = Split_Ability_Name_Suffix(abi_name_full);
                 let abi_entry = Get_Ability_Entry_By_Name(curr_db, abi_name);
-                self.class_abilities.Set(i, abi_entry, undefined);
+                self.class_abilities.Set(i, abi_entry, abi_suffix);
             }else{
                 //TODO?
             }
@@ -602,9 +606,10 @@ const ADEPT_SKILL_COUNT = 2;
             solarion_db, undefined, ["Звёздный режим"]);
         for (let i = 0; i < STELLAR_MODES_LIST.length; i++){
             if (STELLAR_MODES_LIST[i].length == 1){
-                let abi_name = STELLAR_MODES_LIST[i][0];
+                let abi_name_full = STELLAR_MODES_LIST[i][0];
+                let [abi_name, abi_suffix] = Split_Ability_Name_Suffix(abi_name_full);
                 let abi_entry = Get_Ability_Entry_By_Name(curr_db, abi_name);
-                self.stellar_modes.Set(i, abi_entry, undefined);
+                self.stellar_modes.Set(i, abi_entry, abi_suffix);
             }else{
                 //TODO?
             }

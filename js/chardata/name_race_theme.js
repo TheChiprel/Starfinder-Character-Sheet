@@ -78,8 +78,9 @@ function Race_t(){
     
     var Set_Abilities = function(abilities){
         for (let i = 0; i < abilities.length; i++){
-            let abi_entry = Get_Ability_Entry_By_Name(ABILITIES_DATABASE, abilities[i]);
-            chardata.abilities.race.Add(abi_entry);
+            let [abi_name, abi_suffix] = Split_Ability_Name_Suffix(abilities[i]);
+            let abi_entry = Get_Ability_Entry_By_Name(ABILITIES_DATABASE, abi_name);
+            chardata.abilities.race.Add(abi_entry, abi_suffix);
         }
     }
 
@@ -173,8 +174,9 @@ function Theme_t(){
     
     var Set_Abilities = function(abilities){
         for (let i = 0; i < abilities.length; i++){
-            let abi_entry = Get_Ability_Entry_By_Name(ABILITIES_DATABASE, abilities[i]);
-            chardata.abilities.theme.Set(i, abi_entry);
+            let [abi_name, abi_suffix] = Split_Ability_Name_Suffix(abilities[i]);
+            let abi_entry = Get_Ability_Entry_By_Name(ABILITIES_DATABASE, abi_name);
+            chardata.abilities.theme.Set(i, abi_entry, abi_suffix);
         }
     }
 

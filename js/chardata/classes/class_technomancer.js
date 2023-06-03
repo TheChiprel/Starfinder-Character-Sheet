@@ -53,7 +53,8 @@ const SPELLBOOK_LVL_STRING_PREFIX = "Заклинания Техноманта";
         
         for (let i = 0; i < ABILITY_LIST.length; i++){
             if (ABILITY_LIST[i].length == 1){
-                let abi_name = ABILITY_LIST[i][0];
+                let abi_name_full = ABILITY_LIST[i][0];
+                let [abi_name, abi_suffix] = Split_Ability_Name_Suffix(abi_name_full);
                 let abi_entry = Get_Ability_Entry_By_Name(ABILITIES_DATABASE, abi_name);
                 self.class_abilities.Set(i, abi_entry, undefined);
             }else{
