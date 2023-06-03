@@ -152,15 +152,17 @@ function Ability_Collection_t(
         let abi_list = new Array(0);
         
         m_arr.forEach(ability => {
-            if ((ability != null) && (ability.is_active) && (ability.entry.name != "")){
-                let str = ability.entry.name;
-                if (ability.name_suffix != null){
-                    str += " (" + ability.name_suffix + ")"
+            if (ability != null){
+                if ((ability.is_active) && (ability.entry.name != "")){
+                    let str = ability.entry.name;
+                    if (ability.name_suffix != null){
+                        str += " (" + ability.name_suffix + ")"
+                    }
+                    abi_list.push({
+                        name: str,
+                        descr_func: ability.Show_Descr
+                    });
                 }
-                abi_list.push({
-                    name: str,
-                    descr_func: ability.Show_Descr
-                });
             }
         });
         
