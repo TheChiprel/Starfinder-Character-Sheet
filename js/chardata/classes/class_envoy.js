@@ -230,6 +230,7 @@ const TALENTS_LVLS = [3, 7, 11, 15, 19];
             return;
         }
         
+        self.Set_Lvl(obj.lvl);
         self.improvs.Load_From_Obj(obj.improvs);
         self.talents.Load_From_Obj(obj.talents);
         self.exp_skills.Load_From_Obj(obj.exp_skills, obj.lvl);
