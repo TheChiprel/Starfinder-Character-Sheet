@@ -38,8 +38,9 @@ const COMBAT_FEAT_LVLS = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20];
     this.Get_SaveData_Obj = function(){
         var ret = {
             lvl: self.lvl,
-            key_abiscore: self.key_abiscore
-            //TODO
+            key_abiscore: self.key_abiscore,
+            combat_feats: self.combat_feats.Get_SaveData_Obj(),
+            gear_boosts: self.gear_boosts.Get_SaveData_Obj()
         }
         return ret;
     }
@@ -50,7 +51,8 @@ const COMBAT_FEAT_LVLS = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20];
         }
         
         self.key_abiscore = (obj.key_abiscore);
-        //TODO
+        self.combat_feats.Load_From_Obj(obj.combat_feats);
+        self.gear_boosts.Load_From_Obj(obj.gear_boosts);
     }
 
 //private properties
