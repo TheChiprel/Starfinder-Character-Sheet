@@ -25,11 +25,15 @@ function Block_Class_Soldier_t(){
     );
     this.combat_feats = new Block_Ability_List_t(
         document.getElementById('table_class_combat_feats'),
-        Ability_Database_GetList(ABILITIES_DATABASE, "Черта", ["Боевая"], undefined, undefined, true)
+        Ability_Database_GetList(ABILITIES_DATABASE, "Черта", ["Боевая"], undefined, undefined, true),
+        undefined,
+        false,
+        true
     );
     this.gear_boosts = new Block_Ability_List_t(
         document.getElementById('table_class_gear_boosts'),
-        Ability_Database_GetList(ABILITIES_DATABASE, "Класс", ["Солдат", "Военная хитрость"], undefined, 20, true)
+        Ability_Database_GetList(ABILITIES_DATABASE, "Класс", ["Солдат", "Военная хитрость"], undefined, 20, true),
+        undefined
     );
     
     //TODO

@@ -1,10 +1,21 @@
 //TODO: rename methods
 //TODO: rework additional as separate table?
-function Block_Ability_List_t(gui_table, database, has_add_button = false){
+function Block_Ability_List_t(
+    gui_table,
+    database,
+    has_add_button = false,
+    database_show_lvl = true,
+    database_show_req = false
+){
 //constants
     const GUI_TABLE = gui_table;
     const BLOCK_DATABASE = database;
     const HAS_ADD_BUTTON = has_add_button;
+    const DO_DATABASE_SHOW_LVL = database_show_lvl;
+    const DO_DATABASE_SHOW_REQ = database_show_req;
+    
+    const CLMN_DESCR = 1 + (database_show_lvl ? 1 : 0) + (database_show_req ? 1 : 0);
+    const CLMN_SOURCE = 2 + (database_show_lvl ? 1 : 0) + (database_show_req ? 1 : 0);
     
 //private methods
     var Proc_Show_Detail_Event = function(row){
@@ -14,15 +25,23 @@ function Block_Ability_List_t(gui_table, database, has_add_button = false){
     }
     
     var Proc_Open_Database_Event = function(row){
-        //TODO: let max_lvl = m_lvl_list[row];
+        let max_lvl = null;
+        if (m_lvl_list != null){
+            max_lvl = m_lvl_list[row];
+        }
+
         var table_data = new Array(0);
         var filters = new Array(0);
-        let headers = [
-            "Название",
-            "Ур.",
-            "Описание",
-            "Ист."
-        ];
+        let headers = ["Название"];
+        if (DO_DATABASE_SHOW_LVL){
+            headers.push("Ур.");
+        }
+        if (DO_DATABASE_SHOW_REQ){
+            headers.push("Треб.");
+        }
+        headers.push("Описание");
+        headers.push("Ист.");
+
         var add_func;
         
         if (row == null){
@@ -34,16 +53,37 @@ function Block_Ability_List_t(gui_table, database, has_add_button = false){
         for (let i = 0; i < BLOCK_DATABASE.length; i++){
             let cur_ability = BLOCK_DATABASE[i];
 
-            table_data.push([
-                cur_ability.name,
-                cur_ability.lvl,
-                cur_ability.descr,
-                cur_ability.source]);
+            if ((max_lvl != null) && (cur_ability.lvl != null) && cur_ability.lvl > max_lvl){
+                continue;
+            }
+            
+            let arr = [cur_ability.name];
+            if (DO_DATABASE_SHOW_LVL){
+                arr.push(cur_ability.lvl);
+            }
+            if (DO_DATABASE_SHOW_REQ){
+                arr.push(cur_ability.requirement);
+            }
+            arr.push(cur_ability.descr);
+            arr.push(cur_ability.source);
+            table_data.push(arr);
         }
 
-        filters.push(new Database_Filter_Input_t(POPUP_FILTER_TYPES.FIND,    0, "Название"  ));
-        filters.push(new Database_Filter_Input_t(POPUP_FILTER_TYPES.RANGE,   1, "Ур."  ));
-        filters.push(new Database_Filter_Input_t(POPUP_FILTER_TYPES.SELECT,  3, "Источник"  ));
+        filters.push(new Database_Filter_Input_t(
+            POPUP_FILTER_TYPES.FIND,
+            0,
+            "Название"
+        ));
+        filters.push(new Database_Filter_Input_t(
+            POPUP_FILTER_TYPES.RANGE,
+            CLMN_DESCR,
+            "Ур."
+        ));
+        filters.push(new Database_Filter_Input_t(
+            POPUP_FILTER_TYPES.SELECT,
+            CLMN_SOURCE,
+            "Источник"
+        ));
 
         Popup_Database.Open(
             table_data,
@@ -293,7 +333,6 @@ function Block_Ability_List_t(gui_table, database, has_add_button = false){
     var m_owner = null;
     var m_lvl_list = null;
     var m_is_const_list = null;
-    //var m_additional_rows = null;
 
 //public properties
 
