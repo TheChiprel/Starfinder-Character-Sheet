@@ -65,6 +65,7 @@
             <button onclick="Save_Character_To_File()">Сохранить</button>
             <input type="file" id="file_character_upload" value="Load from file" onchange="Load_Character_From_File()" accept=".json" style="display:none"/>
             <label class="pseudobutton" for="file_character_upload">Загрузить</label>
+            <button onclick="Reset()">Очистить</button>
         </div>
 
         <div class="class_layer_main" id="layer_face">
@@ -241,7 +242,7 @@
                 <output class="class_output_field class_output_max_hp" name="outfield_max_hp" form="textarea" id="outfield_max_hp">0</output><br>
 
                 <label for="outfield_max_rp">Макс. Пункты Решимости (ПР):</label><br>
-                <output class="class_output_field class_output_max_sp" name="outfield_max_rp" form="textarea" id="outfield_max_rp">(Не выбран класс)</output><br>
+                <output class="class_output_field class_output_max_rp" name="outfield_max_rp" form="textarea" id="outfield_max_rp">(Не выбран класс)</output><br>
             </div>
 
             <div class="layer_maininfo_block">

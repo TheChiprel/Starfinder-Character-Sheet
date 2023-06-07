@@ -38,6 +38,7 @@ const COMBAT_FEAT_LVLS = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20];
     this.Get_SaveData_Obj = function(){
         var ret = {
             lvl: self.lvl,
+            key_abiscore: self.key_abiscore
             //TODO
         }
         return ret;
@@ -48,7 +49,7 @@ const COMBAT_FEAT_LVLS = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20];
             return;
         }
         
-        self.Set_Lvl(obj.lvl);
+        self.key_abiscore = (obj.key_abiscore);
         //TODO
     }
 
@@ -77,6 +78,7 @@ const COMBAT_FEAT_LVLS = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20];
         GEAR_BOOST_LVLS,
         "soldier_gear_boost_",
         layers.classes.Get_Block(CLASSES.SOLDIER).gear_boosts);
+    this.key_abiscore = null;
 
 //additional initialization
     Init();

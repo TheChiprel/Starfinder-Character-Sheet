@@ -650,7 +650,6 @@ const ADEPT_SKILL_COUNT = 2;
             return;
         }
         
-        self.Set_Lvl(obj.lvl);
         self.adept_skills.Load_From_Obj(obj.adept_skills);
         self.revelations.Load_From_Obj(obj.revelations);
         self.zeniths_graviton.Load_From_Obj(obj.zeniths_graviton);

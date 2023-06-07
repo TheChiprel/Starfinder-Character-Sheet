@@ -521,12 +521,14 @@ function Abiscore_Key_Collection_t(){
 
 //public methods
     this.Add = function(id, abiscore){
+        /*
         if (abiscore.includes(' или ')){
             var as_list = abiscore.split(' или ');
             Popup_Selector.Call(id, "Выберите ключевую хар-ку:", as_list, self.Add);
             return;
         }
         //else NOTHING TO DO
+        */
         
         var abiscore_obj = FindAbiscoreByName(abiscore);
         if (abiscore_obj == null){
@@ -569,27 +571,18 @@ function Abiscore_Key_Collection_t(){
     }
 
     this.Recalc = function(){
-        let mod_name;
-        let mod_value;
+        let mod_name = "Нет";
+        let mod_value = null;
         m_map.forEach((abiscore_obj, key) => {
-            if (!abiscore_obj.Get_Value()){
-                return;
-            }
-
-            if (mod_value != undefined){
-                if (abiscore_obj.sum < mod_value){
-                    return;
-                }
-
-                if (abiscore_obj.sum == mod_value){
-                    mod_name += "/" + abiscore_obj.name;
-                    return;
+            if (abiscore_obj.Get_Value()){
+                let curr_abiscore_value = chardata.stats.abiscores.modifiers.Get_Sum(key);
+                if ((mod_value == null) || (curr_abiscore_value > mod_value)){
+                    mod_name = key;
+                    mod_value = curr_abiscore_value;
+                }else if (curr_abiscore_value == mod_value){
+                    mod_name += "/" + key;
                 }
             }
-            //else NOTHING TO DO
-
-            mod_name = key;
-            mod_value = chardata.stats.abiscores.modifiers.Get_Sum(key);
         });
 
         m_sum = mod_value;

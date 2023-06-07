@@ -31,6 +31,14 @@ function Class_t (entry){
     }
 
 //public methods
+    this.Get_Key_Abiscore = function(){
+        if (self.entry.key_abiscore.includes(' или ')){
+            return self.context.key_abiscore;
+        }
+        
+        return self.entry.key_abiscore;
+    }
+
     this.Get_SaveData_Obj = function(){
         let ret = new Map();
         ret.set('name', self.entry.name);
@@ -60,8 +68,26 @@ function Class_Collection_t (){
         
         CLASS_DATABASE.forEach(entry => {
             self.class_map.set (entry.name, new Class_t (entry));
-            layers.maininfo.Add_Class_Add_Button(entry.name, self.SetLvl.bind(null, entry.name, 1));
+            layers.maininfo.Add_Class_Add_Button(entry.name, Proc_Event_Add_Class.bind(null, entry.name));
         });
+    }
+    
+    var Proc_Event_Add_Class = function(class_name){
+        var class_obj = Find_Class_By_Name(class_name);
+        
+        if (class_obj.entry.key_abiscore.includes(' или ')){
+            var as_list = class_obj.entry.key_abiscore.split(' или ');
+            Popup_Selector.Call("Выберите ключевую хар-ку:", as_list, Proc_Event_Abiscore_Chosen.bind(null, class_name));
+        }else{
+            self.SetLvl(class_name, 1);
+        }
+    }
+    
+    var Proc_Event_Abiscore_Chosen = function(class_name, abiscore){
+        var class_obj = Find_Class_By_Name(class_name);
+        
+        class_obj.context.key_abiscore = abiscore;
+        self.SetLvl(class_name, 1);
     }
 
     var Find_Class_By_Name = function (class_name){
@@ -79,7 +105,7 @@ function Class_Collection_t (){
         class_obj.is_active = true;
         
         // adding key score
-        chardata.stats.abiscores.key.Add(entry.name, entry.key_abiscore);
+        chardata.stats.abiscores.key.Add(entry.name, class_obj.Get_Key_Abiscore());
 
         // adding class skills
         let skill_list = entry.class_skills.split(", ");
@@ -207,8 +233,8 @@ function Class_Collection_t (){
         if (obj != undefined){
             obj.forEach(cl => {
                 let class_obj = Find_Class_By_Name(cl.name);
-                self.SetLvl(cl.name, cl.context.lvl);
                 class_obj.context.Load_From_Obj(cl.context);
+                self.SetLvl(cl.name, cl.context.lvl);
             });
         }
     }
