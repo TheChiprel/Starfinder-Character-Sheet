@@ -339,6 +339,85 @@ function Block_Ability_List_t(
 //additional initialization
 }
 
+function Block_Subclass_Selector_t (gui_block){
+//constants
+    const GUI_BLOCK = gui_block;
+    
+//private methods
+    var Proc_Open_Database_Event = function(){
+        
+    }
+
+    var Proc_Change_Event = function(){
+        
+    }
+    
+    var Proc_Clear_Event = function(){
+        
+    }
+    
+    var Proc_Subclass_Descr = function(){
+        
+    }
+    
+    var Proc_Ability_Descr = function(){
+        
+    }
+
+//public methods
+    this.Reset = function(owner, name, lvl_list, db){
+        m_owner = owner;
+        m_db = db;
+        
+        m_outfield_subclass_name = HTML_Create_Output(
+            "---",
+            Proc_Subclass_Descr,
+            undefined,
+            "class_output_field"
+        );
+        
+        var change_button = HTML_Create_Button(
+            "+",
+            Proc_Change_Event,
+            undefined,
+            undefined //TODO: class?
+        );
+        
+        m_table = HTML_Create_Table(lvl_list.length, 2, false, "100%", ["20%", "80%"]);
+        m_table.class = "class_table_class_abilities"; //TODO: move to HTML tools
+        for (let i = 0; i < lvl_list.length; i++){
+            let curr_row = m_table.rows[i]
+            curr_row.cells[0].innerHTML = lvl_list[i];
+            curr_row.cells[1].innerHTML = "---";
+        }
+        
+        GUI_BLOCK.innerHTML = name;
+        GUI_BLOCK.appendChild(HTML_Create_BR());
+        GUI_BLOCK.appendChild(m_outfield_subclass_name);
+        GUI_BLOCK.appendChild(change_button);
+        GUI_BLOCK.appendChild(m_table);
+    }
+
+    this.Set_Subclass = function(subclass_name, abi_list){
+        
+    }
+    
+    this.Remove_Subclass = function(subclass_name){
+        
+    }
+
+//private properties
+    var self = this;
+    var m_owner = null;
+    var m_table = null;
+    var m_outfield_subclass_name = null;
+    var m_db = null;
+
+//public properties
+
+//additional initialization
+}
+
 function Block_Spell_List_t(
     gui_table,
     database,
