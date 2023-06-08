@@ -1,3 +1,41 @@
+function Fighting_Style_t (lvl_list, gui_block){
+//constants
+    const GUI_BLOCK = gui_block;
+    const LVL_LIST = lvl_list;
+    
+//private methods
+    var Init = function(){
+        GUI_BLOCK.Reset(self, "Основной боевой стиль", LVL_LIST, null);
+        
+        m_abi_list = new Leveled_Ability_List_t (
+            "test",
+            null,
+            lvl_list,
+            "test_test",
+            GUI_BLOCK.abi_list_block,
+            true
+        );
+    }
+
+//public methods
+    this.Set = function(style_name){
+        
+    }
+    
+    this.Clear = function(){
+        
+    }
+
+//private properties
+    var self = this;
+    var m_abi_list;
+
+//public properties
+
+//additional initialization
+    Init();
+}
+
 function Class_Soldier_t (){
 const ABILITY_LIST = [
     ["Основной боевой стиль"],
@@ -13,6 +51,8 @@ const ABILITY_LIST = [
 const CLASS_ABILITY_LVLS = [1, 1, 2, 3, 3, 9, 9, 11, 20];
 const GEAR_BOOST_LVLS = [3, 7, 11, 15, 19];
 const COMBAT_FEAT_LVLS = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20];
+const PRIMARY_FIGHTING_STYLE_LVLS = [1, 5, 9, 13, 17];
+const SECONDARY_FIGHTING_STYLE_LVLS = [1, 5, 9, 13, 17];
 
 //private methods
     var Init = function(){
@@ -80,6 +120,10 @@ const COMBAT_FEAT_LVLS = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20];
         GEAR_BOOST_LVLS,
         "soldier_gear_boost_",
         layers.classes.Get_Block(CLASSES.SOLDIER).gear_boosts);
+    this.primary_fighting_style = new Fighting_Style_t(
+        PRIMARY_FIGHTING_STYLE_LVLS,
+        layers.classes.Get_Block(CLASSES.SOLDIER).primary_fighting_style
+    );
     this.key_abiscore = null;
 
 //additional initialization

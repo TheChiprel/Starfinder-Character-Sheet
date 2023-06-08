@@ -396,6 +396,11 @@ function Block_Subclass_Selector_t (gui_block){
         GUI_BLOCK.appendChild(m_outfield_subclass_name);
         GUI_BLOCK.appendChild(change_button);
         GUI_BLOCK.appendChild(m_table);
+        
+        self.abi_list_block = new Block_Ability_List_t(
+            m_table,
+            null
+        );
     }
 
     this.Set_Subclass = function(subclass_name, abi_list){
@@ -414,6 +419,7 @@ function Block_Subclass_Selector_t (gui_block){
     var m_db = null;
 
 //public properties
+    this.abi_list_block = null;
 
 //additional initialization
 }
