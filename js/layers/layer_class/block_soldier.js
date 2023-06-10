@@ -32,7 +32,7 @@ function Block_Class_Soldier_t(){
     );
     
     this.secondary_fighting_style = new Block_Subclass_Selector_t(
-        document.getElementById("block_soldier_primary_fighting_style")
+        document.getElementById("block_soldier_secondary_fighting_style")
     );
     
     this.combat_feats = new Block_Ability_List_t(

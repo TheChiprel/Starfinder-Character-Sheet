@@ -345,23 +345,64 @@ function Block_Subclass_Selector_t (gui_block){
     
 //private methods
     var Proc_Open_Database_Event = function(){
+        var table_data = new Array(0);
+        var filters = new Array(0);
+        let headers = ["Название", "Описание", "Ист."];
+
+        var add_func = Proc_Change_Event;
         
+        for (let i = 0; i < m_db.length; i++){
+            let cur_ability = m_db[i];
+            let arr = [
+                cur_ability.name,
+                cur_ability.descr,
+                cur_ability.source
+            ];
+            table_data.push(arr);
+        }
+
+        filters.push(new Database_Filter_Input_t(
+            POPUP_FILTER_TYPES.FIND,
+            0,
+            "Название"
+        ));
+        filters.push(new Database_Filter_Input_t(
+            POPUP_FILTER_TYPES.SELECT,
+            2,
+            "Источник"
+        ));
+
+        Popup_Database.Open(
+            table_data,
+            add_func,
+            filters,
+            headers,
+            Proc_Info_Database);
     }
 
-    var Proc_Change_Event = function(){
-        
+    var Proc_Change_Event = function(entry_num){
+        if (m_owner != null){
+            m_owner.Set(m_db[entry_num].name);
+            Popup_Database.Close();
+        }
     }
     
     var Proc_Clear_Event = function(){
-        
+        if (m_owner != null){
+            m_owner.Clear();
+        }
     }
     
     var Proc_Subclass_Descr = function(){
-        
+        if (m_owner != null){
+            
+        }
     }
     
-    var Proc_Ability_Descr = function(){
-        
+    var Proc_Info_Database = function(entry_num){
+        if (m_owner != null){
+            alert(entry_num);
+        }
     }
 
 //public methods
@@ -376,9 +417,9 @@ function Block_Subclass_Selector_t (gui_block){
             "class_output_field"
         );
         
-        var change_button = HTML_Create_Button(
+        m_add_remove_button = HTML_Create_Button(
             "+",
-            Proc_Change_Event,
+            Proc_Open_Database_Event,
             undefined,
             undefined //TODO: class?
         );
@@ -394,7 +435,7 @@ function Block_Subclass_Selector_t (gui_block){
         GUI_BLOCK.innerHTML = name;
         GUI_BLOCK.appendChild(HTML_Create_BR());
         GUI_BLOCK.appendChild(m_outfield_subclass_name);
-        GUI_BLOCK.appendChild(change_button);
+        GUI_BLOCK.appendChild(m_add_remove_button);
         GUI_BLOCK.appendChild(m_table);
         
         self.abi_list_block = new Block_Ability_List_t(
@@ -403,18 +444,23 @@ function Block_Subclass_Selector_t (gui_block){
         );
     }
 
-    this.Set_Subclass = function(subclass_name, abi_list){
-        
+    this.Set_Subclass = function(subclass_name){
+        m_outfield_subclass_name.innerHTML = subclass_name;
+        m_add_remove_button.value = "X";
+        m_add_remove_button.onclick = Proc_Clear_Event;
     }
     
-    this.Remove_Subclass = function(subclass_name){
-        
+    this.Remove_Subclass = function(){
+        m_outfield_subclass_name.innerHTML = "---";
+        m_add_remove_button.value = "+";
+        m_add_remove_button.onclick = Proc_Open_Database_Event;
     }
 
 //private properties
     var self = this;
     var m_owner = null;
     var m_table = null;
+    var m_add_remove_button = null;
     var m_outfield_subclass_name = null;
     var m_db = null;
 

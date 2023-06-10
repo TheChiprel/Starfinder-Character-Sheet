@@ -5,10 +5,11 @@ function Fighting_Style_t (lvl_list, gui_block){
     
 //private methods
     var Init = function(){
-        GUI_BLOCK.Reset(self, "Основной боевой стиль", LVL_LIST, null);
+        var db = Ability_Database_GetList(ABILITIES_DATABASE, "Класс", ["Солдат", "Боевой стиль"]);
+        GUI_BLOCK.Reset(self, "Основной боевой стиль", LVL_LIST, db);
         
         m_abi_list = new Leveled_Ability_List_t (
-            "test",
+            "test" + LVL_LIST[0],//TODO!!
             null,
             lvl_list,
             "test_test",
@@ -19,18 +20,37 @@ function Fighting_Style_t (lvl_list, gui_block){
 
 //public methods
     this.Set = function(style_name){
+        let db = Ability_Database_GetList(ABILITIES_DATABASE, "Класс", ["Солдат", "Способность боевого стиля", style_name]);
+        if (db.length < LVL_LIST.length){
+            console.error("Not all abilities of combat style not found: " + style_name);
+            return;
+        }
         
+        self.current_style = style_name;
+        db.forEach(entry => {
+            let index = LVL_LIST.indexOf(entry.lvl + LVL_LIST[0] - 1);
+            if (index >= 0){
+                m_abi_list.Set(index, entry);
+            }
+        });
+        
+        GUI_BLOCK.Set_Subclass(style_name);
     }
     
     this.Clear = function(){
-        
+        self.current_style = null;
+        m_abi_list.Clear();
+        GUI_BLOCK.Remove_Subclass();
     }
+    
+    //TODO: save, load, show descrs
 
 //private properties
     var self = this;
     var m_abi_list;
 
 //public properties
+    this.current_style = null;
 
 //additional initialization
     Init();
@@ -52,7 +72,7 @@ const CLASS_ABILITY_LVLS = [1, 1, 2, 3, 3, 9, 9, 11, 20];
 const GEAR_BOOST_LVLS = [3, 7, 11, 15, 19];
 const COMBAT_FEAT_LVLS = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20];
 const PRIMARY_FIGHTING_STYLE_LVLS = [1, 5, 9, 13, 17];
-const SECONDARY_FIGHTING_STYLE_LVLS = [1, 5, 9, 13, 17];
+const SECONDARY_FIGHTING_STYLE_LVLS = [9, 13, 17];
 
 //private methods
     var Init = function(){
@@ -99,7 +119,6 @@ const SECONDARY_FIGHTING_STYLE_LVLS = [1, 5, 9, 13, 17];
     var self = this;
 
 //public properties
-    //TODO: у хитростей надо по уровню показывать
     this.lvl = 0;
     this.class_abilities = new Leveled_Ability_List_t(
         "abi_class_soldier",
@@ -123,6 +142,10 @@ const SECONDARY_FIGHTING_STYLE_LVLS = [1, 5, 9, 13, 17];
     this.primary_fighting_style = new Fighting_Style_t(
         PRIMARY_FIGHTING_STYLE_LVLS,
         layers.classes.Get_Block(CLASSES.SOLDIER).primary_fighting_style
+    );
+    this.secondary_fighting_style = new Fighting_Style_t(
+        SECONDARY_FIGHTING_STYLE_LVLS,
+        layers.classes.Get_Block(CLASSES.SOLDIER).secondary_fighting_style
     );
     this.key_abiscore = null;
 
