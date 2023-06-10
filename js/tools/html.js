@@ -228,3 +228,47 @@ function HTML_Create_Selector(null_option = false, list = undefined, onchange_el
 
     return ret_elem;
 }
+
+function HTML_Create_Table(
+    rows,
+    clmns,
+    is_first_row_header = false,
+    table_width = null,
+    cell_width = null
+){
+    var table = document.createElement('table');
+    if (table_width != null){
+        table.width = table_width;
+    }
+    if (rows < 1){
+        return table;
+    }
+    
+    var header_row = table.insertRow(0);
+    for (let clmn = 0; clmn < clmns; clmn++){
+        var header_cell;
+        if (is_first_row_header){
+            header_cell = document.createElement('th');
+            header_row.appendChild(header_cell);
+        }else{
+            header_cell = header_row.insertCell(clmn);
+        }
+        
+        if ((cell_width != null) && (cell_width[clmn] != undefined)){
+            header_cell.width = cell_width[clmn];
+        }
+    }
+    
+    for (row = 1; row < rows; row++){
+        var cur_row = table.insertRow(row);
+        for (let clmn = 0; clmn < clmns; clmn++){
+            cur_row.insertCell(clmn);
+        }
+    }
+    
+    return table;
+}
+
+function HTML_Table_Span(table, row, cell, span_value){
+    //TODO
+}

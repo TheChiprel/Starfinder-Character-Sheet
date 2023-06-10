@@ -271,7 +271,11 @@ function Block_Class_Solarion_t(){
         
     this.revelations = new Block_Ability_List_t(
         document.getElementById('table_solarion_revelations'),
-        Ability_Database_GetList(ABILITIES_DATABASE, "Класс", ["Солярион", "Звёздное откровение"], undefined, undefined, true)
+        Ability_Database_GetList(ABILITIES_DATABASE, "Класс", ["Солярион", "Звёздное откровение"], undefined, undefined, true),
+        true,
+        undefined,
+        false,
+        false
     );
         
     this.zeniths_graviton = new Block_Ability_List_t(

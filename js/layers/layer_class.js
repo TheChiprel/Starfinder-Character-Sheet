@@ -1,10 +1,23 @@
 //TODO: rename methods
 //TODO: rework additional as separate table?
-function Block_Ability_List_t(gui_table, database, has_add_button = false){
+function Block_Ability_List_t(
+    gui_table,
+    database,
+    has_header = true,
+    has_add_button = false,
+    database_show_lvl = true,
+    database_show_req = false
+){
 //constants
     const GUI_TABLE = gui_table;
     const BLOCK_DATABASE = database;
+    const HAS_HEADER = has_header;
     const HAS_ADD_BUTTON = has_add_button;
+    const DO_DATABASE_SHOW_LVL = database_show_lvl;
+    const DO_DATABASE_SHOW_REQ = database_show_req;
+    
+    const CLMN_DESCR = 1 + (database_show_lvl ? 1 : 0) + (database_show_req ? 1 : 0);
+    const CLMN_SOURCE = 2 + (database_show_lvl ? 1 : 0) + (database_show_req ? 1 : 0);
     
 //private methods
     var Proc_Show_Detail_Event = function(row){
@@ -14,15 +27,23 @@ function Block_Ability_List_t(gui_table, database, has_add_button = false){
     }
     
     var Proc_Open_Database_Event = function(row){
-        //TODO: let max_lvl = m_lvl_list[row];
+        let max_lvl = null;
+        if (m_lvl_list != null){
+            max_lvl = m_lvl_list[row];
+        }
+
         var table_data = new Array(0);
         var filters = new Array(0);
-        let headers = [
-            "Название",
-            "Ур.",
-            "Описание",
-            "Ист."
-        ];
+        let headers = ["Название"];
+        if (DO_DATABASE_SHOW_LVL){
+            headers.push("Ур.");
+        }
+        if (DO_DATABASE_SHOW_REQ){
+            headers.push("Треб.");
+        }
+        headers.push("Описание");
+        headers.push("Ист.");
+
         var add_func;
         
         if (row == null){
@@ -34,16 +55,37 @@ function Block_Ability_List_t(gui_table, database, has_add_button = false){
         for (let i = 0; i < BLOCK_DATABASE.length; i++){
             let cur_ability = BLOCK_DATABASE[i];
 
-            table_data.push([
-                cur_ability.name,
-                cur_ability.lvl,
-                cur_ability.descr,
-                cur_ability.source]);
+            if ((max_lvl != null) && (cur_ability.lvl != null) && cur_ability.lvl > max_lvl){
+                continue;
+            }
+            
+            let arr = [cur_ability.name];
+            if (DO_DATABASE_SHOW_LVL){
+                arr.push(cur_ability.lvl);
+            }
+            if (DO_DATABASE_SHOW_REQ){
+                arr.push(cur_ability.requirement);
+            }
+            arr.push(cur_ability.descr);
+            arr.push(cur_ability.source);
+            table_data.push(arr);
         }
 
-        filters.push(new Database_Filter_Input_t(POPUP_FILTER_TYPES.FIND,    0, "Название"  ));
-        filters.push(new Database_Filter_Input_t(POPUP_FILTER_TYPES.RANGE,   1, "Ур."  ));
-        filters.push(new Database_Filter_Input_t(POPUP_FILTER_TYPES.SELECT,  3, "Источник"  ));
+        filters.push(new Database_Filter_Input_t(
+            POPUP_FILTER_TYPES.FIND,
+            0,
+            "Название"
+        ));
+        filters.push(new Database_Filter_Input_t(
+            POPUP_FILTER_TYPES.RANGE,
+            CLMN_DESCR,
+            "Ур."
+        ));
+        filters.push(new Database_Filter_Input_t(
+            POPUP_FILTER_TYPES.SELECT,
+            CLMN_SOURCE,
+            "Источник"
+        ));
 
         Popup_Database.Open(
             table_data,
@@ -169,15 +211,17 @@ function Block_Ability_List_t(gui_table, database, has_add_button = false){
     }
     
     this.Clear = function(){
-        //m_additional_rows = new Array(0);
-        
         while (GUI_TABLE.rows.length > 0){
             GUI_TABLE.deleteRow(0);
         }
-        var row = GUI_TABLE.insertRow(GUI_TABLE.rows.length);
-        var cell_lvl = row.insertCell(row.cells.length);
-        var cell_ability = row.insertCell(row.cells.length);
-        var cell_add_remove_button = row.insertCell(row.cells.length);
+        var header_row = GUI_TABLE.insertRow(GUI_TABLE.rows.length);
+        var cell_lvl = header_row.insertCell(header_row.cells.length);
+        var cell_ability = header_row.insertCell(header_row.cells.length);
+        var cell_add_remove_button = header_row.insertCell(header_row.cells.length);
+        
+        if (!HAS_HEADER){
+            header_row.style.display = "none";
+        }
         
         if (m_lvl_list == null){
             return;
@@ -293,9 +337,141 @@ function Block_Ability_List_t(gui_table, database, has_add_button = false){
     var m_owner = null;
     var m_lvl_list = null;
     var m_is_const_list = null;
-    //var m_additional_rows = null;
 
 //public properties
+
+//additional initialization
+}
+
+function Block_Subclass_Selector_t (gui_block){
+//constants
+    const GUI_BLOCK = gui_block;
+    
+//private methods
+    var Proc_Open_Database_Event = function(){
+        var table_data = new Array(0);
+        var filters = new Array(0);
+        let headers = ["Название", "Описание", "Ист."];
+
+        var add_func = Proc_Change_Event;
+        
+        for (let i = 0; i < m_db.length; i++){
+            let cur_ability = m_db[i];
+            let arr = [
+                cur_ability.name,
+                cur_ability.descr,
+                cur_ability.source
+            ];
+            table_data.push(arr);
+        }
+
+        filters.push(new Database_Filter_Input_t(
+            POPUP_FILTER_TYPES.FIND,
+            0,
+            "Название"
+        ));
+        filters.push(new Database_Filter_Input_t(
+            POPUP_FILTER_TYPES.SELECT,
+            2,
+            "Источник"
+        ));
+
+        Popup_Database.Open(
+            table_data,
+            add_func,
+            filters,
+            headers,
+            Proc_Info_Database);
+    }
+
+    var Proc_Change_Event = function(entry_num){
+        if (m_owner != null){
+            m_owner.Set(m_db[entry_num]);
+            Popup_Database.Close();
+        }
+    }
+    
+    var Proc_Clear_Event = function(){
+        if (m_owner != null){
+            m_owner.Clear();
+        }
+    }
+    
+    var Proc_Subclass_Descr = function(){
+        if (m_owner != null){
+            m_owner.Show_Descr();
+        }
+    }
+    
+    var Proc_Info_Database = function(entry_num){
+        if (m_owner != null){
+            let entry = m_db[entry_num];
+            Popup_Descr.Call(entry.name, entry.descr);
+        }
+    }
+
+//public methods
+    this.Reset = function(owner, name, lvl_list, db){
+        m_owner = owner;
+        m_db = db;
+        
+        m_outfield_subclass_name = HTML_Create_Output(
+            "---",
+            Proc_Subclass_Descr,
+            undefined,
+            "class_output_field"
+        );
+        
+        m_add_remove_button = HTML_Create_Button(
+            "+",
+            Proc_Open_Database_Event,
+            undefined,
+            undefined //TODO: class?
+        );
+        
+        m_table = HTML_Create_Table(lvl_list.length, 2, false, "100%", ["20%", "80%"]);
+        m_table.class = "class_table_class_abilities"; //TODO: move to HTML tools
+        for (let i = 0; i < lvl_list.length; i++){
+            let curr_row = m_table.rows[i]
+            curr_row.cells[0].innerHTML = lvl_list[i];
+            curr_row.cells[1].innerHTML = "---";
+        }
+        
+        GUI_BLOCK.innerHTML = name;
+        GUI_BLOCK.appendChild(HTML_Create_BR());
+        GUI_BLOCK.appendChild(m_outfield_subclass_name);
+        GUI_BLOCK.appendChild(m_add_remove_button);
+        GUI_BLOCK.appendChild(m_table);
+        
+        self.abi_list_block = new Block_Ability_List_t(
+            m_table,
+            null,
+            false
+        );
+    }
+
+    this.Set_Subclass = function(subclass_name){
+        m_outfield_subclass_name.innerHTML = subclass_name;
+        m_add_remove_button.value = "X";
+        m_add_remove_button.onclick = Proc_Clear_Event;
+    }
+    
+    this.Remove_Subclass = function(){
+        m_outfield_subclass_name.innerHTML = "---";
+        m_add_remove_button.value = "+";
+        m_add_remove_button.onclick = Proc_Open_Database_Event;
+    }
+
+//private properties
+    var self = this;
+    var m_owner = null;
+    var m_table = null;
+    var m_add_remove_button = null;
+    var m_outfield_subclass_name = null;
+    var m_db = null;
+
+//public properties
+    this.abi_list_block = null;
 
 //additional initialization
 }

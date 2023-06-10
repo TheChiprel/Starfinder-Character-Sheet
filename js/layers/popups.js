@@ -419,7 +419,6 @@ function Popup_Database_t(){
 }
 
 function Popup_Selector_t(){
-    this.id = "";
     this.callback = null;
     this.block = document.getElementById('layer_popup_select');
     this.selector = document.getElementById('layer_popup_select_selector');
@@ -434,9 +433,8 @@ function Popup_Selector_t(){
 
     }
 
-    this.Call = function(id, header_name, options, callback){
+    this.Call = function(header_name, options, callback){
         self.Clear_Selector();
-        self.id = id;
         self.header.value = header_name;
         self.callback = callback;
         for (let i = 0; i < options.length; i++){
@@ -447,7 +445,7 @@ function Popup_Selector_t(){
 
     this.Confirm = function(){
         self.block.style.display='none';
-        self.callback(self.id, self.selector.value);
+        self.callback(self.selector.value);
     }
 
     //TODO: Add cancel button?

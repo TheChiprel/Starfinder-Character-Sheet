@@ -391,11 +391,18 @@ function Layer_Abilities_t(){
     );
     this.feats = new Block_Ability_List_t(
         document.getElementById('table_abilities_feats'),
-        Ability_Database_GetList(ABILITIES_DATABASE, "Черта")
+        Ability_Database_GetList(ABILITIES_DATABASE, "Черта"),
+        true,
+        undefined,
+        false,
+        true
     );
     this.other = new Block_Ability_List_t(
         document.getElementById('table_abilities_other'),
         ABILITIES_DATABASE,
+        true,
+        true,
+        true,
         true
     );
     
