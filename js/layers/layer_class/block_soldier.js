@@ -39,6 +39,7 @@ function Block_Class_Soldier_t(){
         document.getElementById('table_class_combat_feats'),
         Ability_Database_GetList(ABILITIES_DATABASE, "Черта", ["Боевая"], undefined, undefined, true),
         undefined,
+        undefined,
         false,
         true
     );

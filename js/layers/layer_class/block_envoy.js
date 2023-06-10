@@ -102,6 +102,7 @@ function Block_Class_Envoy_t(){
     this.talents = new Block_Ability_List_t(
         document.getElementById('table_class_talents'),
         Ability_Database_GetList(ABILITIES_DATABASE, "Класс", ["Посланник", "Мастерский талант"], undefined, 20, true),
+        true,
         undefined,
         false,
         true

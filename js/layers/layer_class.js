@@ -3,6 +3,7 @@
 function Block_Ability_List_t(
     gui_table,
     database,
+    has_header = true,
     has_add_button = false,
     database_show_lvl = true,
     database_show_req = false
@@ -10,6 +11,7 @@ function Block_Ability_List_t(
 //constants
     const GUI_TABLE = gui_table;
     const BLOCK_DATABASE = database;
+    const HAS_HEADER = has_header;
     const HAS_ADD_BUTTON = has_add_button;
     const DO_DATABASE_SHOW_LVL = database_show_lvl;
     const DO_DATABASE_SHOW_REQ = database_show_req;
@@ -209,15 +211,17 @@ function Block_Ability_List_t(
     }
     
     this.Clear = function(){
-        //m_additional_rows = new Array(0);
-        
         while (GUI_TABLE.rows.length > 0){
             GUI_TABLE.deleteRow(0);
         }
-        var row = GUI_TABLE.insertRow(GUI_TABLE.rows.length);
-        var cell_lvl = row.insertCell(row.cells.length);
-        var cell_ability = row.insertCell(row.cells.length);
-        var cell_add_remove_button = row.insertCell(row.cells.length);
+        var header_row = GUI_TABLE.insertRow(GUI_TABLE.rows.length);
+        var cell_lvl = header_row.insertCell(header_row.cells.length);
+        var cell_ability = header_row.insertCell(header_row.cells.length);
+        var cell_add_remove_button = header_row.insertCell(header_row.cells.length);
+        
+        if (!HAS_HEADER){
+            header_row.style.display = "none";
+        }
         
         if (m_lvl_list == null){
             return;
@@ -382,7 +386,7 @@ function Block_Subclass_Selector_t (gui_block){
 
     var Proc_Change_Event = function(entry_num){
         if (m_owner != null){
-            m_owner.Set(m_db[entry_num].name);
+            m_owner.Set(m_db[entry_num]);
             Popup_Database.Close();
         }
     }
@@ -395,13 +399,14 @@ function Block_Subclass_Selector_t (gui_block){
     
     var Proc_Subclass_Descr = function(){
         if (m_owner != null){
-            
+            m_owner.Show_Descr();
         }
     }
     
     var Proc_Info_Database = function(entry_num){
         if (m_owner != null){
-            alert(entry_num);
+            let entry = m_db[entry_num];
+            Popup_Descr.Call(entry.name, entry.descr);
         }
     }
 
@@ -440,7 +445,8 @@ function Block_Subclass_Selector_t (gui_block){
         
         self.abi_list_block = new Block_Ability_List_t(
             m_table,
-            null
+            null,
+            false
         );
     }
 

@@ -1,32 +1,34 @@
-function Fighting_Style_t (lvl_list, gui_block){
+function Fighting_Style_t (name, lvl_list, gui_block){
 //constants
     const GUI_BLOCK = gui_block;
     const LVL_LIST = lvl_list;
+    const NAME = name;
     
 //private methods
     var Init = function(){
         var db = Ability_Database_GetList(ABILITIES_DATABASE, "Класс", ["Солдат", "Боевой стиль"]);
-        GUI_BLOCK.Reset(self, "Основной боевой стиль", LVL_LIST, db);
+        GUI_BLOCK.Reset(self, NAME, LVL_LIST, db);
         
         m_abi_list = new Leveled_Ability_List_t (
-            "test" + LVL_LIST[0],//TODO!!
-            null,
+            "fight_style_" + LVL_LIST[0],
+            NAME,
             lvl_list,
-            "test_test",
+            "fight_style_" + LVL_LIST[0] + "_",
             GUI_BLOCK.abi_list_block,
             true
         );
     }
 
 //public methods
-    this.Set = function(style_name){
-        let db = Ability_Database_GetList(ABILITIES_DATABASE, "Класс", ["Солдат", "Способность боевого стиля", style_name]);
+    this.Set = function(style_entry){
+        let db = Ability_Database_GetList(ABILITIES_DATABASE, "Класс", ["Солдат", "Способность боевого стиля", style_entry.name]);
         if (db.length < LVL_LIST.length){
-            console.error("Not all abilities of combat style not found: " + style_name);
+            console.error("Not all abilities of combat style not found: " + style_entry.name);
             return;
         }
         
-        self.current_style = style_name;
+        self.current_style = style_entry;
+        m_abi_list.Rename_List(NAME + "(" + style_entry + ")");
         db.forEach(entry => {
             let index = LVL_LIST.indexOf(entry.lvl + LVL_LIST[0] - 1);
             if (index >= 0){
@@ -34,16 +36,49 @@ function Fighting_Style_t (lvl_list, gui_block){
             }
         });
         
-        GUI_BLOCK.Set_Subclass(style_name);
+        GUI_BLOCK.Set_Subclass(style_entry.name);
     }
     
     this.Clear = function(){
         self.current_style = null;
         m_abi_list.Clear();
+        m_abi_list.Rename_List(NAME);
         GUI_BLOCK.Remove_Subclass();
     }
     
-    //TODO: save, load, show descrs
+    this.Update_Lvl = function(lvl){
+        m_abi_list.Update_Lvl(lvl);
+    }
+    
+    this.Show_Descr = function(){
+        if (self.current_style != null){
+            Popup_Descr.Call(self.current_style.name, self.current_style.descr);
+        }
+    }
+    
+    this.Get_SaveData_Obj = function(){
+        if (self.current_style == null){
+            return null;
+        }
+        return self.current_style.name;
+    }
+    
+    this.Load_From_Obj = function(obj){
+        if (obj == undefined){
+            return;
+        }
+        
+        let style_entry = Get_Ability_Entry_By_Name(
+            Ability_Database_GetList(ABILITIES_DATABASE, "Класс", ["Солдат", "Боевой стиль"]),
+            obj
+        );
+        if (style_entry == null){
+            console.error("Failed to set unknown combat style: " + obj);
+            return;
+        }
+        
+        self.Set(style_entry);
+    }
 
 //private properties
     var self = this;
@@ -92,7 +127,10 @@ const SECONDARY_FIGHTING_STYLE_LVLS = [9, 13, 17];
     this.Set_Lvl = function(lvl){
         self.lvl = lvl;
         self.class_abilities.Update_Lvl(self.lvl);
-        //TODO
+        self.combat_feats.Update_Lvl(self.lvl);
+        self.gear_boosts.Update_Lvl(self.lvl);
+        self.primary_fighting_style.Update_Lvl(self.lvl);
+        self.secondary_fighting_style.Update_Lvl(self.lvl);
     }
 
     this.Get_SaveData_Obj = function(){
@@ -100,7 +138,9 @@ const SECONDARY_FIGHTING_STYLE_LVLS = [9, 13, 17];
             lvl: self.lvl,
             key_abiscore: self.key_abiscore,
             combat_feats: self.combat_feats.Get_SaveData_Obj(),
-            gear_boosts: self.gear_boosts.Get_SaveData_Obj()
+            gear_boosts: self.gear_boosts.Get_SaveData_Obj(),
+            prim_fs: self.primary_fighting_style.Get_SaveData_Obj(),
+            sec_fs: self.secondary_fighting_style.Get_SaveData_Obj()
         }
         return ret;
     }
@@ -113,6 +153,8 @@ const SECONDARY_FIGHTING_STYLE_LVLS = [9, 13, 17];
         self.key_abiscore = (obj.key_abiscore);
         self.combat_feats.Load_From_Obj(obj.combat_feats);
         self.gear_boosts.Load_From_Obj(obj.gear_boosts);
+        self.primary_fighting_style.Load_From_Obj(obj.prim_fs);
+        self.secondary_fighting_style.Load_From_Obj(obj.sec_fs);
     }
 
 //private properties
@@ -140,10 +182,12 @@ const SECONDARY_FIGHTING_STYLE_LVLS = [9, 13, 17];
         "soldier_gear_boost_",
         layers.classes.Get_Block(CLASSES.SOLDIER).gear_boosts);
     this.primary_fighting_style = new Fighting_Style_t(
+        "Основной боевой стиль",
         PRIMARY_FIGHTING_STYLE_LVLS,
         layers.classes.Get_Block(CLASSES.SOLDIER).primary_fighting_style
     );
     this.secondary_fighting_style = new Fighting_Style_t(
+        "Вспомогательный боевой стиль",
         SECONDARY_FIGHTING_STYLE_LVLS,
         layers.classes.Get_Block(CLASSES.SOLDIER).secondary_fighting_style
     );
