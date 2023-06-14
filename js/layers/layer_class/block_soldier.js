@@ -3,9 +3,6 @@ function Block_Class_Soldier_t(){
 //private methods
     var Init = function(){
         self.Hide_Block();
-        
-        //TODO: remove below, was used for debug!
-        //self.primary_fighting_style.Reset(null, "Тест", [1, 2, 3], null);
     }
 
 //public methods
@@ -48,8 +45,6 @@ function Block_Class_Soldier_t(){
         Ability_Database_GetList(ABILITIES_DATABASE, "Класс", ["Солдат", "Военная хитрость"], undefined, 20, true),
         undefined
     );
-    
-    //TODO
 
 //additional initialization
     Init();

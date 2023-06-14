@@ -12,7 +12,7 @@ function Fighting_Style_t (name, lvl_list, gui_block){
         m_abi_list = new Leveled_Ability_List_t (
             "fight_style_" + LVL_LIST[0],
             NAME,
-            lvl_list,
+            LVL_LIST,
             "fight_style_" + LVL_LIST[0] + "_",
             GUI_BLOCK.abi_list_block,
             true
