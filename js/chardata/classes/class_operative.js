@@ -28,7 +28,7 @@ function Operative_Speciality_t (gui_block){
         }
         
         self.current_spec = spec_entry;
-        m_abi_list.Rename_List(NAME + "(" + spec_entry + ")");
+        m_abi_list.Rename_List(NAME + " (" + spec_entry.name + ")");
         db.forEach(entry => {
             if (entry.subtype.includes("Оперативная уловка")){
                 m_abi_list.Set(0, entry);

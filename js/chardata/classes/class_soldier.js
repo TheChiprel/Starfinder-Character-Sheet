@@ -28,7 +28,7 @@ function Fighting_Style_t (name, lvl_list, gui_block){
         }
         
         self.current_style = style_entry;
-        m_abi_list.Rename_List(NAME + "(" + style_entry + ")");
+        m_abi_list.Rename_List(NAME + " (" + style_entry.name + ")");
         db.forEach(entry => {
             let index = LVL_LIST.indexOf(entry.lvl + LVL_LIST[0] - 1);
             if (index >= 0){

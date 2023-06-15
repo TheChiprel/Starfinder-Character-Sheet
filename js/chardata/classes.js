@@ -6,7 +6,7 @@ function Class_t (entry){
             return new Class_Mechanic_t();
             
         case CLASSES.MYSTIC:
-            return new Class_Mechanic_t();
+            return new Class_Mystic_t();
             
         case CLASSES.OPERATIVE:
             return new Class_Operative_t();
