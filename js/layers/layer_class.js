@@ -1126,6 +1126,27 @@ const SPELL_DATABASE = database;
         }
     }
 
+    this.Set_Row_Const_State = function(spell_lvl, row, is_const){
+        let table_row = m_tables[spell_lvl].rows[row + 1]; // +1 with header
+        let cell_name = table_row.cells[1];
+        let cell_add_remove_button = table_row.cells[2];
+        
+        cell_add_remove_button.innerHTML = "";
+        if (is_const == true){
+            return;
+        }
+        
+        var add_func;
+        if (cell_name.innerHTML == "---"){
+            add_func = Proc_Open_Database_Event.bind(null, spell_lvl, row);
+        }else{
+            add_func = Proc_Remove_Spell_Event.bind(null, spell_lvl, row);
+        }
+        
+        var add_remove_button = HTML_Create_Button("+", add_func);
+        cell_add_remove_button.appendChild(add_remove_button);
+    }
+
 //private properties
     var self = this;
     var m_owner = null;

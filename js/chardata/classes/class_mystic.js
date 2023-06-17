@@ -1,6 +1,10 @@
-function Mystic_Connection_t (gui_block){
+function Mystic_Connection_t (
+    gui_block,
+    gui_spells
+){
 //constants
     const GUI_BLOCK = gui_block;
+    const GUI_SPELLS = gui_spells;
     const LVL_LIST = [1, 3, 6, 9, 12, 15, 18];
     const NAME = "Дарование";
     
@@ -17,6 +21,10 @@ function Mystic_Connection_t (gui_block){
             GUI_BLOCK.abi_list_block,
             true
         );
+        
+        for (let spell_lvl = 1; spell_lvl <= 6; spell_lvl++){ //TODO: magic
+            GUI_SPELLS.Set_Row_Const_State(spell_lvl, 0, true);
+        }
     }
 
 //public methods
@@ -108,15 +116,15 @@ function Class_Mystic_t (){
     ];
     const CLASS_ABILITY_LVLS = [1, 1, 1, 1, 2, 2, 3, 11, 19, 20];
     
-
+    //connection slots is included
     const SPELLS_KNOWN = [
         [ 1,  1,  1,  1,  2,  3], //0 lvl
-        [ 1,  1,  2,  3,  7, 11], //1 lvl
-        [ 4,  4,  5,  6, 10, 14], //2 lvl
-        [ 7,  7,  8,  9, 13, 17], //3 lvl
-        [10, 10, 11, 12, 16, 20], //4 lvl
-        [13, 13, 14, 15, 19    ], //5 lvl
-        [16, 16, 17, 18, 20    ]  //6 lvl
+        [ 1,  1,  1,  2,  3,  7, 11], //1 lvl
+        [ 4,  4,  4,  5,  6, 10, 14], //2 lvl
+        [ 7,  7,  7,  8,  9, 13, 17], //3 lvl
+        [10, 10, 10, 11, 12, 16, 20], //4 lvl
+        [13, 13, 13, 14, 15, 19    ], //5 lvl
+        [16, 16, 16, 17, 18, 20    ]  //6 lvl
     ];
 
     const RECALC_FUNC_ID = "MYSTIC_SPELL_DAILY";
@@ -207,7 +215,10 @@ function Class_Mystic_t (){
         layers.classes.Get_Block(CLASSES.MYSTIC).spells
     );
     //TODO: add spells by connection
-    this.connection = new Mystic_Connection_t(layers.classes.Get_Block(CLASSES.MYSTIC).connection);
+    this.connection = new Mystic_Connection_t(
+        layers.classes.Get_Block(CLASSES.MYSTIC).connection,
+        layers.classes.Get_Block(CLASSES.MYSTIC).spells
+    );
 
 //additional initialization
     Init();
