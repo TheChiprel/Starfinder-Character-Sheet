@@ -1,11 +1,23 @@
+function Connection_Spell_t (
+    entry_main,
+    entry_replace
+){
+//constants
+    this.entry_main = entry_main;
+    this.entry_replace = entry_replace;
+}
+
 function Mystic_Connection_t (
+    spells_obj,
     gui_block,
     gui_spells
 ){
 //constants
+    const SPELLS_OBJ = spells_obj;
     const GUI_BLOCK = gui_block;
     const GUI_SPELLS = gui_spells;
     const LVL_LIST = [1, 3, 6, 9, 12, 15, 18];
+    const CONNECTION_SPELL_LVLS = [1, 4, 7, 10, 13, 16];
     const NAME = "Дарование";
     
 //private methods
@@ -24,6 +36,98 @@ function Mystic_Connection_t (
         
         for (let spell_lvl = 1; spell_lvl <= 6; spell_lvl++){ //TODO: magic
             GUI_SPELLS.Set_Row_Const_State(spell_lvl, 0, true);
+        }
+    }
+    
+    //TODO: errors and warnings
+    //TODO: remake/remove later, when ability system is updated
+    var Set_Connection_Spells = function(descr){
+        let curr_lvl = 1;
+        Clear_Connection_Spells();
+        
+        while (curr_lvl <= 6){
+            let reg = RegExp("(?:" + curr_lvl + "-)([0-9])(?: – )(.+)(?:;)", 'g');
+            let pre_res = reg.exec(descr);
+            if (pre_res != null){
+                let next_lvl = pre_res[1];
+                let main_spell_entry = Get_Spell_Entry_By_Name(SPELLS_DATABASE, pre_res[2]);
+                if (main_spell_entry == null){
+                    console.error("Failed to find connection spell: " + pre_res[2]);
+                    curr_lvl = next_lvl + 1;
+                }
+                
+                for (; curr_lvl < next_lvl; curr_lvl++){
+                    if (curr_lvl < (next_lvl - 1)){
+                        reg = RegExp("(?:" + curr_lvl + " – )(.+)(?:, " + (curr_lvl + 1) + ")", 'g');
+                    }else{
+                        reg = RegExp("(?:" + curr_lvl + " – )(.+)(?:\.)", 'g');
+                    }
+                    let range_res = reg.exec(descr);
+                    if (range_res != null){
+                        let entry = Get_Spell_Entry_By_Name(SPELLS_DATABASE, range_res[1]);
+                        m_connection_spells[curr_lvl-1] = new Connection_Spell_t(main_spell_entry, entry);
+                        if ((m_curr_lvl < CONNECTION_SPELL_LVLS[curr_lvl]) || (entry == null)){
+                            SPELLS_OBJ.Set(curr_lvl, 0, main_spell_entry);
+                        }else{
+                            SPELLS_OBJ.Set(curr_lvl, 0, entry);
+                        }
+                    }
+                }
+                
+                m_connection_spells[curr_lvl-1] = Connection_Spell_t(main_spell_entry, null);
+                SPELLS_OBJ.Set(curr_lvl, 0, main_spell_entry);
+                curr_lvl++;
+                continue;
+            }
+            
+            if (curr_lvl < 6){
+                reg = RegExp("(?:" + curr_lvl + " – )(.+)(?:, " + (curr_lvl + 1) + ")", 'g');
+            }else{
+                reg = RegExp("(?:" + curr_lvl + " – )(.+)(?:\.)", 'g');
+            }
+            let res = reg.exec(descr);
+            if (res != null){
+                let entry = Get_Spell_Entry_By_Name(SPELLS_DATABASE, res[1]);
+                if (entry != null){
+                    m_connection_spells[curr_lvl-1] = new Connection_Spell_t(entry, null);
+                }
+                SPELLS_OBJ.Set(curr_lvl, 0, entry);
+            }
+            
+            curr_lvl++;
+        }
+    }
+    
+    var Update_Connection_Spells = function(previous_lvl){
+        if (self.current_spec == null){
+            return;
+        }
+        
+        for (let curr_lvl = 1; curr_lvl <= 5; curr_lvl++){
+            if (m_connection_spells[curr_lvl-1].entry_replace == null){
+                continue;
+            }
+            
+            if (
+                !(
+                    (previous_lvl < CONNECTION_SPELL_LVLS[curr_lvl]) ^
+                    (m_curr_lvl < CONNECTION_SPELL_LVLS[curr_lvl])
+                )
+            ){
+                continue;
+            }
+            
+            if (m_curr_lvl < previous_lvl){
+                SPELLS_OBJ.Set(curr_lvl, 0, m_connection_spells[curr_lvl-1].entry_main);
+            }else{
+                SPELLS_OBJ.Set(curr_lvl, 0, m_connection_spells[curr_lvl-1].entry_replace);
+            }
+        }
+    }
+    
+    var Clear_Connection_Spells = function(){
+        for (let curr_lvl = 1; curr_lvl <= 6; curr_lvl++){
+            spells_obj.Remove(curr_lvl, 0);
         }
     }
 
@@ -46,6 +150,8 @@ function Mystic_Connection_t (
             }
         });
         
+        Set_Connection_Spells(connection_entry.descr);
+        
         GUI_BLOCK.Set_Subclass(connection_entry.name);
     }
     
@@ -53,11 +159,15 @@ function Mystic_Connection_t (
         self.current_spec = null;
         m_abi_list.Clear();
         m_abi_list.Rename_List(NAME);
+        Clear_Connection_Spells();
         GUI_BLOCK.Remove_Subclass();
     }
     
     this.Update_Lvl = function(lvl){
-        m_abi_list.Update_Lvl(lvl);
+        let prev_lvl = m_curr_lvl;
+        m_curr_lvl = lvl;
+        m_abi_list.Update_Lvl(m_curr_lvl);
+        Update_Connection_Spells(prev_lvl);
     }
     
     this.Show_Descr = function(){
@@ -93,6 +203,8 @@ function Mystic_Connection_t (
 //private properties
     var self = this;
     var m_abi_list;
+    var m_curr_lvl = 0;
+    var m_connection_spells = new Array(6).fill(null); //TODO: magic
 
 //public properties
     this.current_spec = null;
@@ -118,7 +230,7 @@ function Class_Mystic_t (){
     
     //connection slots is included
     const SPELLS_KNOWN = [
-        [ 1,  1,  1,  1,  2,  3], //0 lvl
+        [ 1,  1,  1,  1,  2,  3],     //0 lvl
         [ 1,  1,  1,  2,  3,  7, 11], //1 lvl
         [ 4,  4,  4,  5,  6, 10, 14], //2 lvl
         [ 7,  7,  7,  8,  9, 13, 17], //3 lvl
@@ -216,6 +328,7 @@ function Class_Mystic_t (){
     );
     //TODO: add spells by connection
     this.connection = new Mystic_Connection_t(
+        self.spells,
         layers.classes.Get_Block(CLASSES.MYSTIC).connection,
         layers.classes.Get_Block(CLASSES.MYSTIC).spells
     );

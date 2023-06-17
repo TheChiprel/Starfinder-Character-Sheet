@@ -2511,7 +2511,7 @@ const ABILITIES_DATABASE = [
 },
 {
     name: "Эмпат",
-    descr: "Your connection helps you sense emotions and notice details others can\’t. You might be a diplomat, an investigator, a mind-reading bodyguard, a ship\’s psychologist, or a psychic con artist.\nAssociated Deities: Abadar, Hylax, Iomedae, Sarenrae, Talavet, Triune (Casandalee)\nНавыки: Внимание; Проницательность.\nЗаклинания: 1 – Обнаружение мыслей, 2 – Место истины, 3 – Яснослышание/ясновидение, 4 – Зондирование памяти, 5 – Телепатия, 6 – Истинное зрение.",
+    descr: "Your connection helps you sense emotions and notice details others can\’t. You might be a diplomat, an investigator, a mind-reading bodyguard, a ship\’s psychologist, or a psychic con artist.\nAssociated Deities: Abadar, Hylax, Iomedae, Sarenrae, Talavet, Triune (Casandalee)\nНавыки: Внимание; Проницательность.\nЗаклинания: 1 – Обнаружение мыслей, 2 – Место истины, 3 – Яснослышание/Ясновидение, 4 – Зондирование памяти, 5 – Телепатия, 6 – Истинное зрение.",
     lvl: 1,
     type: "Класс",
     subtype: "Мистик, Дарование",
