@@ -1,3 +1,78 @@
+function Drone_t(){
+//constants
+
+
+//private methods
+
+//public methods
+
+//private properties
+    var self = this;
+
+//public properties
+
+//additional initialization
+}
+
+function Exocortex_t(){
+//constants
+const ABILITY_LIST = [
+    ["Модуль памяти"],
+    ["Система отслеживания целей"],
+    ["Беспроводной взлом"],
+    ["Модификация экзокортекса"],
+    ["Двухпотоковое отслеживание"],
+    ["Многозадачность"],
+    ["Четырёхпотоковое отслеживание"]
+];
+const ABILITY_LVLS = [1, 1, 5, 7, 10, 15, 20];
+const MODS_LVLS = [7, 11, 14, 17];
+
+//private methods
+    var Init = function(){
+        let db = Ability_Database_GetList(ABILITIES_DATABASE, "Класс", ["Механик", "Способность экзокортекса"]);
+        for (let i = 0; i < ABILITY_LIST.length; i++){
+            if (ABILITY_LIST[i].length == 1){
+                let abi_name_full = ABILITY_LIST[i][0];
+                let [abi_name, abi_suffix] = Split_Ability_Name_Suffix(abi_name_full);
+                let abi_entry = Get_Ability_Entry_By_Name(db, abi_name);
+                self.abilities.Set(i, abi_entry, abi_suffix);
+            }else{
+                //TODO?
+            }
+        }
+    }
+
+//public methods
+    this.Set_Lvl = function(lvl){
+        self.lvl = lvl;
+    }
+
+//private properties
+    var self = this;
+
+//public properties
+    this.lvl = 0;
+    this.abilities = new Leveled_Ability_List_t(
+        "abi_exocortex",
+        "Способности экзокортекса",
+        ABILITY_LVLS,
+        "exocortex_",
+        layers.classes.Get_Block(CLASSES.MECHANIC).speciality.Get_Block("Экзокортекс").abilities,
+        true
+    );
+    // this.mods = new Leveled_Ability_List_t(
+        // "mods_exocortex",
+        // "Модификации экзокортекса",
+        // TRICKS_LVLS,
+        // "mechanic_tricks_",
+        // layers.classes.Get_Block(CLASSES.MECHANIC).speciality.Get_Block("Экзокортекс").mods
+    // );
+
+//additional initialization
+    Init();
+}
+
 function Mechanic_Speciality_t (
     selector_gui_block,
     main_gui_block
@@ -52,6 +127,8 @@ function Mechanic_Speciality_t (
 
 //public properties
     this.current_spec = null;
+    this.drone = new Drone_t();
+    this.exocortex = new Exocortex_t();
 
 //additional initialization
     Init();
