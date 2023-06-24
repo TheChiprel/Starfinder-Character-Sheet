@@ -1,3 +1,62 @@
+function Mechanic_Speciality_t (
+    selector_gui_block,
+    main_gui_block
+){
+//constants
+    const SELECTOR_GUI_BLOCK = selector_gui_block;
+    const MAIN_GUI_BLOCK = main_gui_block;
+    const LVL_LIST = [];
+    const NAME = "Искусственный интеллект";
+    
+//private methods
+    var Init = function(){
+        var db = Ability_Database_GetList(ABILITIES_DATABASE, "Класс", [CLASSES.MECHANIC, NAME]);
+        SELECTOR_GUI_BLOCK.Reset(self, NAME, LVL_LIST, db);
+        MAIN_GUI_BLOCK.Reset();
+    }
+
+//public methods
+    this.Set = function(spec_entry){
+        self.current_spec = spec_entry;
+        SELECTOR_GUI_BLOCK.Set_Subclass(spec_entry.name);
+        MAIN_GUI_BLOCK.Set(spec_entry.name);
+    }
+    
+    this.Clear = function(){
+        self.current_spec = null;
+        SELECTOR_GUI_BLOCK.Remove_Subclass();
+        MAIN_GUI_BLOCK.Clear();
+    }
+    
+    this.Update_Lvl = function(lvl){
+
+    }
+    
+    this.Show_Descr = function(){
+        if (self.current_spec != null){
+            Popup_Descr.Call(self.current_spec.name, self.current_spec.descr);
+        }
+    }
+    
+    this.Get_SaveData_Obj = function(){
+
+    }
+    
+    this.Load_From_Obj = function(obj){
+
+    }
+
+//private properties
+    var self = this;
+    var m_abi_list;
+
+//public properties
+    this.current_spec = null;
+
+//additional initialization
+    Init();
+}
+
 function Class_Mechanic_t (){
 const ABILITY_LIST = [
     ["Искусственный интеллект"],
@@ -69,13 +128,19 @@ const TRICKS_LVLS = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20];
         CLASS_ABILITY_LVLS,
         "mechanic_class_",
         layers.classes.Get_Block(CLASSES.MECHANIC).class_abilities,
-        true);
+        true
+    );
     this.tricks = new Leveled_Ability_List_t(
         "abi_class_mechanic_tricks",
         "Трюки механика",
         TRICKS_LVLS,
         "mechanic_tricks_",
-        layers.classes.Get_Block(CLASSES.MECHANIC).tricks);
+        layers.classes.Get_Block(CLASSES.MECHANIC).tricks
+    );
+    this.speciality = new Mechanic_Speciality_t(
+        layers.classes.Get_Block(CLASSES.MECHANIC).speciality_selector,
+        layers.classes.Get_Block(CLASSES.MECHANIC).speciality
+    );
 
 //additional initialization
     Init();
