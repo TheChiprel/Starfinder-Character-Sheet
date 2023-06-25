@@ -272,3 +272,11 @@ function HTML_Create_Table(
 function HTML_Table_Span(table, row, cell, span_value){
     //TODO
 }
+
+function HTML_Create_Div(class_elem = undefined){
+    var ret_elem = document.createElement('div');
+    if (class_elem != undefined){
+        ret_elem.setAttribute('class', class_elem);
+    }
+    return ret_elem;
+}

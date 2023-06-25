@@ -58,7 +58,7 @@ const MODS_LVLS = [7, 11, 14, 17];
         "Способности экзокортекса",
         ABILITY_LVLS,
         "exocortex_",
-        layers.classes.Get_Block(CLASSES.MECHANIC).speciality.Get_Block("Экзокортекс").abilities,
+        layers.classes.Get_Block(CLASSES.MECHANIC).speciality.exocortex.abilities,
         true
     );
     // this.mods = new Leveled_Ability_List_t(
@@ -66,7 +66,7 @@ const MODS_LVLS = [7, 11, 14, 17];
         // "Модификации экзокортекса",
         // TRICKS_LVLS,
         // "mechanic_tricks_",
-        // layers.classes.Get_Block(CLASSES.MECHANIC).speciality.Get_Block("Экзокортекс").mods
+        // layers.classes.Get_Block(CLASSES.MECHANIC).speciality.exocortex.mods
     // );
 
 //additional initialization
@@ -74,11 +74,9 @@ const MODS_LVLS = [7, 11, 14, 17];
 }
 
 function Mechanic_Speciality_t (
-    selector_gui_block,
     main_gui_block
 ){
 //constants
-    const SELECTOR_GUI_BLOCK = selector_gui_block;
     const MAIN_GUI_BLOCK = main_gui_block;
     const LVL_LIST = [];
     const NAME = "Искусственный интеллект";
@@ -86,21 +84,36 @@ function Mechanic_Speciality_t (
 //private methods
     var Init = function(){
         var db = Ability_Database_GetList(ABILITIES_DATABASE, "Класс", [CLASSES.MECHANIC, NAME]);
-        SELECTOR_GUI_BLOCK.Reset(self, NAME, LVL_LIST, db);
+        MAIN_GUI_BLOCK.main_ai_selector.Reset(self, NAME, LVL_LIST, db);
         MAIN_GUI_BLOCK.Reset();
     }
 
 //public methods
     this.Set = function(spec_entry){
         self.current_spec = spec_entry;
-        SELECTOR_GUI_BLOCK.Set_Subclass(spec_entry.name);
+        MAIN_GUI_BLOCK.main_ai_selector.Set_Subclass(spec_entry.name);
+        
+        switch(spec_entry.name){
+        case "Экзокортекс":
+            MAIN_GUI_BLOCK.exocortex.Show();
+            break;
+            
+        case "Дрон":
+            MAIN_GUI_BLOCK.drone.Show();
+            break;
+            
+        default:
+            console.error("Failed to set unknown mechanic speciality: " + spec_entry.name)
+            break;
+        
+        }
         MAIN_GUI_BLOCK.Set(spec_entry.name);
     }
     
     this.Clear = function(){
         self.current_spec = null;
-        SELECTOR_GUI_BLOCK.Remove_Subclass();
-        MAIN_GUI_BLOCK.Clear();
+        MAIN_GUI_BLOCK.Hide_All();
+        MAIN_GUI_BLOCK.main_ai_selector.Remove_Subclass();
     }
     
     this.Update_Lvl = function(lvl){
@@ -215,7 +228,6 @@ const TRICKS_LVLS = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20];
         layers.classes.Get_Block(CLASSES.MECHANIC).tricks
     );
     this.speciality = new Mechanic_Speciality_t(
-        layers.classes.Get_Block(CLASSES.MECHANIC).speciality_selector,
         layers.classes.Get_Block(CLASSES.MECHANIC).speciality
     );
 
