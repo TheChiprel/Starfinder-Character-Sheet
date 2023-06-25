@@ -29,8 +29,41 @@ function Block_Drone_t(){
 function Block_Exocortex_t(){
 //constants
     const GUI_BLOCK = document.getElementById("block_mechanic_exocortex");
+    const MOD_LIST = [
+        "Багажник",
+        "Водомёты",
+        "Гаффы",
+        "Место под улучшение брони",
+        "Обращение с высокотехнологичным оружием ближнего боя [Модификация дрона]",
+        "Обращение с тяжёлым оружием [Модификация дрона]",
+        "Потайной отсек",
+        "Прыжковые двигатели",
+        "Усиленное восприятие",
+        "Ускоритель",
+        "Устойчивость",
+        "Адаптивный камуфляж",
+        "Летательная установка",
+        "Поле невидимости",
+        "Устойчивость+",
+        "Экскаватор",
+        "Эхолокаторы"
+    ];
 
 //private methods
+    var Get_Mod_DB = function(){
+        const FIRST_MOD_LVL = 7;
+        
+        var db = Ability_Database_GetList(ABILITIES_DATABASE, "Класс", ["Механик", "Модификация дрона"], undefined, 20, true);
+        
+        for (let i = db.length - 1; i >= 0; i--){
+            if (!MOD_LIST.includes(db[i].name)){
+                db.splice(i, 1);
+            }else if (db[i].lvl == 1){
+                db[i].lvl = FIRST_MOD_LVL;
+            }
+        }
+        return db;
+    }
 
 //public methods
     this.Reset = function(){
@@ -52,6 +85,10 @@ function Block_Exocortex_t(){
     this.abilities = new Block_Ability_List_t(
         document.getElementById('table_abilities_exocortex'),
         null
+    );
+    this.mods = new Block_Ability_List_t(
+        document.getElementById('table_exocortex_mods'),
+        Get_Mod_DB()
     );
 
 //additional initialization

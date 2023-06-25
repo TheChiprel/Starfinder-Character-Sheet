@@ -20,12 +20,30 @@ function Drone_t(gui_block, set_gui_lvl_func){
         }else{
             GUI_BLOCK.Hide();
         }
+        
         SET_GUI_LVL_FUNC(lvl);
     }
+    
+    this.Get_SaveData_Obj = function(){
+        var ret = {
+            lvl: self.lvl
+        }
+        return ret;
+    }
+    
+    this.Load_From_Obj = function(obj){
+        if (obj == undefined){
+            return;
+        }
+        
+        self.Update_Lvl(obj.lvl);
+    }
+    
 //private properties
     var self = this;
 
 //public properties
+    this.lvl = 0;
 
 //additional initialization
     Init();
@@ -76,7 +94,27 @@ function Exocortex_t(gui_block, set_gui_lvl_func){
         }else{
             GUI_BLOCK.Hide();
         }
+        
+        self.abilities.Update_Lvl(self.lvl);
         SET_GUI_LVL_FUNC(lvl);
+    }
+    
+    this.Get_SaveData_Obj = function(){
+        var ret = {
+            lvl: self.lvl,
+            mods: self.mods.Get_SaveData_Obj()
+        };
+        
+        return ret;
+    }
+    
+    this.Load_From_Obj = function(obj){
+        if (obj == undefined){
+            return;
+        }
+        
+        self.Update_Lvl(obj.lvl);
+        self.mods.Load_From_Obj(obj.mods);
     }
 
 //private properties
@@ -92,13 +130,14 @@ function Exocortex_t(gui_block, set_gui_lvl_func){
         layers.classes.Get_Block(CLASSES.MECHANIC).speciality.exocortex.abilities,
         true
     );
-    // this.mods = new Leveled_Ability_List_t(
-        // "mods_exocortex",
-        // "Модификации экзокортекса",
-        // TRICKS_LVLS,
-        // "mechanic_tricks_",
-        // layers.classes.Get_Block(CLASSES.MECHANIC).speciality.exocortex.mods
-    // );
+    
+    this.mods = new Leveled_Ability_List_t(
+        "mods_exocortex",
+        "Модификации экзокортекса",
+        MODS_LVLS,
+        "mods_exocortex_",
+        layers.classes.Get_Block(CLASSES.MECHANIC).speciality.exocortex.mods
+    );
 
 //additional initialization
     Init();
@@ -173,6 +212,7 @@ function Mechanic_Speciality_t (
         if (m_lvl == lvl){
             return;
         }
+        
         let prev_lvl = m_lvl;
         m_lvl = lvl;
         
@@ -244,16 +284,45 @@ function Mechanic_Speciality_t (
     }
     
     this.Get_SaveData_Obj = function(){
-
+        var ret = {
+            main: null,
+            drone: self.drone.Get_SaveData_Obj(),
+            exocortex: self.exocortex.Get_SaveData_Obj()
+        }
+        if (self.current_main_spec != null){
+            ret.main = self.current_main_spec.name;
+        }
+        return ret; 
     }
     
     this.Load_From_Obj = function(obj){
-
+        if (obj == undefined){
+            return;
+        }
+        
+        if (obj.main != null){
+            let spec_entry = Get_Ability_Entry_By_Name(
+                Ability_Database_GetList(ABILITIES_DATABASE, "Класс", ["Механик", NAME]),
+                obj.main
+            );
+            if (spec_entry == null){
+                console.error("Failed to set unknown mechanic speciality: " + obj.main);
+            }
+            self.Set(spec_entry);
+        }
+        
+        self.drone.Load_From_Obj(obj.drone);
+        self.exocortex.Load_From_Obj(obj.exocortex);
+        
+        //TODO: stub! need a solution!
+        m_lvl = obj.drone.lvl + obj.exocortex.lvl;
+        if (m_lvl >= CONTROL_NET_LVL){
+            MAIN_GUI_BLOCK.ai_lvl_selector.Show();
+        }
     }
 
 //private properties
     var self = this;
-    var m_abi_list;
     var m_lvl = 0;
 
 //public properties
@@ -319,7 +388,8 @@ const TRICKS_LVLS = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20];
     this.Get_SaveData_Obj = function(){
         var ret = {
             lvl: self.lvl,
-            tricks: self.tricks.Get_SaveData_Obj()
+            tricks: self.tricks.Get_SaveData_Obj(),
+            speciality: self.speciality.Get_SaveData_Obj()
         }
         return ret;
     }
@@ -330,6 +400,7 @@ const TRICKS_LVLS = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20];
         }
         
         self.tricks.Load_From_Obj(obj.tricks);
+        self.speciality.Load_From_Obj(obj.speciality);
     }
 
 //private properties
