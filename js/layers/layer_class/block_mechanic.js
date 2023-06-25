@@ -6,7 +6,7 @@ function Block_Drone_t(){
 
 //public methods
     this.Reset = function(){
-        self.Clear();
+        self.Hide();
     }
 
     this.Show = function(spec){
@@ -34,7 +34,7 @@ function Block_Exocortex_t(){
 
 //public methods
     this.Reset = function(){
-        self.Clear();
+        self.Hide();
     }
 
     this.Show = function(){
@@ -92,20 +92,35 @@ function Block_AI_Level_t(div_block){
     }
     
     var Proc_Incr_Exocortex_Event = function(){
-        if (owner == null){
+        if (m_owner == null){
             return;
         }
+        
+        m_owner.Increase_Exocortex_Lvl();
     }
     
     var Proc_Incr_Drone_Event = function(){
-        if (owner == null){
+        if (m_owner == null){
             return;
         }
+        
+        m_owner.Increase_Drone_Lvl();
     }
 
 //public methods
     this.Reset = function(owner){
-        
+        m_owner = owner;
+        self.Hide();
+        self.Set_Drone_Lvl(0);
+        self.Set_Exocortex_Lvl(0);
+    }
+    
+    this.Set_Drone_Lvl = function(value){
+        m_outfield_drone.value = value;
+    }
+    
+    this.Set_Exocortex_Lvl = function(value){
+        m_outfield_exocortex.value = value;
     }
     
     this.Show = function(){
