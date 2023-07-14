@@ -2,7 +2,12 @@ function HTML_Create_BR(){
     return document.createElement("br");
 }
 
-function HTML_Create_Output(value, onclick_elem = undefined, id = undefined, class_elem = undefined){
+function HTML_Create_Output(
+    value,
+    onclick_elem = undefined,
+    id = undefined,
+    class_elem = undefined
+){
     var ret_elem = document.createElement("output");
         ret_elem.classList.add = 'class_output_field';
         ret_elem.value = value;
@@ -56,8 +61,8 @@ function HTML_Create_Button(
     onclick_elem = undefined,
     id = undefined,
     class_elem = undefined,
-    name = undefined)
-    {
+    name = undefined
+){
     var ret_elem = document.createElement("input");
     ret_elem.type = "button";
     ret_elem.value = display_text;

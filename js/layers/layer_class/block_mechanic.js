@@ -1,3 +1,44 @@
+function Block_Drone_Chassis_t(){
+//constants
+    const GUI_BLOCK = document.getElementById("block_drone_chassis");
+
+//private methods
+    var Init = function(){
+        const ABISCORE_ARR = Object.values(ABISCORES);
+        
+        //clear div
+        GUI_BLOCK.innerHTML = "Корпус";
+        
+        //create and fill table
+        m_outfield = HTML_Create_Output(
+            "Не выбрано",
+            undefined, //TODO: onclick event
+            undefined,
+            "class_output_field"
+        );
+        m_add_remove_button = HTML_Create_Button(
+            "+",
+            undefined //TODO: onclick event
+        );
+        
+        GUI_BLOCK.appendChild(HTML_Create_BR());
+        GUI_BLOCK.appendChild(m_outfield);
+        GUI_BLOCK.appendChild(m_add_remove_button);
+    }
+
+//public methods
+
+//private properties
+    var self = this;
+    var m_outfield;
+    var m_add_remove_button;
+
+//public properties
+
+//additional initialization
+    Init();
+}
+
 function Block_Drone_Abiscores_t(){
 //constants
     const GUI_BLOCK = document.getElementById("block_drone_abiscores");
@@ -109,10 +150,36 @@ function Block_Drone_t(){
     var self = this;
 
 //public properties
+    this.chassis = new Block_Drone_Chassis_t();
+    this.feats = new Block_Ability_List_t(
+        document.getElementById('table_drone_feats'),
+        Ability_Database_GetList(
+            ABILITIES_DATABASE,
+            "Черта",
+            ["Черта дрона"],
+            undefined,
+            undefined,
+            true
+        )
+    );
+    this.mods = new Block_Ability_List_t(
+        document.getElementById('table_drone_mods'),
+        Ability_Database_GetList(
+            ABILITIES_DATABASE,
+            "Класс",
+            ["Механик", "Дрон", "Модификация дрона"],
+            undefined,
+            20,
+            true
+        )
+    );
     this.abiscores = new Block_Drone_Abiscores_t();
     this.skills = new Block_Drone_Skills_t();
 
 //additional initialization
+    //TODO: below is just test, remove
+    //this.feats.Reset(null, "Черты дрона", [1, 3, 6, 9, 11, 14, 17, 19]);
+    //this.mods.Reset(null, "Модификации дрона", [1, 3, 5, 7, 9, 11, 13, 15, 17, 19]);
 }
 
 function Block_Exocortex_t(){
