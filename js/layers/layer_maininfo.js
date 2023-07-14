@@ -1,3 +1,313 @@
+//TODO: move GUI elements to separate file?
+
+//TODO: check numerical values, cancel invalids
+function GUI_Element_InField_t(is_numerical = false){
+//constants
+
+//private methods
+    var Event_OnChange = function(event){
+        if ((m_owner == null) || (m_owner.Set == undefined)){
+            return;
+        }
+        
+        m_owner.Set(event.target.value);
+    }
+
+//public methods
+    this.Reset = function(owner){
+        m_owner = owner;
+        self.Set_Value("");
+    }
+
+    this.Set_Value = function(value){
+        self.html_element.value = value;
+    }
+
+//private properties
+    var self = this;
+    var m_owner = null;
+
+//public properties
+    this.html_element = HTML_Create_Input_Text(
+        "",
+        Event_OnChange
+    );
+
+//additional initialization
+}
+
+function GUI_Element_OutField_t(){
+//constants
+
+//private methods
+    var Event_OnClick = function(){
+        if (m_onclick_func == null){
+            return;
+        }
+        
+        m_onclick_func();
+    }
+
+//public methods
+    this.Reset = function(owner, onclick_func){
+        m_owner = owner;
+        m_onclick_func = onclick_func;
+        self.Set_Value("");
+    }
+
+    this.Set_Value = function(value){
+        self.html_element.value = value;
+    }
+
+//private properties
+    var self = this;
+    var m_owner = null;
+    var m_onclick_func = null;
+
+//public properties
+    this.html_element = HTML_Create_Output(
+        "",
+        Event_OnClick,
+        undefined,
+        "class_output_field"
+    );
+
+//additional initialization
+}
+
+function GUI_Element_Selector_t(option_list){
+//constants
+
+//private methods
+    var Event_OnChange = function(){
+        if ((m_owner == null) || (m_owner.Set == undefined)){
+            return;
+        }
+        
+        m_owner.Set(event.target.value);
+    }
+
+//public methods
+    this.Reset = function(owner){
+        m_owner = owner;
+    }
+
+    this.Set_Value = function(value){
+        self.html_element.value = value;
+    }
+
+//private properties
+    var self = this;
+    var m_owner = null;
+
+//public properties
+    this.html_element = HTML_Create_Selector(
+        false,
+        option_list,
+        Event_OnChange
+    );
+
+//additional initialization
+}
+
+function Block_MainInfo_Main_t(){
+//constants
+    const GUI_BLOCK = document.getElementById("block_maininfo_main");
+
+//private methods
+    var Get_Race_List = function(){
+        var list = new Array(0);
+        
+        list.push("---");
+        RACE_DATABASE.forEach(entry => {
+            list.push(entry.name);
+        });
+        return list;
+    }
+    
+    var Get_Theme_List = function(){
+        var list = new Array(0);
+        
+        list.push("---");
+        THEME_DATABASE.forEach(entry => {
+            list.push(entry.name);
+        });
+        return list;
+    }
+
+    var Init = function(){
+        var label_name = HTML_Create_Label(
+            "Имя:",
+            undefined //TODO
+        );
+        var label_race = HTML_Create_Label(
+            "Раса:",
+            undefined //TODO
+        );
+        var label_theme = HTML_Create_Label(
+            "Тема:",
+            undefined //TODO
+        );
+        var label_size = HTML_Create_Label(
+            "Размер:",
+            undefined //TODO
+        );
+        var label_category = HTML_Create_Label(
+            "Тип:",
+            undefined //TODO
+        );
+        
+        GUI_BLOCK.innerHTML = "";
+        
+        GUI_BLOCK.appendChild(label_name);
+        GUI_BLOCK.appendChild(HTML_Create_BR());
+        GUI_BLOCK.appendChild(self.infield_name.html_element);
+        GUI_BLOCK.appendChild(HTML_Create_BR());
+        
+        GUI_BLOCK.appendChild(label_race);
+        GUI_BLOCK.appendChild(HTML_Create_BR());
+        GUI_BLOCK.appendChild(self.selector_race.html_element);
+        GUI_BLOCK.appendChild(HTML_Create_BR());
+        
+        GUI_BLOCK.appendChild(label_theme);
+        GUI_BLOCK.appendChild(HTML_Create_BR());
+        GUI_BLOCK.appendChild(self.selector_theme.html_element);
+        GUI_BLOCK.appendChild(HTML_Create_BR());
+        
+        GUI_BLOCK.appendChild(label_size);
+        GUI_BLOCK.appendChild(HTML_Create_BR());
+        GUI_BLOCK.appendChild(self.outfield_size.html_element);
+        GUI_BLOCK.appendChild(HTML_Create_BR());
+        
+        GUI_BLOCK.appendChild(label_category);
+        GUI_BLOCK.appendChild(HTML_Create_BR());
+        GUI_BLOCK.appendChild(self.outfield_category.html_element);
+    }
+    
+//public methods
+
+
+//private properties
+    var self = this;
+    
+    var m_owner = null;
+
+//public properties
+    this.infield_name = new GUI_Element_InField_t();
+    this.selector_race = new GUI_Element_Selector_t(Get_Race_List());
+    this.selector_theme = new GUI_Element_Selector_t(Get_Theme_List());
+    this.outfield_size = new GUI_Element_OutField_t();
+    this.outfield_category = new GUI_Element_OutField_t();
+
+//additional initialization
+    Init();
+}
+
+function Block_MainInfo_Numbers_t(){
+//constants
+
+//private methods
+
+//public methods
+
+//private properties
+    var self = this;
+
+//public properties
+
+//additional initialization
+}
+
+function Block_MainInfo_Classes_t(){
+//constants
+
+//private methods
+
+//public methods
+
+//private properties
+    var self = this;
+
+//public properties
+
+//additional initialization
+}
+
+function Block_MainInfo_Proficiency_t(){
+//constants
+
+//private methods
+
+//public methods
+
+//private properties
+    var self = this;
+
+//public properties
+
+//additional initialization
+}
+
+function Block_MainInfo_Attack_t(){
+//constants
+
+//private methods
+
+//public methods
+
+//private properties
+    var self = this;
+
+//public properties
+
+//additional initialization
+}
+
+function Block_MainInfo_Defense_t(){
+//constants
+
+//private methods
+
+//public methods
+
+//private properties
+    var self = this;
+
+//public properties
+
+//additional initialization
+}
+
+function Block_MainInfo_Speed_t(){
+//constants
+
+//private methods
+
+//public methods
+
+//private properties
+    var self = this;
+
+//public properties
+
+//additional initialization
+}
+
+function Block_MainInfo_Saves_t(){
+//constants
+
+//private methods
+
+//public methods
+
+//private properties
+    var self = this;
+
+//public properties
+
+//additional initialization
+}
+
 function Layer_MainInfo_t(){
 //private methods
     var Init_Proficiency_HTML = function(){
@@ -192,6 +502,14 @@ function Layer_MainInfo_t(){
     var m_class_table = document.getElementById("table_classes_lvl");
 
 //public properties
+    this.main = new Block_MainInfo_Main_t();
+    this.numbers = new Block_MainInfo_Numbers_t();
+    this.classes = new Block_MainInfo_Classes_t();
+    this.proficiency = new Block_MainInfo_Proficiency_t();
+    this.attack = new Block_MainInfo_Attack_t();
+    this.defense = new Block_MainInfo_Defense_t();
+    this.speed = new Block_MainInfo_Speed_t();
+    this.saves = new Block_MainInfo_Saves_t();
 
 //additional initialization
 }

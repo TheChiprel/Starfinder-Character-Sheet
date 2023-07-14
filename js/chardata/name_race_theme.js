@@ -1,22 +1,16 @@
-//TODO: In all functions change to classes instead of IDs?
-function Name_t(){
+function Name_t(gui_block){
 //constants
-    const INFIELD = document.getElementById("infield_charname");
+    const GUI_BLOCK = gui_block;
     
 //private methods
     var Init = function(){
-        INFIELD.value = self.value;
-        INFIELD.onchange = Proc_OnChange_Event;
-    }
-    
-    var Proc_OnChange_Event = function(event){
-        self.Set(event.target.value);
+        GUI_BLOCK.Reset(self);
     }
 
 //public methods
     this.Set = function(new_name){
         self.value = new_name;
-        INFIELD.value = new_name;
+        GUI_BLOCK.Set_Value(self.value);
     }
     
     this.Get_SaveData_Obj = function(){
@@ -39,30 +33,21 @@ function Name_t(){
     Init();
 }
 
-function Race_t(){
+function Race_t(
+    gui_block_race,
+    gui_block_size,
+    gui_block_type
+){
 //constants
-    const SELECTOR_RACE = document.getElementById("selector_race");
-    const OUTFIELD_SIZE = document.getElementById("outfield_size");
-    const OUTFIELD_TYPE = document.getElementById("outfield_race_type");
+    const GUI_BLOCK_RACE = gui_block_race;
+    const GUI_BLOCK_SIZE = gui_block_size;
+    const GUI_BLOCK_TYPE = gui_block_type;
     
 //private methods
     var Init = function(){
-        HTML_Selector_Clear_Options(SELECTOR_RACE);
-
-        HTML_Selector_Add_Option(SELECTOR_RACE, "---");
-
-        RACE_DATABASE.forEach(race_entry => {
-            HTML_Selector_Add_Option(SELECTOR_RACE, race_entry.name);
-        });
-        SELECTOR_RACE.onchange = Proc_OnChange_Event;
-        
-        SELECTOR_RACE.value = "---";
-        OUTFIELD_SIZE.value = "---";
-        OUTFIELD_TYPE.value = "---";
-    }
-    
-    var Proc_OnChange_Event = function(event){
-        self.Set(event.target.value);
+        GUI_BLOCK_RACE.Reset(self);
+        GUI_BLOCK_SIZE.Reset(self);
+        GUI_BLOCK_TYPE.Reset(self);
     }
     
     var Get_Entry_By_Name = function(name){
@@ -94,9 +79,9 @@ function Race_t(){
         
         chardata.abilities.race.Clear();
         if (m_entry != null){
-            SELECTOR_RACE.value = m_entry.name;
-            OUTFIELD_SIZE.value = m_entry.size;
-            OUTFIELD_TYPE.value = m_entry.type;
+            GUI_BLOCK_RACE.Set_Value(m_entry.name);
+            GUI_BLOCK_SIZE.Set_Value(m_entry.size);
+            GUI_BLOCK_TYPE.Set_Value(m_entry.type);
             
             chardata.stats.abiscores.values.SetRaceValues(m_entry.abiscores, m_entry.plus2);
             chardata.stats.speeds.land.Set_Base_Value(m_entry.speed, m_entry.name);
@@ -104,9 +89,9 @@ function Race_t(){
             chardata.abilities.race.Rename_List("Способности расы (" + m_entry.name + ")");
             Set_Abilities(m_entry.abilities);
         }else{
-            SELECTOR_RACE.value = "---";
-            OUTFIELD_SIZE.value = "---";
-            OUTFIELD_TYPE.value = "---";
+            GUI_BLOCK_RACE.Set_Value("---");
+            GUI_BLOCK_SIZE.Set_Value("---");
+            GUI_BLOCK_TYPE.Set_Value("---");
             
             chardata.stats.abiscores.values.SetRaceValues([0, 0, 0, 0, 0, 0], false);
             chardata.stats.speeds.land.Set_Base_Value(0, null);
@@ -139,26 +124,13 @@ function Race_t(){
 }
 
 
-function Theme_t(){
+function Theme_t(gui_block){
 //constants
-    const SELECTOR_THEME = document.getElementById("selector_theme");
+    const GUI_BLOCK = gui_block;
     
 //private methods
     var Init = function(){
-        HTML_Selector_Clear_Options(SELECTOR_THEME);
-
-        HTML_Selector_Add_Option(SELECTOR_THEME, "---");
-
-        for (let i = 0; i < THEME_DATABASE.length; i++){
-            HTML_Selector_Add_Option(SELECTOR_THEME, THEME_DATABASE[i].name);
-        }
-        SELECTOR_THEME.onchange = Proc_OnChange_Event;
-        
-        SELECTOR_THEME.value = "---";
-    }
-    
-    var Proc_OnChange_Event = function(event){
-        self.Set(event.target.value);
+        GUI_BLOCK.Reset(self);
     }
     
     var Get_Entry_By_Name = function(name){
@@ -191,12 +163,12 @@ function Theme_t(){
         
         chardata.abilities.theme.Clear();
         if (m_entry != null){
-            SELECTOR_THEME.value = m_entry.name;
+            GUI_BLOCK.Set_Value(m_entry.name);
             chardata.abilities.theme.Rename_List("Способности темы (" + m_entry.name + ")");
             Set_Abilities(m_entry.abilities);
             chardata.stats.abiscores.values.SetThemeValue(m_entry.abiscore);
         }else{
-            SELECTOR_THEME.value = "---";
+            GUI_BLOCK.Set_Value("---");
             chardata.abilities.theme.Rename_List("Способности темы");
             chardata.stats.abiscores.values.SetThemeValue(null);
         }

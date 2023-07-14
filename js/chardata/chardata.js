@@ -3,9 +3,13 @@ function Chardata_t(){
 
 //public methods
     this.Reset = function(){
-        self.name = new Name_t();
-        self.race = new Race_t();
-        self.theme = new Theme_t();
+        self.name = new Name_t(layers.maininfo.main.infield_name);
+        self.race = new Race_t(
+            layers.maininfo.main.selector_race,
+            layers.maininfo.main.outfield_size,
+            layers.maininfo.main.outfield_category
+        );
+        self.theme = new Theme_t(layers.maininfo.main.selector_theme);
         self.abilities = new Chardata_Abilities_t();
         self.classes = new Class_Collection_t();
         self.lvl = new Level_t();

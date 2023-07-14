@@ -9,7 +9,7 @@ function HTML_Create_Output(
     class_elem = undefined
 ){
     var ret_elem = document.createElement("output");
-        ret_elem.classList.add = 'class_output_field';
+        ret_elem.classList.add = 'class_output_field';//TODO: why is it here?
         ret_elem.value = value;
 
     if (onclick_elem != undefined){
@@ -34,7 +34,12 @@ function HTML_Create_Output(
     return ret_elem;
 }
 
-function HTML_Create_Label(display_text, for_elem = undefined, id = undefined, class_elem = undefined){
+function HTML_Create_Label(
+    display_text,
+    for_elem = undefined,
+    id = undefined,
+    class_elem = undefined
+){
     var ret_elem = document.createElement("label");
     ret_elem.innerHTML = display_text;
 
@@ -94,7 +99,12 @@ function HTML_Create_Button(
     return ret_elem;
 }
 
-function HTML_Create_Input_Text(value = "", onchange_elem = undefined, id = undefined, class_elem = undefined){
+function HTML_Create_Input_Text(
+    value = "",
+    onchange_elem = undefined,
+    id = undefined,
+    class_elem = undefined
+){
     var ret_elem = document.createElement("input");
     ret_elem.type = 'text';
     ret_elem.value = value;
@@ -199,7 +209,13 @@ function HTML_Selector_Clear_Options(selector){
     }
 }
 
-function HTML_Create_Selector(null_option = false, list = undefined, onchange_elem = undefined, id = undefined, class_elem = undefined){
+function HTML_Create_Selector(
+    null_option = false,
+    list = undefined,
+    onchange_elem = undefined,
+    id = undefined,
+    class_elem = undefined
+){
     var ret_elem = document.createElement("select");
 
     if (null_option){
