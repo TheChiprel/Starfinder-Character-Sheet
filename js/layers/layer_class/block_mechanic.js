@@ -1,3 +1,91 @@
+function Block_Drone_Abiscores_t(){
+//constants
+    const GUI_BLOCK = document.getElementById("block_drone_abiscores");
+
+//private methods
+    var Init = function(){
+        const ABISCORE_ARR = Object.values(ABISCORES);
+        
+        //clear div
+        GUI_BLOCK.innerHTML = "";
+        
+        //create and fill table
+        m_table = HTML_Create_Table(
+            ABISCORE_ARR.length + 1,
+            3,
+            true,
+            "100%",
+            ["50%", "25%", "25%"]
+        );
+        
+        m_table.rows[0].cells[0].innerHTML = "Хар-ки";
+        m_table.rows[0].cells[1].innerHTML = "Значение";
+        m_table.rows[0].cells[2].innerHTML = "Мод.";
+        for (let i = 0; i < ABISCORE_ARR.length; i++){
+            let row = m_table.rows[i+1];
+            row.cells[0].innerHTML = ABISCORE_ARR[i];
+            row.cells[1].innerHTML = 10;
+            row.cells[2].innerHTML = 0;
+        }
+        
+        GUI_BLOCK.appendChild(m_table);
+    }
+
+//public methods
+
+//private properties
+    var self = this;
+    var m_table;
+
+//public properties
+
+//additional initialization
+    Init();
+}
+
+function Block_Drone_Skills_t(){
+//constants
+    const GUI_BLOCK = document.getElementById("block_drone_skills");
+
+//private methods
+    var Init = function(){
+        const SKILLS_ARR = Object.values(SKILLS);
+        
+        //clear div
+        GUI_BLOCK.innerHTML = "";
+        
+        //create and fill table
+        m_table = HTML_Create_Table(
+            SKILLS_ARR.length + 1,
+            2,
+            true,
+            "100%",
+            ["75%", "25%"]
+        );
+        
+        m_table.rows[0].cells[0].innerHTML = "Навыки";
+        m_table.rows[0].cells[1].innerHTML = "Значение";
+        for (let i = 0; i < SKILLS_ARR.length; i++){
+            let row = m_table.rows[i+1];
+            row.cells[0].innerHTML = SKILLS_ARR[i];
+            row.cells[1].innerHTML = 0;
+        }
+        
+        GUI_BLOCK.appendChild(m_table);
+    }
+
+//public methods
+
+//private properties
+    var self = this;
+    var m_table;
+
+//public properties
+
+//additional initialization
+    Init();
+}
+
 function Block_Drone_t(){
 //constants
     const GUI_BLOCK = document.getElementById("block_mechanic_drone");
@@ -21,7 +109,8 @@ function Block_Drone_t(){
     var self = this;
 
 //public properties
-    
+    this.abiscores = new Block_Drone_Abiscores_t();
+    this.skills = new Block_Drone_Skills_t();
 
 //additional initialization
 }
