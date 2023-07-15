@@ -11,7 +11,7 @@ function Initative_t(
         }
     );
     const GUI_ELEMENT_MAIN = gui_element_main;
-    //const GUI_ELEMENT_FACE = gui_element_face; //TODO
+    const GUI_ELEMENT_FACE = gui_element_face; //TODO
 
 //private methods
     var Init = function(){
@@ -20,7 +20,7 @@ function Initative_t(
             new Modifier_t(0, ABISCORES.AGI));
             
         GUI_ELEMENT_MAIN.Reset(self, self.Show_Detail_Popup);
-        //GUI_ELEMENT_FACE.Reset(self, self.Show_Detail_Popup);
+        GUI_ELEMENT_FACE.Reset(self, self.Show_Detail_Popup);
         Set_Field_Values();
     }
 
@@ -28,7 +28,7 @@ function Initative_t(
         let str = GetModifierStr(self.sum);
 
         GUI_ELEMENT_MAIN.Set_Value(str);
-        //GUI_ELEMENT_FACE.Set_Value(str);
+        GUI_ELEMENT_FACE.Set_Value(str);
     }
 
     var Update_Mod_Map = function(){
@@ -81,7 +81,7 @@ function Health_t(
     );
     
     const GUI_ELEMENT_MAIN = gui_element_main;
-    //const GUI_ELEMENT_FACE = gui_element_face; //TODO
+    const GUI_ELEMENT_FACE = gui_element_face; //TODO
 
 //private methods
     var Init = function(){
@@ -96,7 +96,7 @@ function Health_t(
         });
         
         GUI_ELEMENT_MAIN.Reset(self, self.Show_Detail_Popup);
-        //GUI_ELEMENT_FACE.Reset(self, self.Show_Detail_Popup);
+        GUI_ELEMENT_FACE.Reset(self, self.Show_Detail_Popup);
         Set_Field_Values();
     }
 
@@ -171,7 +171,7 @@ function Stamina_t(
     }
 );
     const GUI_ELEMENT_MAIN = gui_element_main;
-    //const GUI_ELEMENT_FACE = gui_element_face; //TODO
+    const GUI_ELEMENT_FACE = gui_element_face; //TODO
 
 //private methods
     var Init = function(){
@@ -186,13 +186,13 @@ function Stamina_t(
         });
         
         GUI_ELEMENT_MAIN.Reset(self, self.Show_Detail_Popup);
-        //GUI_ELEMENT_FACE.Reset(self, self.Show_Detail_Popup);
+        GUI_ELEMENT_FACE.Reset(self, self.Show_Detail_Popup);
         Set_Field_Values();
     }
 
     var Set_Field_Values = function(){
         GUI_ELEMENT_MAIN.Set_Value(self.sum);
-        //GUI_ELEMENT_FACE.Set_Value(self.sum);
+        GUI_ELEMENT_FACE.Set_Value(self.sum);
     }
 
 //private methods
@@ -254,7 +254,7 @@ function Resolve_t(
         }
     );
     const GUI_ELEMENT_MAIN = gui_element_main;
-    //const GUI_ELEMENT_FACE = gui_element_face; //TODO
+    const GUI_ELEMENT_FACE = gui_element_face; //TODO
 
 //private methods
     var Init = function(){
@@ -269,14 +269,14 @@ function Resolve_t(
             new Modifier_t(1, "Минимальное значение", null, MODIFIER_TYPES_T.MIN_VALUE));
             
         GUI_ELEMENT_MAIN.Reset(self, self.Show_Detail_Popup);
-        //GUI_ELEMENT_FACE.Reset(self, self.Show_Detail_Popup);
+        GUI_ELEMENT_FACE.Reset(self, self.Show_Detail_Popup);
         Set_Field_Values();
     }
     
     var Set_Field_Values = function(){
         let str = is_Calculated ? self.sum : "Нет";
         GUI_ELEMENT_MAIN.Set_Value(str);
-        //GUI_ELEMENT_FACESet_Value(str);
+        GUI_ELEMENT_FACE.Set_Value(str);
     }
 
     var Update_Mod_Map = function(){
@@ -494,14 +494,14 @@ function Attack_Type_t (
             new Modifier_t(0, "БМА"));
             
         GUI_ELEMENT_MAIN.Reset(self, self.Show_Detail_Popup);
-        //GUI_ELEMENT_FACE.Reset(self, self.Show_Detail_Popup);
+        GUI_ELEMENT_FACE.Reset(self, self.Show_Detail_Popup);
         Set_Field_Values();
     }
     
     var Set_Field_Values = function(){
         let str = GetModifierStr(self.sum);
         GUI_ELEMENT_MAIN.Set_Value(str);
-        //GUI_ELEMENT_FACE.Set_Value(str);
+        GUI_ELEMENT_FACE.Set_Value(str);
     }
 
     var Update_Mod_Map = function(){
@@ -625,7 +625,11 @@ function Attacks_t (){
     );
 }
 
-function AC_t (name, out_field_class){
+function AC_t (
+    name,
+    gui_element_main,
+    gui_element_face
+){
 //constants
     const BASIC_MOD_ID_T = Object.freeze(
         {
@@ -635,17 +639,11 @@ function AC_t (name, out_field_class){
             "ARMOR_PROF": 'ARMOR_PROF'
         }
     );
-    const OUTFIELD_CLASS_NAME = out_field_class;
+    const GUI_ELEMENT_MAIN = gui_element_main;
+    const GUI_ELEMENT_FACE = gui_element_face;
 
 //private methods
     var Init = function(){
-        let elems = document.getElementsByClassName(OUTFIELD_CLASS_NAME);
-        for (let i = 0; i < elems.length; i++){
-            elems[i].onclick = self.Show_Detail_Popup;
-        }
-        
-        Set_Field_Values();
-
         self.modifier_map.Add(
             BASIC_MOD_ID_T.BASE_VALUE,
             new Modifier_t(10, "Начальное значение"));
@@ -658,13 +656,15 @@ function AC_t (name, out_field_class){
         self.modifier_map.Add(
             BASIC_MOD_ID_T.ARMOR_PROF,
             new Modifier_t(0, "Отсутствие ношения брони", ARMOR_TYPES.NONE));
+            
+        GUI_ELEMENT_MAIN.Reset(self, self.Show_Detail_Popup);
+        GUI_ELEMENT_FACE.Reset(self, self.Show_Detail_Popup);
+        Set_Field_Values();
     }
     
     var Set_Field_Values = function(){
-        let elems = document.getElementsByClassName(OUTFIELD_CLASS_NAME);
-        for (let i = 0; i < elems.length; i++){
-            elems[i].value = self.sum;
-        }
+        GUI_ELEMENT_MAIN.Set_Value(self.sum);
+        GUI_ELEMENT_FACE.Set_Value(self.sum);
     }
 
     var Update_Mod_Map = function(){
@@ -745,7 +745,10 @@ function AC_t (name, out_field_class){
     Init();
 }
 
-function Against_Maneuver_t (){
+function Against_Maneuver_t (
+    gui_element_main,
+    gui_element_face
+){
 //constants
     const BASIC_MOD_ID_T = Object.freeze(
         {
@@ -753,30 +756,26 @@ function Against_Maneuver_t (){
             "KAC": 'KAC'
         }
     );
-    const OUTFIELD_CLASS_NAME = "class_output_defense_maneuver";
+    const GUI_ELEMENT_MAIN = gui_element_main;
+    const GUI_ELEMENT_FACE = gui_element_face;
 
 //private methods
     var Init = function(){
-        let elems = document.getElementsByClassName(OUTFIELD_CLASS_NAME);
-        for (let i = 0; i < elems.length; i++){
-            elems[i].onclick = self.Show_Detail_Popup;
-        }
-        
-        Set_Field_Values();
-
         self.modifier_map.Add(
             BASIC_MOD_ID_T.KAC,
             new Modifier_t(10, "ККБ"));
         self.modifier_map.Add(
             BASIC_MOD_ID_T.AGAINST_MANEUVER,
             new Modifier_t(8, "Бонус против манёвров"));
+            
+        GUI_ELEMENT_MAIN.Reset(self, self.Show_Detail_Popup);
+        GUI_ELEMENT_FACE.Reset(self, self.Show_Detail_Popup);
+        Set_Field_Values();
     }
     
     var Set_Field_Values = function(){
-        let elems = document.getElementsByClassName(OUTFIELD_CLASS_NAME);
-        for (let i = 0; i < elems.length; i++){
-            elems[i].value = self.sum;
-        }
+        GUI_ELEMENT_MAIN.Set_Value(self.sum);
+        GUI_ELEMENT_FACE.Set_Value(self.sum);
     }
 
     var Update_Mod_Map = function(){
@@ -803,12 +802,10 @@ function Against_Maneuver_t (){
     }
 
 //private properties
-    /* var m_mod_map = new Map(); */
     var self = this;
 
 //public properties
     this.sum = 18;
-    /* this.other_mod = new Other_Mod_Collection_t(this.Recalc); */
     this.arr_recalc_functions = new Recalc_Function_Collection_t();
     this.modifier_map = new Modifier_Map_t(this.Recalc);
 
@@ -860,11 +857,21 @@ const BASIC_MOD_ID_T = Object.freeze(
         new Modifier_t(Infinity, "Броня"));
 }
 
-function Resistance_Collection_t(){
+function Resistance_Collection_t(
+    gui_element_main,
+    gui_element_face
+){
 //constants
-    const OUTFIELD_CLASS_NAME = "class_output_defense_resistance";
+    const GUI_ELEMENT_MAIN = gui_element_main;
+    const GUI_ELEMENT_FACE = gui_element_face;
 
 //private methods
+    var Init = function(){
+        GUI_ELEMENT_MAIN.Reset(self/*, self.Show_Detail_Popup*/);
+        GUI_ELEMENT_FACE.Reset(self/*, self.Show_Detail_Popup*/);
+        Update_Outfield();
+    }
+    
     var Get_Mod_Map = function(type, do_generate){
         if (!m_map.has(type)){
             if(!do_generate){
@@ -896,10 +903,8 @@ function Resistance_Collection_t(){
             out_string = "Нет"
         }
         
-        let elems = document.getElementsByClassName(OUTFIELD_CLASS_NAME);
-        for (let i = 0; i < elems.length; i++){
-            elems[i].value = out_string;
-        }
+        GUI_ELEMENT_MAIN.Set_Value(out_string);
+        GUI_ELEMENT_FACE.Set_Value(out_string);
     }
 
 //public methods
@@ -933,12 +938,11 @@ function Resistance_Collection_t(){
 //private properties
     var self = this;
     var m_map = new Map();
-    var m_outfield = document.getElementById('outfield_resistance');
 
 //public properties
 
 //additional initialization
-    Update_Outfield();
+    Init();
 }
 
 function Defense_t(){
@@ -959,12 +963,25 @@ function Defense_t(){
         }
     };
 
-    this.eac = new AC_t("ЭКБ", "class_output_defense_eac");
-    this.kac = new AC_t("ККБ", "class_output_defense_kac");
-    this.against_maneuver = new Against_Maneuver_t ();
+    this.eac = new AC_t(
+        "ЭКБ",
+        layers.maininfo.defense.outfield_eac,
+        layers.maininfo.defense.outfield_eac //TODO
+    );
+    this.kac = new AC_t("ККБ",
+        layers.maininfo.defense.outfield_kac,
+        layers.maininfo.defense.outfield_kac //TODO
+    );
+    this.against_maneuver = new Against_Maneuver_t(
+        layers.maininfo.defense.outfield_maneuver,
+        layers.maininfo.defense.outfield_maneuver //TODO
+    );
     this.armor_limit_agi = new Armor_Limit_Agi();
-    this.resistance = new Resistance_Collection_t();
-    this.dr = 0;//TODO
+    this.resistance = new Resistance_Collection_t(
+        layers.maininfo.defense.outfield_resistance,
+        layers.maininfo.defense.outfield_resistance //TODO
+    );
+    this.dr = 0;//TODO layers.maininfo.defense.outfield_dr
 
     var self = this;
 }

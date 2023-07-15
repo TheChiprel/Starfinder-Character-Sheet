@@ -300,17 +300,72 @@ function Block_MainInfo_Attack_t(){
 
 function Block_MainInfo_Defense_t(){
 //constants
+    const GUI_BLOCK = document.getElementById("block_maininfo_defense");
 
 //private methods
 
+    var Init = function(){
+        GUI_BLOCK.innerHTML = "Защита:";
+        GUI_BLOCK.appendChild(HTML_Create_BR());
+        
+        Append_Label_Element_Pair(
+            GUI_BLOCK,
+            "ЭКБ:",
+            self.outfield_eac.html_element,
+            false
+        );
+        GUI_BLOCK.appendChild(HTML_Create_BR());
+        
+        Append_Label_Element_Pair(
+            GUI_BLOCK,
+            "ККБ:",
+            self.outfield_kac.html_element,
+            false
+        );
+        GUI_BLOCK.appendChild(HTML_Create_BR());
+        
+        Append_Label_Element_Pair(
+            GUI_BLOCK,
+            "Против манёвров:",
+            self.outfield_maneuver.html_element,
+            false
+        );
+        GUI_BLOCK.appendChild(HTML_Create_BR());
+        
+        Append_Label_Element_Pair(
+            GUI_BLOCK,
+            "Устойчивости:",
+            self.outfield_resistance.html_element,
+            false
+        );
+        GUI_BLOCK.appendChild(HTML_Create_BR());
+        
+        Append_Label_Element_Pair(
+            GUI_BLOCK,
+            "СУ:",
+            self.outfield_dr.html_element,
+            false
+        );
+        
+        //TODO: remove, once implemented!
+        self.outfield_dr.Set_Value(0);
+    }
+    
 //public methods
+
 
 //private properties
     var self = this;
 
 //public properties
+    this.outfield_eac = new GUI_Element_OutField_t();
+    this.outfield_kac = new GUI_Element_OutField_t();
+    this.outfield_maneuver = new GUI_Element_OutField_t();
+    this.outfield_resistance = new GUI_Element_OutField_t();
+    this.outfield_dr = new GUI_Element_OutField_t();
 
 //additional initialization
+    Init();
 }
 
 function Block_MainInfo_Speed_t(){
