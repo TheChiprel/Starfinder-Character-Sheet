@@ -60,30 +60,21 @@ function Class_t (entry){
 //additional initialization
 }
 
-function Class_Collection_t (){
+function Class_Collection_t (gui_block){
+//constants
+    GUI_BLOCK = gui_block;
+    
 //private methods
     var Init = function(){
-        layers.maininfo.Clear_Class_Table();
-        layers.maininfo.Clear_Class_Add_Buttons();
         
         CLASS_DATABASE.forEach(entry => {
             self.class_map.set (entry.name, new Class_t (entry));
-            layers.maininfo.Add_Class_Add_Button(entry.name, Proc_Event_Add_Class.bind(null, entry.name));
         });
-    }
-    
-    var Proc_Event_Add_Class = function(class_name){
-        var class_obj = Find_Class_By_Name(class_name);
         
-        if (class_obj.entry.key_abiscore.includes(' или ')){
-            var as_list = class_obj.entry.key_abiscore.split(' или ');
-            Popup_Selector.Call("Выберите ключевую хар-ку:", as_list, Proc_Event_Abiscore_Chosen.bind(null, class_name));
-        }else{
-            self.SetLvl(class_name, 1);
-        }
+        GUI_BLOCK.Reset(self);
     }
     
-    var Proc_Event_Abiscore_Chosen = function(class_name, abiscore){
+    var Event_Abiscore_Chosen = function(class_name, abiscore){
         var class_obj = Find_Class_By_Name(class_name);
         
         class_obj.context.key_abiscore = abiscore;
@@ -178,6 +169,17 @@ function Class_Collection_t (){
     }
 
 //public methods
+    this.Add_Class_From_GUI = function(class_name){
+        var class_obj = Find_Class_By_Name(class_name);
+        
+        if (class_obj.entry.key_abiscore.includes(' или ')){
+            var as_list = class_obj.entry.key_abiscore.split(' или ');
+            Popup_Selector.Call("Выберите ключевую хар-ку:", as_list, Event_Abiscore_Chosen.bind(null, class_name));
+        }else{
+            self.SetLvl(class_name, 1);
+        }
+    }
+
     this.SetLvl = function(class_name, lvl_to_set){
         var class_obj = Find_Class_By_Name(class_name);
         if (class_obj == null){
@@ -191,10 +193,10 @@ function Class_Collection_t (){
         
         if (class_obj.context.lvl == 0){
             Activate_Class(class_obj);
-            layers.maininfo.Add_New_Class(class_name, lvl_to_set);
+            GUI_BLOCK.Add_Class(class_name, lvl_to_set);
         }else if (lvl_to_set == 0){
             Deactivate_Class(class_obj);
-            layers.maininfo.Remove_Class(class_name);
+            GUI_BLOCK.Remove_Class(class_name);
         }
 
         if ((class_obj.context.lvl < 3) && (lvl_to_set >= 3)){

@@ -226,19 +226,192 @@ function Block_MainInfo_Numbers_t(){
     Init();
 }
 
-function Block_MainInfo_Classes_t(){
+function Block_DropDownList_t(
+    option_list
+){
 //constants
 
 //private methods
+    var Init = function(option_list){
+        self.html_element = HTML_Create_Div("class_ddlist_classes");
+        var pseudo_button = HTML_Create_Button("+");
+        self.html_element.appendChild(pseudo_button);
+        var dd_list = HTML_Create_Div("class_ddlist_classes_content");
+        
+        option_list.forEach(option => {
+            var button = HTML_Create_Button(
+                option,
+                Event_DD_Button_OnClick.bind(null, option)
+            );
+            dd_list.appendChild(button);
+            m_dd_button_map.set(option, button);
+        });
+        self.html_element.appendChild(dd_list);
+    }
+    
+    var Event_DD_Button_OnClick = function(button_name){
+        if (m_callback_button_press == null){
+            return;
+        }
+        
+        m_callback_button_press(button_name);
+    }
 
 //public methods
+    this.Reset = function(callback_button_press){
+        m_callback_button_press = callback_button_press;
+        m_dd_button_map.forEach((button, key) => {
+            button.disabled = false;
+        });
+    }
+
+    this.Set_DD_Button_State = function(button_name, is_enabled){
+        if (!m_dd_button_map.has(button_name)){
+            console.error("Button '" + button_name + "' not found in dropdown list!");
+            return;
+        }
+        
+        let button = m_dd_button_map.get(button_name);
+        button.disabled = !is_enabled;
+    }
 
 //private properties
     var self = this;
+    var m_owner = null;
+    var m_dd_button_map = new Map();
+    var m_callback_button_press = null;
+
+//public properties
+    this.html_element; //set on init
+
+//additional initialization
+    Init(option_list);
+}
+
+function Block_MainInfo_Classes_t(){
+//constants
+    const GUI_BLOCK = document.getElementById("block_maininfo_classes");
+
+//private methods
+
+    var Init = function(){
+        GUI_BLOCK.innerHTML = "Классы:";
+        GUI_BLOCK.appendChild(m_dropdown_add_class.html_element);
+        m_class_table.rows[0].cells[0].innerHTML = "Класс";
+        m_class_table.rows[0].cells[1].innerHTML = "Ур.";
+        GUI_BLOCK.appendChild(m_class_table);
+    }
+    
+    var Event_Add_Class = function(class_name){
+        if (m_owner == null){
+            return;
+        }
+        
+        m_owner.Add_Class_From_GUI(class_name);
+    }
+    
+    var Event_Remove_Class = function(class_name){
+        if (m_owner == null){
+            return;
+        }
+        
+        m_owner.SetLvl(class_name, 0);
+    }
+    
+    var Event_Class_Change_Lvl = function(class_name, event){
+        if (m_owner == null){
+            return;
+        }
+        
+        let value = event.target.value;
+        if(isNaN(value)){
+            event.target.value = m_owner.Get_Lvl(class_name);
+            return;
+        }
+        m_owner.SetLvl(class_name, parseInt(value));
+    }
+    
+//public methods
+    this.Reset = function(owner){
+        m_owner = owner;
+        
+        while (m_class_table.rows.length > 1){
+            m_class_table.deleteRow(1);
+        }
+        m_outfield_class_level_map.clear();
+        m_dropdown_add_class.Reset(Event_Add_Class);
+    }
+
+    this.Add_Class = function(class_name, lvl = 1){
+        m_dropdown_add_class.Set_DD_Button_State(class_name, false);
+
+        var row = m_class_table.insertRow(m_class_table.rows.length);
+        //row.class = 'class_row_class_lvl';
+        row.name =  class_name;
+
+        var cell_name = row.insertCell(0);
+        var cell_lvl = row.insertCell(1);
+        var cell_button = row.insertCell(2);
+
+        cell_name.innerHTML = class_name;
+        var class_lvl = HTML_Create_Input_Number(
+            lvl,
+            1,
+            20, 
+            Event_Class_Change_Lvl.bind(null, class_name)
+        );//TODO: magic
+        var class_button_remove = HTML_Create_Button("X", Event_Remove_Class.bind(null, class_name));
+
+        cell_lvl.appendChild(class_lvl);
+        cell_button.appendChild(class_button_remove);
+        m_class_table.style.display = "block";
+
+        m_outfield_class_level_map.set(class_name, class_lvl);
+        layers.classes.Show_Block(class_name); //TODO: move to chardata?
+    }
+    
+    this.Remove_Class = function(class_name){
+        //removing table row
+        for (let i = 1; i < m_class_table.rows.length; i++){
+            var row = m_class_table.rows[i];
+
+            if(row.name == class_name){
+                m_class_table.deleteRow(i);
+                if (m_class_table.rows.length <= 1){
+                    m_class_table.style.display = "none";
+                }
+                break;
+            }
+        }
+
+        //enable class add button
+        m_dropdown_add_class.Set_DD_Button_State(class_name, true);
+        m_outfield_class_level_map.delete(class_name);
+
+        layers.classes.Hide_Block(class_name); //TODO: move to chardata?
+    }
+    
+    this.Set_Class_Lvl = function(class_name, lvl){
+        let outfield = m_outfield_class_level_map.get(class_name);
+    }
+
+//private properties
+    var self = this;
+    var m_owner = null;
+    var m_outfield_class_level_map = new Map();
+    var m_class_table = HTML_Create_Table(
+        1,
+        3,
+        true,
+        "100%",
+        ["50%", "25%", "25%"]
+    );
+    var m_dropdown_add_class = new Block_DropDownList_t(Object.values(CLASSES));
 
 //public properties
 
 //additional initialization
+    Init();
 }
 
 function Block_MainInfo_Proficiency_t(){
@@ -552,124 +725,11 @@ function Layer_MainInfo_t(){
             value.checkbox = cell_prof_checkbox.appendChild(prof_checkbox);
         });
     }
-
-    var Proc_Set_Class_Lvl_Event = function(class_name, event){
-        let new_value = event.target.value;
-        if (isNaN(new_value)){
-            event.target.value = chardata.classes.Get_Lvl(class_name);
-            return;
-        }
-        chardata.classes.SetLvl(class_name, parseInt(new_value));
-    }
-    
-    var Proc_Remove_Class_Event = function(class_name){
-        chardata.classes.SetLvl(class_name, 0);
-    }
     
 //public methods
     //TODO: rework, remove
     this.Reset = function (){
         Init_Proficiency_HTML();
-    }
-
-    this.Clear_Class_Add_Buttons = function(){
-        m_class_add_list.innerHTML = "";
-    }
-
-    this.Clear_Class_Table = function(){
-        while (m_class_table.rows.length > 1){
-            m_class_table.deleteRow(1);
-        }
-        m_class_table.style.display = "none";
-    }
-    
-    this.Add_Class_Add_Button = function(class_name, call_back_func){
-        var new_button = HTML_Create_Button(
-            class_name,
-            call_back_func,
-            undefined,
-            "class_button_add_class");
-        m_class_add_list.appendChild(new_button);
-
-        var br = document.createElement("br");
-        m_class_add_list.appendChild(br);
-
-        m_class_add_button_map.set(class_name, new_button);
-    }
-
-    this.Add_New_Class = function(class_name, lvl = 1){
-        if (m_class_add_button_map.has(class_name)){
-            m_class_add_button_map.get(class_name).disabled = true;
-        }else{
-            console.error("Attempt to add unknown class '" + class_name + "'");
-            return;
-        }
-
-        var row = m_class_table.insertRow(m_class_table.rows.length);
-        row.class = 'class_row_class_lvl';
-        row.name =  class_name;
-
-        var cell_label = row.insertCell(0);
-        var cell_lvl = row.insertCell(1);
-        var cell_button = row.insertCell(2);
-
-        var class_label = HTML_Create_Label(class_name);
-        var class_lvl = HTML_Create_Input_Number(
-            lvl,
-            1,
-            20, 
-            Proc_Set_Class_Lvl_Event.bind(null, class_name)
-        );//TODO: magic
-        var class_button_remove = HTML_Create_Button("X", Proc_Remove_Class_Event.bind(null, class_name));
-
-        cell_label.appendChild(class_label);
-        cell_lvl.appendChild(class_lvl);
-        cell_button.appendChild(class_button_remove);
-        m_class_table.style.display = "block";
-
-        //chardata.classes.SetLvl(class_name, lvl);
-        layers.classes.Show_Block(class_name);
-    }
-    
-    this.Add_New_Class_By_Context = function(class_name, context){
-        self.Add_New_Class(class_name, context.lvl);
-        layers.classes.Load_From_Obj(class_name, context);
-    }
-
-    this.Remove_Class = function(class_name){
-        //removing table row
-        for (let i = 1; i < m_class_table.rows.length; i++){
-            var row = m_class_table.rows[i];
-
-            if(row.name == class_name){
-                m_class_table.deleteRow(i);
-                if (m_class_table.rows.length <= 1){
-                    m_class_table.style.display = "none";
-                }
-                break;
-            }
-        }
-
-        //enable class add button
-        if (m_class_add_button_map.has(class_name)){
-            m_class_add_button_map.get(class_name).disabled = false;
-        }else{
-            console.error("Attempt to remove unknown class '" + class_name + "'");
-            return;
-        }
-
-        //chardata.classes.SetLvl(class_name, 0);
-        layers.classes.Hide_Block(class_name);
-    }
-
-    this.Set_Class_Lvl = function(value, class_name){
-        chardata.classes.SetLvl(class_name, value);
-    }
-
-    this.Load_Classes_From_Obj = function(arr){
-        arr.forEach(cur_class => {
-            self.Add_New_Class_By_Context(cur_class.name, cur_class.context);
-        });
     }
 
 //private properties
