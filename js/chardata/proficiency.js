@@ -3,22 +3,28 @@ function Prof_Spec_t(){
 
 //public methods
     this.Recalc = function(){
-        self.checkbox.checked = self.mod_map.Get_Value();
-        self.arr_recalc_functions.Call();
+        let new_value = self.mod_map.Get_Value();
+        if (new_value != self.value){
+            self.value = new_value;
+            self.arr_recalc_functions.Call();
+        }
     }
 
 //private properties
     var self = this;
 
 //public properties
-    this.checkbox; //set on initialization
+    this.value = false;
     this.mod_map = new Boolean_Modifier_t(false, this.Recalc);
     this.arr_recalc_functions = new Recalc_Function_Collection_t();
 
 //additional initialization
 }
 
-function Prof_Spec_Collection_t (w_type_arr) {
+function Prof_Spec_Collection_t (gui_set_func, w_type_arr){
+//constants
+    const GUI_SET_FUNC = gui_set_func;
+    
 //private functions
     var Find_Weapon_Spec_By_Name = function(name){
         if (!self.prof_map.has(name)){
@@ -38,7 +44,7 @@ function Prof_Spec_Collection_t (w_type_arr) {
         }
         //else NOTHING TO DO
 
-        return prof.mod_map.Get_Value();
+        return prof.value;
     }
 
     this.Add_Recalc_Func = function(in_prof_name, recalc){
@@ -73,6 +79,7 @@ function Prof_Spec_Collection_t (w_type_arr) {
 
         prof.mod_map.Add(id);
         prof.Recalc();
+        GUI_SET_FUNC(w_type, prof.value);
     }
 
     this.Remove = function(w_type, id){
@@ -85,6 +92,7 @@ function Prof_Spec_Collection_t (w_type_arr) {
 
         prof.mod_map.Remove(id);
         prof.Recalc();
+        GUI_SET_FUNC(w_type, prof.value);
     }
 
     this.Get_Bool_Map = function(w_type){

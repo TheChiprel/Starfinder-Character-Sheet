@@ -416,17 +416,139 @@ function Block_MainInfo_Classes_t(){
 
 function Block_MainInfo_Proficiency_t(){
 //constants
+    const GUI_BLOCK = document.getElementById("block_maininfo_proficiency");
+    //TODO: currently created separately from charadata's proficiencies. 
+    //Find a way to create by chardata
+    //TODO: when addition of special will be added, need a proper reset
+    const WEAPON_PROFICIENCY_LIST = [
+        WEAPON_TYPES.MELEE_SIMPLE,
+        WEAPON_TYPES.MELEE_ADVANCED,
+        WEAPON_TYPES.RANGED_SMALL,
+        WEAPON_TYPES.RANGED_LONG,
+        WEAPON_TYPES.RANGED_SNIPER,
+        WEAPON_TYPES.RANGED_HEAVY,
+        WEAPON_TYPES.GRENADE
+    ];
+    const WEAPON_SPECIALIZATION_LIST = [
+        WEAPON_TYPES.MELEE_SIMPLE,
+        WEAPON_TYPES.MELEE_ADVANCED,
+        WEAPON_TYPES.RANGED_SMALL,
+        WEAPON_TYPES.RANGED_LONG,
+        WEAPON_TYPES.RANGED_SNIPER,
+        WEAPON_TYPES.RANGED_HEAVY
+    ];
+    const ARMOR_PROFICIENCY_LIST = [
+        ARMOR_TYPES.LIGHT,
+        ARMOR_TYPES.HEAVY,
+        ARMOR_TYPES.POWER
+    ];
 
 //private methods
-
-//public methods
+    var Init = function(){
+        GUI_BLOCK.innerHTML = "";
+        
+        m_table_prof_weapon = HTML_Create_Table(
+            1,
+            3,
+            true,
+            "100%",
+            ["50%", "25%", "25%"]
+        );
+        m_table_prof_weapon.rows[0].cells[0].innerHTML = "Тип оружия";
+        m_table_prof_weapon.rows[0].cells[1].innerHTML = "Владение";
+        m_table_prof_weapon.rows[0].cells[2].innerHTML = "Привычное";
+        
+        m_table_prof_armor = HTML_Create_Table(
+            1,
+            3,
+            true,
+            "100%",
+            ["50%", "25%", "25%"]
+        );
+        m_table_prof_armor.rows[0].cells[0].innerHTML = "Тип брони";
+        m_table_prof_armor.rows[0].cells[1].innerHTML = "Ношение";
+        
+        WEAPON_PROFICIENCY_LIST.forEach(weapon_type => {
+            var curr_row = m_table_prof_weapon.insertRow(m_table_prof_weapon.rows.length);
+            var name_cell = curr_row.insertCell(curr_row.cells.length);
+            var prof_cell = curr_row.insertCell(curr_row.cells.length);
+            
+            name_cell.innerHTML = weapon_type;
+            
+            var prof_checkbox = document.createElement("input");
+            prof_checkbox.type = 'checkbox';
+            prof_checkbox.disabled = true;
+            prof_checkbox.checked = false;
+            prof_cell.appendChild(prof_checkbox);
+            m_map_prof_weapon.set(weapon_type, prof_checkbox);
+            
+            if (WEAPON_SPECIALIZATION_LIST.includes(weapon_type)){
+                var spec_cell = curr_row.insertCell(curr_row.cells.length);
+                var spec_checkbox = document.createElement("input");
+                spec_checkbox.type = 'checkbox';
+                spec_checkbox.disabled = true;
+                spec_checkbox.checked = false;
+                spec_cell.appendChild(spec_checkbox);
+                m_map_spec_weapon.set(weapon_type, spec_checkbox);
+            }
+        });
+        
+        ARMOR_PROFICIENCY_LIST.forEach(armor_type => {
+            var curr_row = m_table_prof_armor.insertRow(m_table_prof_armor.rows.length);
+            var name_cell = curr_row.insertCell(curr_row.cells.length);
+            var prof_cell = curr_row.insertCell(curr_row.cells.length);
+            
+            name_cell.innerHTML = armor_type;
+            
+            var prof_checkbox = document.createElement("input");
+            prof_checkbox.type = 'checkbox';
+            prof_checkbox.disabled = true;
+            prof_checkbox.checked = false;
+            prof_cell.appendChild(prof_checkbox);
+            m_map_prof_armor.set(armor_type, prof_checkbox);
+            
+        });
+        
+        GUI_BLOCK.appendChild(m_table_prof_weapon);
+        GUI_BLOCK.appendChild(m_table_prof_armor);
+    }
+    
+    this.Set_Weapon_Proficiency = function(weapon_type, value){
+        if (!m_map_prof_weapon.has(weapon_type)){
+            console.error("Failed to set proficiency checkbox to weapon type: " + weapon_type);
+            return;
+        }
+        m_map_prof_weapon.get(weapon_type).checked = value;
+    }
+    
+    this.Set_Weapon_Speciality = function(weapon_type, value){
+        if (!m_map_spec_weapon.has(weapon_type)){
+            console.error("Failed to set specialization checkbox to weapon type: " + weapon_type);
+            return;
+        }
+        m_map_spec_weapon.get(weapon_type).checked = value;
+    }
+    
+    this.Set_Armor_Proficiency = function(armor_type, value){
+        if (!m_map_prof_armor.has(armor_type)){
+            console.error("Failed to set proficiency checkbox to armor type: " + armor_type);
+            return;
+        }
+        m_map_prof_armor.get(armor_type).checked = value;
+    }
 
 //private properties
     var self = this;
+    var m_table_prof_weapon; //set on init
+    var m_table_prof_armor; //set on init
+    var m_map_prof_weapon = new Map();
+    var m_map_spec_weapon = new Map();
+    var m_map_prof_armor = new Map();
 
 //public properties
 
 //additional initialization
+    Init();
 }
 
 function Block_MainInfo_Attack_t(){
@@ -660,83 +782,11 @@ function Block_MainInfo_Saves_t(){
 
 function Layer_MainInfo_t(){
 //private methods
-    var Init_Proficiency_HTML = function(){
-        let table_prof_weapon = document.getElementById('table_prof_weapon');
-        let table_prof_armor = document.getElementById('table_prof_armor');
-
-        while (table_prof_weapon.rows.length > 1){
-            table_prof_weapon.deleteRow(1);
-        }
-        
-        while (table_prof_armor.rows.length > 1){
-            table_prof_armor.deleteRow(1);
-        }
-
-        chardata.stats.weapon_proficiency.prof_map.forEach((value, key) => {
-            var row = table_prof_weapon.insertRow(table_prof_weapon.rows.length);
-
-            row.class = 'class_row_prof';
-            row.name = key;
-
-            var cell_label = row.insertCell(0);
-            var cell_prof_checkbox = row.insertCell(1);
-            var cell_spec_checkbox = row.insertCell(2);
-
-            var prof_label = document.createElement("label");
-            prof_label.innerHTML = key;
-            cell_label.appendChild(prof_label);
-            //cell_label.setAttribute('class', "class_table_clmn_header");
-
-            var prof_checkbox = document.createElement("input");
-            prof_checkbox.type = 'checkbox';
-            prof_checkbox.name = key + '_prof';
-            prof_checkbox.disabled = true;
-            value.checkbox = cell_prof_checkbox.appendChild(prof_checkbox);
-
-            if (chardata.stats.weapon_specialization.prof_map.has(key)){
-                let specialization = chardata.stats.weapon_specialization.prof_map.get(key);
-                var spec_checkbox = document.createElement("input");
-                spec_checkbox.type = 'checkbox';
-                spec_checkbox.name = key + '_spec';
-                spec_checkbox.disabled = true;
-                specialization.checkbox = cell_spec_checkbox.appendChild(spec_checkbox);
-            }
-            //else NOTHING TO DO
-        });
-
-        chardata.stats.armor_proficiency.prof_map.forEach((value, key) => {
-            var row = table_prof_armor.insertRow(table_prof_armor.rows.length);
-
-            row.class = 'class_row_prof';
-            row.name = key;
-
-            var cell_label = row.insertCell(0);
-            var cell_prof_checkbox = row.insertCell(1);
-
-            var prof_label = document.createElement("label");
-            prof_label.innerHTML = key;
-            cell_label.appendChild(prof_label);
-            //cell_label.setAttribute('class', "class_table_clmn_header");
-
-            var prof_checkbox = document.createElement("input");
-            prof_checkbox.type = 'checkbox';
-            prof_checkbox.name = key + '_prof';
-            prof_checkbox.disabled = true;
-            value.checkbox = cell_prof_checkbox.appendChild(prof_checkbox);
-        });
-    }
     
 //public methods
-    //TODO: rework, remove
-    this.Reset = function (){
-        Init_Proficiency_HTML();
-    }
 
 //private properties
     var self = this;
-    var m_class_add_list = document.getElementById('class_ddlist_classes_content');
-    var m_class_add_button_map = new Map();
-    var m_class_table = document.getElementById("table_classes_lvl");
 
 //public properties
     this.main = new Block_MainInfo_Main_t();

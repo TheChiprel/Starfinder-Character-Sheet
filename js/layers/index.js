@@ -56,9 +56,8 @@ function Layers_t (){
 //private methods
 
 //public methods
-    this.Reset = function(){
-        self.maininfo.Reset();  //TODO: rework, remove
-        self.custom.Reset();
+    this.Reset = function(){ 
+        self.custom.Reset(); //TODO: rework, remove
     }
     
 

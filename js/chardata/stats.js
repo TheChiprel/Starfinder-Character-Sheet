@@ -1300,28 +1300,37 @@ function Stats_t(){
     this.attacks = new Attacks_t();
     this.defense = new Defense_t();
     this.speeds = new Speeds_t();
-    this.weapon_proficiency = new Prof_Spec_Collection_t([
-        WEAPON_TYPES.MELEE_SIMPLE,
-        WEAPON_TYPES.MELEE_ADVANCED,
-        WEAPON_TYPES.RANGED_SMALL,
-        WEAPON_TYPES.RANGED_LONG,
-        WEAPON_TYPES.RANGED_SNIPER,
-        WEAPON_TYPES.RANGED_HEAVY,
-        WEAPON_TYPES.GRENADE
-    ]);
-    this.weapon_specialization = new Prof_Spec_Collection_t([
-        WEAPON_TYPES.MELEE_SIMPLE,
-        WEAPON_TYPES.MELEE_ADVANCED,
-        WEAPON_TYPES.RANGED_SMALL,
-        WEAPON_TYPES.RANGED_LONG,
-        WEAPON_TYPES.RANGED_SNIPER,
-        WEAPON_TYPES.RANGED_HEAVY
-    ]);
-    this.armor_proficiency = new Prof_Spec_Collection_t([
-        ARMOR_TYPES.LIGHT,
-        ARMOR_TYPES.HEAVY,
-        ARMOR_TYPES.POWER,
-    ]);
+    this.weapon_proficiency = new Prof_Spec_Collection_t(
+        layers.maininfo.proficiency.Set_Weapon_Proficiency,
+        [
+            WEAPON_TYPES.MELEE_SIMPLE,
+            WEAPON_TYPES.MELEE_ADVANCED,
+            WEAPON_TYPES.RANGED_SMALL,
+            WEAPON_TYPES.RANGED_LONG,
+            WEAPON_TYPES.RANGED_SNIPER,
+            WEAPON_TYPES.RANGED_HEAVY,
+            WEAPON_TYPES.GRENADE
+        ]
+    );
+    this.weapon_specialization = new Prof_Spec_Collection_t(
+        layers.maininfo.proficiency.Set_Weapon_Speciality,
+        [
+            WEAPON_TYPES.MELEE_SIMPLE,
+            WEAPON_TYPES.MELEE_ADVANCED,
+            WEAPON_TYPES.RANGED_SMALL,
+            WEAPON_TYPES.RANGED_LONG,
+            WEAPON_TYPES.RANGED_SNIPER,
+            WEAPON_TYPES.RANGED_HEAVY
+        ]
+    );
+    this.armor_proficiency = new Prof_Spec_Collection_t(
+        layers.maininfo.proficiency.Set_Armor_Proficiency,
+        [
+            ARMOR_TYPES.LIGHT,
+            ARMOR_TYPES.HEAVY,
+            ARMOR_TYPES.POWER
+        ]
+    );
     this.custom_mods = new Custom_Data_t();
 }
 
