@@ -1140,7 +1140,13 @@ function Speeds_t (){
     );
 }
 
-function Save_Type_t (name, prefix, abiscore, out_field_class){
+function Save_Type_t (
+    name,
+    prefix,
+    abiscore, 
+    gui_element_main,
+    gui_element_face
+){
 //constants
     const CLASS_ID_PREFIX = "CLASS_";
     const CLASS_MAIN_STR = "Класс";
@@ -1149,17 +1155,11 @@ function Save_Type_t (name, prefix, abiscore, out_field_class){
             "ABISCORE": 'ABISCORE'
         }
     );
-    const OUTFIELD_CLASS_NAME = out_field_class;
+    const GUI_ELEMENT_MAIN = gui_element_main;
+    const GUI_ELEMENT_FACE = gui_element_face;
 
 //private methods
     var Init = function(){
-        let elems = document.getElementsByClassName(OUTFIELD_CLASS_NAME);
-        for (let i = 0; i < elems.length; i++){
-            elems[i].onclick = self.Show_Detail_Popup;
-        }
-        
-            Set_Field_Values();
-
         self.modifier_map.Add(
             BASIC_MOD_ID_T.ABISCORE,
             new Modifier_t(0, m_abiscore));
@@ -1168,14 +1168,16 @@ function Save_Type_t (name, prefix, abiscore, out_field_class){
                 CLASS_ID_PREFIX + class_item.name,
                 new Modifier_t(0, CLASS_MAIN_STR, class_item.name));
         });
+        
+        GUI_ELEMENT_MAIN.Reset(self, self.Show_Detail_Popup);
+        GUI_ELEMENT_FACE.Reset(self, self.Show_Detail_Popup);
+        Set_Field_Values();
     }
     
     var Set_Field_Values = function(){
         let str = GetModifierStr(self.sum);
-        let elems = document.getElementsByClassName(OUTFIELD_CLASS_NAME);
-        for (let i = 0; i < elems.length; i++){
-            elems[i].value = str;
-        }
+        GUI_ELEMENT_MAIN.Set_Value(str);
+        GUI_ELEMENT_FACE.Set_Value(str);
     }
 
     var Update_Mod_Map = function(){
@@ -1252,9 +1254,27 @@ function Saves_t (){
     var self = this;
 
 //public properties
-    this.fortitude = new Save_Type_t("Стойкость", 'fort', ABISCORES.CON, "class_output_save_fort");
-    this.reflex = new Save_Type_t("Реакция", 'refl', ABISCORES.AGI, "class_output_save_refl");
-    this.will = new Save_Type_t("Воля", 'will', ABISCORES.WIS, "class_output_save_will");
+    this.fortitude = new Save_Type_t(
+        "Стойкость",
+        'fort',
+        ABISCORES.CON,
+        layers.maininfo.saves.outfield_fort,
+        layers.maininfo.saves.outfield_fort //TODO
+    );
+    this.reflex = new Save_Type_t(
+        "Реакция",
+        'refl',
+        ABISCORES.AGI,
+        layers.maininfo.saves.outfield_refl,
+        layers.maininfo.saves.outfield_refl //TODO
+    );
+    this.will = new Save_Type_t(
+        "Воля",
+        'will',
+        ABISCORES.WIS,
+        layers.maininfo.saves.outfield_will,
+        layers.maininfo.saves.outfield_will //TODO
+    );
 }
 
 function Stats_t(){

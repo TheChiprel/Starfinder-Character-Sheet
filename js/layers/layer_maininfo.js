@@ -437,17 +437,52 @@ function Block_MainInfo_Speed_t(){
 
 function Block_MainInfo_Saves_t(){
 //constants
+    const GUI_BLOCK = document.getElementById("block_maininfo_saves");
 
 //private methods
 
+    var Init = function(){
+        GUI_BLOCK.innerHTML = "Испытания:";
+        GUI_BLOCK.appendChild(HTML_Create_BR());
+        
+        Append_Label_Element_Pair(
+            GUI_BLOCK,
+            "Стойкость:",
+            self.outfield_fort.html_element,
+            false
+        );
+        GUI_BLOCK.appendChild(HTML_Create_BR());
+        
+        Append_Label_Element_Pair(
+            GUI_BLOCK,
+            "Реакция:",
+            self.outfield_refl.html_element,
+            false
+        );
+        GUI_BLOCK.appendChild(HTML_Create_BR());
+        
+        
+        Append_Label_Element_Pair(
+            GUI_BLOCK,
+            "Воля:",
+            self.outfield_will.html_element,
+            false
+        );
+    }
+    
 //public methods
+
 
 //private properties
     var self = this;
 
 //public properties
+    this.outfield_fort = new GUI_Element_OutField_t();
+    this.outfield_refl = new GUI_Element_OutField_t();
+    this.outfield_will = new GUI_Element_OutField_t();
 
 //additional initialization
+    Init();
 }
 
 function Layer_MainInfo_t(){
