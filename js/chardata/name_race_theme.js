@@ -4,7 +4,8 @@ function Name_t(gui_block){
     
 //private methods
     var Init = function(){
-        GUI_BLOCK.Reset(self, "");
+        GUI_BLOCK.Reset(self);
+        GUI_BLOCK.Set_Value(self.value);
     }
 
 //public methods
@@ -45,9 +46,12 @@ function Race_t(
     
 //private methods
     var Init = function(){
-        GUI_BLOCK_RACE.Reset(self, "---");
-        GUI_BLOCK_SIZE.Reset(self, "---");
-        GUI_BLOCK_TYPE.Reset(self, "---");
+        GUI_BLOCK_RACE.Reset(self);
+        GUI_BLOCK_SIZE.Reset(self);
+        GUI_BLOCK_TYPE.Reset(self);
+        GUI_BLOCK_RACE.Set_Value("---");
+        GUI_BLOCK_SIZE.Set_Value("---");
+        GUI_BLOCK_TYPE.Set_Value("---");
     }
     
     var Get_Entry_By_Name = function(name){
@@ -123,7 +127,6 @@ function Race_t(
     Init();
 }
 
-
 function Theme_t(gui_block){
 //constants
     const GUI_BLOCK = gui_block;
@@ -131,6 +134,7 @@ function Theme_t(gui_block){
 //private methods
     var Init = function(){
         GUI_BLOCK.Reset(self, "---");
+        GUI_BLOCK.Set_Value("---");
     }
     
     var Get_Entry_By_Name = function(name){

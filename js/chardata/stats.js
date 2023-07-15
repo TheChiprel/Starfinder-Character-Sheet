@@ -1,31 +1,34 @@
-function Initative_t () {
+//TODO: Show_Detail_Popup -> private?
+
+function Initative_t(
+    gui_element_main,
+    gui_element_face
+){
 //constants
     const BASIC_MOD_ID_T = Object.freeze(
         {
             "AGI": 'AGI',
         }
     );
-    const OUTFIELD_CLASS_NAME = "class_output_initiative";
+    const GUI_ELEMENT_MAIN = gui_element_main;
+    //const GUI_ELEMENT_FACE = gui_element_face; //TODO
 
 //private methods
     var Init = function(){
-        let elems = document.getElementsByClassName(OUTFIELD_CLASS_NAME);
-        for (let i = 0; i < elems.length; i++){
-            elems[i].onclick = self.Show_Detail_Popup;
-        }
-        
-        Set_Field_Values();
         self.modifier_map.Add(
             BASIC_MOD_ID_T.AGI,
             new Modifier_t(0, ABISCORES.AGI));
+            
+        GUI_ELEMENT_MAIN.Reset(self, self.Show_Detail_Popup);
+        //GUI_ELEMENT_FACE.Reset(self, self.Show_Detail_Popup);
+        Set_Field_Values();
     }
 
     var Set_Field_Values = function(){
         let str = GetModifierStr(self.sum);
-        let elems = document.getElementsByClassName(OUTFIELD_CLASS_NAME);
-        for (let i = 0; i < elems.length; i++){
-            elems[i].value = str;
-        }
+
+        GUI_ELEMENT_MAIN.Set_Value(str);
+        //GUI_ELEMENT_FACE.Set_Value(str);
     }
 
     var Update_Mod_Map = function(){
@@ -64,7 +67,10 @@ function Initative_t () {
     Init();
 }
 
-function Health_t () {
+function Health_t(
+    gui_element_main,
+    gui_element_face
+){
 //constants
     const CLASS_ID_PREFIX = "CLASS_";
     const CLASS_MAIN_STR = "Класс";
@@ -73,16 +79,12 @@ function Health_t () {
             "RACE": 'RACE',
         }
     );
-    const OUTFIELD_CLASS_NAME = "class_output_max_hp";
+    
+    const GUI_ELEMENT_MAIN = gui_element_main;
+    //const GUI_ELEMENT_FACE = gui_element_face; //TODO
 
 //private methods
     var Init = function(){
-        let elems = document.getElementsByClassName(OUTFIELD_CLASS_NAME);
-        for (let i = 0; i < elems.length; i++){
-            elems[i].onclick = self.Show_Detail_Popup;
-        }
-        
-        Set_Field_Values();
         self.modifier_map.Add(
             BASIC_MOD_ID_T.RACE,
             new Modifier_t(0, "Раса", "Нет"));
@@ -92,13 +94,15 @@ function Health_t () {
                 CLASS_ID_PREFIX + class_item.name,
                 new Modifier_t(0, CLASS_MAIN_STR, class_item.name));
         });
+        
+        GUI_ELEMENT_MAIN.Reset(self, self.Show_Detail_Popup);
+        //GUI_ELEMENT_FACE.Reset(self, self.Show_Detail_Popup);
+        Set_Field_Values();
     }
 
     var Set_Field_Values = function(){
-        let elems = document.getElementsByClassName(OUTFIELD_CLASS_NAME);
-        for (let i = 0; i < elems.length; i++){
-            elems[i].value = self.sum;
-        }
+        GUI_ELEMENT_MAIN.Set_Value(self.sum);
+        //GUI_ELEMENT_FACE.Set_Value(self.sum);
     }
 
     var Update_Mod_Map = function(){
@@ -154,7 +158,10 @@ function Health_t () {
     Init();
 }
 
-function Stamina_t () {
+function Stamina_t(
+    gui_element_main,
+    gui_element_face
+){
 //constants
     const CLASS_ID_PREFIX = "CLASS_";
     const CLASS_MAIN_STR = "Класс";
@@ -163,16 +170,11 @@ function Stamina_t () {
         "CON": 'CON',
     }
 );
-    const OUTFIELD_CLASS_NAME = "class_output_max_sp";
+    const GUI_ELEMENT_MAIN = gui_element_main;
+    //const GUI_ELEMENT_FACE = gui_element_face; //TODO
 
 //private methods
     var Init = function(){
-        let elems = document.getElementsByClassName(OUTFIELD_CLASS_NAME);
-        for (let i = 0; i < elems.length; i++){
-            elems[i].onclick = self.Show_Detail_Popup;
-        }
-        
-        Set_Field_Values();
         self.modifier_map.Add(
             BASIC_MOD_ID_T.CON,
             new Modifier_t(0, ABISCORES.CON));
@@ -182,13 +184,15 @@ function Stamina_t () {
                 CLASS_ID_PREFIX + class_item.name,
                 new Modifier_t(0, CLASS_MAIN_STR, class_item.name));
         });
+        
+        GUI_ELEMENT_MAIN.Reset(self, self.Show_Detail_Popup);
+        //GUI_ELEMENT_FACE.Reset(self, self.Show_Detail_Popup);
+        Set_Field_Values();
     }
 
     var Set_Field_Values = function(){
-        let elems = document.getElementsByClassName(OUTFIELD_CLASS_NAME);
-        for (let i = 0; i < elems.length; i++){
-            elems[i].value = self.sum;
-        }
+        GUI_ELEMENT_MAIN.Set_Value(self.sum);
+        //GUI_ELEMENT_FACE.Set_Value(self.sum);
     }
 
 //private methods
@@ -236,7 +240,10 @@ function Stamina_t () {
     Init();
 }
 
-function Resolve_t () {
+function Resolve_t(
+    gui_element_main,
+    gui_element_face
+){
 //constants
     const STRING_NEED_CLASS = "Нельзя посчитать ПР, пока не добавлен хотя бы один класс.";
     const BASIC_MOD_ID_T = Object.freeze(
@@ -246,15 +253,11 @@ function Resolve_t () {
             "MIN_VALUE": 'MIN_VALUE'
         }
     );
-    const OUTFIELD_CLASS_NAME = "class_output_max_rp";
+    const GUI_ELEMENT_MAIN = gui_element_main;
+    //const GUI_ELEMENT_FACE = gui_element_face; //TODO
 
 //private methods
     var Init = function(){
-        let elems = document.getElementsByClassName(OUTFIELD_CLASS_NAME);
-        for (let i = 0; i < elems.length; i++){
-            elems[i].onclick = self.Show_Detail_Popup;
-        }
-        Set_Field_Values();
         self.modifier_map.Add(
             BASIC_MOD_ID_T.KEY_ABISCORE,
             new Modifier_t(0, "Ключевая хар-ка", "Нет"));
@@ -264,13 +267,16 @@ function Resolve_t () {
         self.modifier_map.Add(
             BASIC_MOD_ID_T.MIN_VALUE,
             new Modifier_t(1, "Минимальное значение", null, MODIFIER_TYPES_T.MIN_VALUE));
+            
+        GUI_ELEMENT_MAIN.Reset(self, self.Show_Detail_Popup);
+        //GUI_ELEMENT_FACE.Reset(self, self.Show_Detail_Popup);
+        Set_Field_Values();
     }
     
     var Set_Field_Values = function(){
-        let elems = document.getElementsByClassName(OUTFIELD_CLASS_NAME);
-        for (let i = 0; i < elems.length; i++){
-            elems[i].value = self.sum;
-        }
+        let str = is_Calculated ? self.sum : "Нет";
+        GUI_ELEMENT_MAIN.Set_Value(str);
+        //GUI_ELEMENT_FACESet_Value(str);
     }
 
     var Update_Mod_Map = function(){
@@ -296,8 +302,6 @@ function Resolve_t () {
         self.modifier_map.Change_Value(
             BASIC_MOD_ID_T.LVL,
             Math.floor(chardata.lvl.sum / 2));
-
-
     }
 
 //public methods
@@ -344,14 +348,27 @@ function Resolve_t () {
     Init();
 }
 
-function Level_t (){
+function Level_t(
+    gui_element_main,
+){
 //constants
     const CLASS_ID_PREFIX = "CLASS_";
     const CLASS_MAIN_STR = "Класс";
+    
+    const GUI_ELEMENT_MAIN = gui_element_main;
 
 //private methods
+    var Init = function(){
+        CLASS_DATABASE.forEach(class_item => {
+            self.modifier_map.Add(
+                CLASS_ID_PREFIX + class_item.name,
+                new Modifier_t(0, CLASS_MAIN_STR, class_item.name));
+        });
+        GUI_ELEMENT_MAIN.Reset(self, self.Show_Detail_Popup);
+        Set_Field_Values();
+    }
     var Set_Field_Values = function(){
-        m_out_field.value = self.sum;
+        GUI_ELEMENT_MAIN.Set_Value(self.sum);
     }
 
     var Update_Mod_Map = function(){
@@ -379,7 +396,6 @@ function Level_t (){
     }
 
 //private properties
-    var m_out_field = document.getElementById('outfield_level');
     var self = this;
 
 //public properties
@@ -388,12 +404,7 @@ function Level_t (){
     this.modifier_map = new Modifier_Map_t(this.Recalc);
 
 //additional initialization
-    Set_Field_Values();
-    CLASS_DATABASE.forEach(class_item => {
-        this.modifier_map.Add(
-            CLASS_ID_PREFIX + class_item.name,
-            new Modifier_t(0, CLASS_MAIN_STR, class_item.name));
-    });
+    Init();
 }
 
 function BAB_t (out_field){
@@ -1180,10 +1191,22 @@ function Saves_t (){
 function Stats_t(){
 //public properties
     this.abiscores = new Abiscore_t();
-    this.initiative = new Initative_t();
-    this.hp = new Health_t();
-    this.sp = new Stamina_t();
-    this.rp = new Resolve_t();
+    this.initiative = new Initative_t(
+        layers.maininfo.numbers.outfield_initiative,
+        layers.maininfo.numbers.outfield_initiative //TODO
+    );
+    this.hp = new Health_t(
+        layers.maininfo.numbers.outfield_hp,
+        layers.maininfo.numbers.outfield_hp //TODO
+    );
+    this.sp = new Stamina_t(
+        layers.maininfo.numbers.outfield_sp,
+        layers.maininfo.numbers.outfield_sp //TODO
+    );
+    this.rp = new Resolve_t(
+        layers.maininfo.numbers.outfield_rp,
+        layers.maininfo.numbers.outfield_rp //TODO
+    );
     this.saves = new Saves_t();
     this.attacks = new Attacks_t();
     this.defense = new Defense_t();

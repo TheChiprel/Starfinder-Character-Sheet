@@ -12,7 +12,7 @@ function Chardata_t(){
         self.theme = new Theme_t(layers.maininfo.main.selector_theme);
         self.abilities = new Chardata_Abilities_t();
         self.classes = new Class_Collection_t();
-        self.lvl = new Level_t();
+        self.lvl = new Level_t(layers.maininfo.numbers.outfield_lvl);
         self.stats = new Stats_t();
         self.skills = new Skills_t();
         self.inventory = new Inventory_t();

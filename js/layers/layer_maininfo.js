@@ -31,9 +31,8 @@ function GUI_Element_InField_t(is_numerical = false){
     }
 
 //public methods
-    this.Reset = function(owner, value){
+    this.Reset = function(owner){
         m_owner = owner;
-        self.Set_Value(value);
     }
 
     this.Set_Value = function(value){
@@ -58,7 +57,6 @@ function GUI_Element_OutField_t(){
 
 //private methods
     var Event_OnClick = function(){
-        alert("test!");
         if (m_onclick_func == null){
             return;
         }
@@ -67,10 +65,9 @@ function GUI_Element_OutField_t(){
     }
 
 //public methods
-    this.Reset = function(owner, value, onclick_func){
+    this.Reset = function(owner, onclick_func){
         m_owner = owner;
         m_onclick_func = onclick_func;
-        self.Set_Value(value);
     }
 
     this.Set_Value = function(value){
@@ -106,9 +103,8 @@ function GUI_Element_Selector_t(option_list){
     }
 
 //public methods
-    this.Reset = function(owner, value){
+    this.Reset = function(owner){
         m_owner = owner;
-        self.Set_Value(value)
     }
 
     this.Set_Value = function(value){
@@ -177,8 +173,6 @@ function Block_MainInfo_Main_t(){
 
 //private properties
     var self = this;
-    
-    var m_owner = null;
 
 //public properties
     this.infield_name = new GUI_Element_InField_t();
@@ -193,17 +187,43 @@ function Block_MainInfo_Main_t(){
 
 function Block_MainInfo_Numbers_t(){
 //constants
+    const GUI_BLOCK = document.getElementById("block_maininfo_numbers");
 
 //private methods
 
+    var Init = function(){
+        GUI_BLOCK.innerHTML = "";
+        
+        Append_Label_Element_Pair(GUI_BLOCK, "Уровень:", self.outfield_lvl.html_element, false);
+        GUI_BLOCK.appendChild(HTML_Create_BR());
+        
+        Append_Label_Element_Pair(GUI_BLOCK, "Инициатива:", self.outfield_initiative.html_element, false);
+        GUI_BLOCK.appendChild(HTML_Create_BR());
+        
+        Append_Label_Element_Pair(GUI_BLOCK, "Макс. Пункты Живучести (ПЖ):", self.outfield_sp.html_element, true);
+        GUI_BLOCK.appendChild(HTML_Create_BR());
+        
+        Append_Label_Element_Pair(GUI_BLOCK, "Макс. Пункты Здоровья (ПЗ):", self.outfield_hp.html_element, true);
+        GUI_BLOCK.appendChild(HTML_Create_BR());
+        
+        Append_Label_Element_Pair(GUI_BLOCK, "Макс. Пункты Решимости (ПР):", self.outfield_rp.html_element, true);
+    }
+    
 //public methods
+
 
 //private properties
     var self = this;
 
 //public properties
+    this.outfield_lvl = new GUI_Element_OutField_t();
+    this.outfield_initiative = new GUI_Element_OutField_t();
+    this.outfield_sp = new GUI_Element_OutField_t();
+    this.outfield_hp = new GUI_Element_OutField_t();
+    this.outfield_rp = new GUI_Element_OutField_t();
 
 //additional initialization
+    Init();
 }
 
 function Block_MainInfo_Classes_t(){
