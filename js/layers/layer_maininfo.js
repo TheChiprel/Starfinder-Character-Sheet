@@ -370,17 +370,69 @@ function Block_MainInfo_Defense_t(){
 
 function Block_MainInfo_Speed_t(){
 //constants
+    const GUI_BLOCK = document.getElementById("block_maininfo_speed");
 
 //private methods
 
+    var Init = function(){
+        GUI_BLOCK.innerHTML = "Скорости:";
+        GUI_BLOCK.appendChild(HTML_Create_BR());
+        
+        Append_Label_Element_Pair(
+            GUI_BLOCK,
+            "Наземная:",
+            self.outfield_land.html_element,
+            false
+        );
+        GUI_BLOCK.appendChild(HTML_Create_BR());
+        
+        Append_Label_Element_Pair(
+            GUI_BLOCK,
+            "Полёт:",
+            self.outfield_flight.html_element,
+            false
+        );
+        GUI_BLOCK.appendChild(HTML_Create_BR());
+        
+        Append_Label_Element_Pair(
+            GUI_BLOCK,
+            "Рытьё:",
+            self.outfield_burrow.html_element,
+            false
+        );
+        GUI_BLOCK.appendChild(HTML_Create_BR());
+        
+        Append_Label_Element_Pair(
+            GUI_BLOCK,
+            "Плавание:",
+            self.outfield_swim.html_element,
+            false
+        );
+        GUI_BLOCK.appendChild(HTML_Create_BR());
+        
+        Append_Label_Element_Pair(
+            GUI_BLOCK,
+            "Лазание:",
+            self.outfield_climb.html_element,
+            false
+        );
+    }
+    
 //public methods
+
 
 //private properties
     var self = this;
 
 //public properties
+    this.outfield_land = new GUI_Element_OutField_t();
+    this.outfield_flight = new GUI_Element_OutField_t();
+    this.outfield_burrow = new GUI_Element_OutField_t();
+    this.outfield_swim = new GUI_Element_OutField_t();
+    this.outfield_climb = new GUI_Element_OutField_t();
 
 //additional initialization
+    Init();
 }
 
 function Block_MainInfo_Saves_t(){

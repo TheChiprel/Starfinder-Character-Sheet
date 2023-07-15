@@ -986,7 +986,11 @@ function Defense_t(){
     var self = this;
 }
 
-function Speed_Type_t (name, out_field_class){
+function Speed_Type_t (
+    name,
+    gui_element_main,
+    gui_element_face
+){
 //constants
     const BASIC_MOD_ID_T = Object.freeze(
         {
@@ -994,19 +998,28 @@ function Speed_Type_t (name, out_field_class){
             "ARMOR_PENALTY": 'ARMOR_PENALTY'
         }
     );
-    const OUTFIELD_CLASS_NAME = out_field_class;
+    const GUI_ELEMENT_MAIN = gui_element_main;
+    const GUI_ELEMENT_FACE = gui_element_face;
 
 //private methods
-    var Set_Field_Values = function(){
-        let elems = document.getElementsByClassName(OUTFIELD_CLASS_NAME);
-        let str = "Нет";
-        if (self.sum > 0){
-            str = self.sum;
-        }
+    var Init = function(){
+        self.modifier_map.Add(
+            BASIC_MOD_ID_T.BASE_VALUE,
+            new Modifier_t(this.base_value, "Начальное значение"));
+        self.modifier_map.Add(
+            BASIC_MOD_ID_T.ARMOR_PENALTY,
+            new Modifier_t(0, "Штраф брони", "Без брони"));
+            
+        GUI_ELEMENT_MAIN.Reset(self, self.Show_Detail_Popup);
+        GUI_ELEMENT_FACE.Reset(self, self.Show_Detail_Popup);
+        Set_Field_Values();
+    }
 
-        for (let i = 0; i < elems.length; i++){
-            elems[i].value = str;
-        }
+    var Set_Field_Values = function(){
+        let str = (self.sum > 0) ? self.sum : "Нет";
+
+        GUI_ELEMENT_MAIN.Set_Value(str);
+        GUI_ELEMENT_FACE.Set_Value(str);
     }
 
 //public methods
@@ -1058,14 +1071,7 @@ function Speed_Type_t (name, out_field_class){
     this.arr_recalc_functions = new Recalc_Function_Collection_t();
 
 //additional initialization
-    Set_Field_Values();
-
-    this.modifier_map.Add(
-        BASIC_MOD_ID_T.BASE_VALUE,
-        new Modifier_t(this.base_value, "Начальное значение"));
-    this.modifier_map.Add(
-        BASIC_MOD_ID_T.ARMOR_PENALTY,
-        new Modifier_t(0, "Штраф брони", "Без брони"));
+    Init();
 }
 
 function Speeds_t (){
@@ -1107,11 +1113,31 @@ function Speeds_t (){
     var self = this;
 
 //public properties
-    this.land = new Speed_Type_t("Наземная", "class_output_mspeed_land");
-    this.flight = new Speed_Type_t("Полёт", "class_output_mspeed_flight");
-    this.burrow = new Speed_Type_t("Рытьё", "class_output_mspeed_burrow");
-    this.swim = new Speed_Type_t("Плавание", "class_output_mspeed_swim");
-    this.climb = new Speed_Type_t("Лазание", "class_output_mspeed_climb");
+    this.land = new Speed_Type_t(
+        "Наземная",
+        layers.maininfo.speed.outfield_land,
+        layers.maininfo.speed.outfield_land //TODO
+    );
+    this.flight = new Speed_Type_t(
+        "Полёт",
+        layers.maininfo.speed.outfield_flight,
+        layers.maininfo.speed.outfield_flight //TODO
+    );
+    this.burrow = new Speed_Type_t(
+        "Рытьё",
+        layers.maininfo.speed.outfield_burrow,
+        layers.maininfo.speed.outfield_burrow //TODO
+    );
+    this.swim = new Speed_Type_t(
+        "Плавание",
+        layers.maininfo.speed.outfield_swim,
+        layers.maininfo.speed.outfield_swim //TODO
+    );
+    this.climb = new Speed_Type_t(
+        "Лазание",
+        layers.maininfo.speed.outfield_climb,
+        layers.maininfo.speed.outfield_climb //TODO
+    );
 }
 
 function Save_Type_t (name, prefix, abiscore, out_field_class){
