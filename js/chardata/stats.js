@@ -407,14 +407,26 @@ function Level_t(
     Init();
 }
 
-function BAB_t (out_field){
+function BAB_t (gui_element){
 //constants
     const CLASS_ID_PREFIX = "CLASS_";
     const CLASS_MAIN_STR = "Класс";
+    const GUI_ELEMENT = gui_element;
 
 //private methods
+    var Init = function(){
+        CLASS_DATABASE.forEach(class_item => {
+            self.modifier_map.Add(
+                CLASS_ID_PREFIX + class_item.name,
+                new Modifier_t(0, CLASS_MAIN_STR, class_item.name));
+        });
+        
+        GUI_ELEMENT.Reset(self, self.Show_Detail_Popup);
+        Set_Field_Values();
+    }
+
     var Set_Field_Values = function(){
-        m_out_field.value = GetModifierStr(self.sum);
+        GUI_ELEMENT.Set_Value(GetModifierStr(self.sum));
     }
 
     var Update_Mod_Map = function(){
@@ -446,7 +458,6 @@ function BAB_t (out_field){
     }
 //private properties
     var self = this;
-    var m_out_field = out_field;
 
 //public properties
     this.sum = 0;
@@ -454,16 +465,15 @@ function BAB_t (out_field){
     this.arr_recalc_functions = new Recalc_Function_Collection_t();
 
 //additional initialization
-    Set_Field_Values();
-
-    CLASS_DATABASE.forEach(class_item => {
-        this.modifier_map.Add(
-            CLASS_ID_PREFIX + class_item.name,
-            new Modifier_t(0, CLASS_MAIN_STR, class_item.name));
-    });
+    Init();
 }
 
-function Attack_Type_t (name, abiscore, out_field_class){
+function Attack_Type_t (
+    name,
+    abiscore,
+    gui_element_main,
+    gui_element_face
+){
 //constants
     const BASIC_MOD_ID_T = Object.freeze(
         {
@@ -471,31 +481,27 @@ function Attack_Type_t (name, abiscore, out_field_class){
             "ABISCORE": 'ABISCORE'
         }
     );
-    const OUTFIELD_CLASS_NAME = out_field_class;
+    const GUI_ELEMENT_MAIN = gui_element_main;
+    const GUI_ELEMENT_FACE = gui_element_face;
 
 //private methods
     var Init = function(){
-        let elems = document.getElementsByClassName(OUTFIELD_CLASS_NAME);
-        for (let i = 0; i < elems.length; i++){
-            elems[i].onclick = self.Show_Detail_Popup;
-        }
-        
-        Set_Field_Values();
-
         self.modifier_map.Add(
             BASIC_MOD_ID_T.ABISCORE,
             new Modifier_t(0, m_abiscore));
         self.modifier_map.Add(
             BASIC_MOD_ID_T.BAB,
             new Modifier_t(0, "БМА"));
+            
+        GUI_ELEMENT_MAIN.Reset(self, self.Show_Detail_Popup);
+        //GUI_ELEMENT_FACE.Reset(self, self.Show_Detail_Popup);
+        Set_Field_Values();
     }
     
     var Set_Field_Values = function(){
         let str = GetModifierStr(self.sum);
-        let elems = document.getElementsByClassName(OUTFIELD_CLASS_NAME);
-        for (let i = 0; i < elems.length; i++){
-            elems[i].value = str;
-        }
+        GUI_ELEMENT_MAIN.Set_Value(str);
+        //GUI_ELEMENT_FACE.Set_Value(str);
     }
 
     var Update_Mod_Map = function(){
@@ -592,11 +598,31 @@ function Attacks_t (){
     var self = this;
 
 //public properties
-    this.bab = new BAB_t(document.getElementById('outfield_attack_bab'));
-    this.melee = new Attack_Type_t (WEAPON_MODIFIER.MELEE, ABISCORES.STR, "class_output_attack_melee");
-    this.operative = new Attack_Type_t (WEAPON_MODIFIER.OPERATIVE, ABISCORES.AGI, "class_output_attack_operative");
-    this.ranged = new Attack_Type_t (WEAPON_MODIFIER.RANGED, ABISCORES.AGI, "class_output_attack_ranged");
-    this.thrown = new Attack_Type_t (WEAPON_MODIFIER.THROWN, ABISCORES.STR, "class_output_attack_thrown");
+    this.bab = new BAB_t(layers.maininfo.attack.outfield_bab);
+    this.melee = new Attack_Type_t (
+        WEAPON_MODIFIER.MELEE,
+        ABISCORES.STR,
+        layers.maininfo.attack.outfield_melee,
+        layers.maininfo.attack.outfield_melee //TODO
+    );  
+    this.operative = new Attack_Type_t (
+        WEAPON_MODIFIER.OPERATIVE,
+        ABISCORES.AGI,
+        layers.maininfo.attack.outfield_operative,
+        layers.maininfo.attack.outfield_operative //TODO
+    );
+    this.ranged = new Attack_Type_t (
+        WEAPON_MODIFIER.RANGED,
+        ABISCORES.AGI,
+        layers.maininfo.attack.outfield_ranged,
+        layers.maininfo.attack.outfield_ranged //TODO
+    );
+    this.thrown = new Attack_Type_t (
+        WEAPON_MODIFIER.THROWN,
+        ABISCORES.STR,
+        layers.maininfo.attack.outfield_thrown,
+        layers.maininfo.attack.outfield_thrown //TODO
+    );
 }
 
 function AC_t (name, out_field_class){

@@ -258,17 +258,44 @@ function Block_MainInfo_Proficiency_t(){
 
 function Block_MainInfo_Attack_t(){
 //constants
+    const GUI_BLOCK = document.getElementById("block_maininfo_attack");
 
 //private methods
 
+    var Init = function(){
+        GUI_BLOCK.innerHTML = "Атака:";
+        GUI_BLOCK.appendChild(HTML_Create_BR());
+        
+        Append_Label_Element_Pair(GUI_BLOCK, "БМА:", self.outfield_bab.html_element, false);
+        GUI_BLOCK.appendChild(HTML_Create_BR());
+        
+        Append_Label_Element_Pair(GUI_BLOCK, "Ближняя:", self.outfield_melee.html_element, false);
+        GUI_BLOCK.appendChild(HTML_Create_BR());
+        
+        Append_Label_Element_Pair(GUI_BLOCK, "Оперативная:", self.outfield_operative.html_element, false);
+        GUI_BLOCK.appendChild(HTML_Create_BR());
+        
+        Append_Label_Element_Pair(GUI_BLOCK, "Дистанционная:", self.outfield_ranged.html_element, false);
+        GUI_BLOCK.appendChild(HTML_Create_BR());
+        
+        Append_Label_Element_Pair(GUI_BLOCK, "Метательная:", self.outfield_thrown.html_element, false);
+    }
+    
 //public methods
+
 
 //private properties
     var self = this;
 
 //public properties
+    this.outfield_bab = new GUI_Element_OutField_t();
+    this.outfield_melee = new GUI_Element_OutField_t();
+    this.outfield_operative = new GUI_Element_OutField_t();
+    this.outfield_ranged = new GUI_Element_OutField_t();
+    this.outfield_thrown = new GUI_Element_OutField_t();
 
 //additional initialization
+    Init();
 }
 
 function Block_MainInfo_Defense_t(){
