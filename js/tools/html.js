@@ -1,3 +1,5 @@
+//TODO: remove IDs and names
+
 function HTML_Create_BR(){
     return document.createElement("br");
 }
@@ -36,17 +38,11 @@ function HTML_Create_Output(
 
 function HTML_Create_Label(
     display_text,
-    for_elem = undefined,
     id = undefined,
     class_elem = undefined
 ){
     var ret_elem = document.createElement("label");
     ret_elem.innerHTML = display_text;
-
-    if (for_elem != undefined){
-        ret_elem.setAttribute('for', for_elem);
-    }
-    //else NOTHING TO DO
 
     if (id != undefined){
         ret_elem.setAttribute('id', id);

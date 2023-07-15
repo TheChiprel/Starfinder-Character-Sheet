@@ -1,3 +1,20 @@
+function Append_Label_Element_Pair(
+    gui_block,
+    label_name,
+    html_element,
+    is_separate_line = false
+){
+    var label = HTML_Create_Label(
+        label_name
+    );
+    
+    if (is_separate_line){
+        label.appendChild(HTML_Create_BR());
+    }
+    label.appendChild(html_element);
+    gui_block.appendChild(label);
+}
+
 //TODO: move GUI elements to separate file?
 
 //TODO: check numerical values, cancel invalids
@@ -14,9 +31,9 @@ function GUI_Element_InField_t(is_numerical = false){
     }
 
 //public methods
-    this.Reset = function(owner){
+    this.Reset = function(owner, value){
         m_owner = owner;
-        self.Set_Value("");
+        self.Set_Value(value);
     }
 
     this.Set_Value = function(value){
@@ -41,6 +58,7 @@ function GUI_Element_OutField_t(){
 
 //private methods
     var Event_OnClick = function(){
+        alert("test!");
         if (m_onclick_func == null){
             return;
         }
@@ -49,10 +67,10 @@ function GUI_Element_OutField_t(){
     }
 
 //public methods
-    this.Reset = function(owner, onclick_func){
+    this.Reset = function(owner, value, onclick_func){
         m_owner = owner;
         m_onclick_func = onclick_func;
-        self.Set_Value("");
+        self.Set_Value(value);
     }
 
     this.Set_Value = function(value){
@@ -88,8 +106,9 @@ function GUI_Element_Selector_t(option_list){
     }
 
 //public methods
-    this.Reset = function(owner){
+    this.Reset = function(owner, value){
         m_owner = owner;
+        self.Set_Value(value)
     }
 
     this.Set_Value = function(value){
@@ -136,52 +155,21 @@ function Block_MainInfo_Main_t(){
     }
 
     var Init = function(){
-        var label_name = HTML_Create_Label(
-            "Имя:",
-            undefined //TODO
-        );
-        var label_race = HTML_Create_Label(
-            "Раса:",
-            undefined //TODO
-        );
-        var label_theme = HTML_Create_Label(
-            "Тема:",
-            undefined //TODO
-        );
-        var label_size = HTML_Create_Label(
-            "Размер:",
-            undefined //TODO
-        );
-        var label_category = HTML_Create_Label(
-            "Тип:",
-            undefined //TODO
-        );
-        
         GUI_BLOCK.innerHTML = "";
         
-        GUI_BLOCK.appendChild(label_name);
-        GUI_BLOCK.appendChild(HTML_Create_BR());
-        GUI_BLOCK.appendChild(self.infield_name.html_element);
+        Append_Label_Element_Pair(GUI_BLOCK, "Имя:", self.infield_name.html_element, true);
         GUI_BLOCK.appendChild(HTML_Create_BR());
         
-        GUI_BLOCK.appendChild(label_race);
-        GUI_BLOCK.appendChild(HTML_Create_BR());
-        GUI_BLOCK.appendChild(self.selector_race.html_element);
+        Append_Label_Element_Pair(GUI_BLOCK, "Раса:", self.selector_race.html_element, true);
         GUI_BLOCK.appendChild(HTML_Create_BR());
         
-        GUI_BLOCK.appendChild(label_theme);
-        GUI_BLOCK.appendChild(HTML_Create_BR());
-        GUI_BLOCK.appendChild(self.selector_theme.html_element);
+        Append_Label_Element_Pair(GUI_BLOCK, "Тема:", self.selector_theme.html_element, true);
         GUI_BLOCK.appendChild(HTML_Create_BR());
         
-        GUI_BLOCK.appendChild(label_size);
-        GUI_BLOCK.appendChild(HTML_Create_BR());
-        GUI_BLOCK.appendChild(self.outfield_size.html_element);
+        Append_Label_Element_Pair(GUI_BLOCK, "Размер:", self.outfield_size.html_element, true);
         GUI_BLOCK.appendChild(HTML_Create_BR());
         
-        GUI_BLOCK.appendChild(label_category);
-        GUI_BLOCK.appendChild(HTML_Create_BR());
-        GUI_BLOCK.appendChild(self.outfield_category.html_element);
+        Append_Label_Element_Pair(GUI_BLOCK, "Тип:", self.outfield_category.html_element, true);
     }
     
 //public methods

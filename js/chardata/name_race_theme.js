@@ -4,7 +4,7 @@ function Name_t(gui_block){
     
 //private methods
     var Init = function(){
-        GUI_BLOCK.Reset(self);
+        GUI_BLOCK.Reset(self, "");
     }
 
 //public methods
@@ -45,9 +45,9 @@ function Race_t(
     
 //private methods
     var Init = function(){
-        GUI_BLOCK_RACE.Reset(self);
-        GUI_BLOCK_SIZE.Reset(self);
-        GUI_BLOCK_TYPE.Reset(self);
+        GUI_BLOCK_RACE.Reset(self, "---");
+        GUI_BLOCK_SIZE.Reset(self, "---");
+        GUI_BLOCK_TYPE.Reset(self, "---");
     }
     
     var Get_Entry_By_Name = function(name){
@@ -130,7 +130,7 @@ function Theme_t(gui_block){
     
 //private methods
     var Init = function(){
-        GUI_BLOCK.Reset(self);
+        GUI_BLOCK.Reset(self, "---");
     }
     
     var Get_Entry_By_Name = function(name){
