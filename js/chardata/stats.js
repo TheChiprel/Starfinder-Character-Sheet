@@ -102,7 +102,7 @@ function Health_t(
 
     var Set_Field_Values = function(){
         GUI_ELEMENT_MAIN.Set_Value(self.sum);
-        //GUI_ELEMENT_FACE.Set_Value(self.sum);
+        GUI_ELEMENT_FACE.Set_Value(self.sum);
     }
 
     var Update_Mod_Map = function(){
@@ -603,25 +603,25 @@ function Attacks_t (){
         WEAPON_MODIFIER.MELEE,
         ABISCORES.STR,
         layers.maininfo.attack.outfield_melee,
-        layers.maininfo.attack.outfield_melee //TODO
+        layers.face.block_stats.attack_melee
     );  
     this.operative = new Attack_Type_t (
         WEAPON_MODIFIER.OPERATIVE,
         ABISCORES.AGI,
         layers.maininfo.attack.outfield_operative,
-        layers.maininfo.attack.outfield_operative //TODO
+        layers.face.block_stats.attack_operative
     );
     this.ranged = new Attack_Type_t (
         WEAPON_MODIFIER.RANGED,
         ABISCORES.AGI,
         layers.maininfo.attack.outfield_ranged,
-        layers.maininfo.attack.outfield_ranged //TODO
+        layers.face.block_stats.attack_ranged
     );
     this.thrown = new Attack_Type_t (
         WEAPON_MODIFIER.THROWN,
         ABISCORES.STR,
         layers.maininfo.attack.outfield_thrown,
-        layers.maininfo.attack.outfield_thrown //TODO
+        layers.face.block_stats.attack_thrown
     );
 }
 
@@ -966,22 +966,22 @@ function Defense_t(){
     this.eac = new AC_t(
         "ЭКБ",
         layers.maininfo.defense.outfield_eac,
-        layers.maininfo.defense.outfield_eac //TODO
+        layers.face.block_stats.eac
     );
     this.kac = new AC_t("ККБ",
         layers.maininfo.defense.outfield_kac,
-        layers.maininfo.defense.outfield_kac //TODO
+        layers.face.block_stats.kac
     );
     this.against_maneuver = new Against_Maneuver_t(
         layers.maininfo.defense.outfield_maneuver,
-        layers.maininfo.defense.outfield_maneuver //TODO
+        layers.face.block_stats.against_maneuvers
     );
     this.armor_limit_agi = new Armor_Limit_Agi();
     this.resistance = new Resistance_Collection_t(
         layers.maininfo.defense.outfield_resistance,
-        layers.maininfo.defense.outfield_resistance //TODO
+        layers.face.block_stats.resistance
     );
-    this.dr = 0;//TODO layers.maininfo.defense.outfield_dr
+    this.dr = 0;//TODO layers.maininfo.defense.outfield_dr & layers.face.block_stats.dr
 
     var self = this;
 }
@@ -1116,27 +1116,27 @@ function Speeds_t (){
     this.land = new Speed_Type_t(
         "Наземная",
         layers.maininfo.speed.outfield_land,
-        layers.maininfo.speed.outfield_land //TODO
+        layers.face.block_stats.speed_land
     );
     this.flight = new Speed_Type_t(
         "Полёт",
         layers.maininfo.speed.outfield_flight,
-        layers.maininfo.speed.outfield_flight //TODO
+        layers.face.block_stats.speed_flight
     );
     this.burrow = new Speed_Type_t(
         "Рытьё",
         layers.maininfo.speed.outfield_burrow,
-        layers.maininfo.speed.outfield_burrow //TODO
+        layers.face.block_stats.speed_burrow
     );
     this.swim = new Speed_Type_t(
         "Плавание",
         layers.maininfo.speed.outfield_swim,
-        layers.maininfo.speed.outfield_swim //TODO
+        layers.face.block_stats.speed_swim
     );
     this.climb = new Speed_Type_t(
         "Лазание",
         layers.maininfo.speed.outfield_climb,
-        layers.maininfo.speed.outfield_climb //TODO
+        layers.face.block_stats.speed_climb
     );
 }
 
@@ -1259,21 +1259,21 @@ function Saves_t (){
         'fort',
         ABISCORES.CON,
         layers.maininfo.saves.outfield_fort,
-        layers.maininfo.saves.outfield_fort //TODO
+        layers.face.block_stats.save_fort
     );
     this.reflex = new Save_Type_t(
         "Реакция",
         'refl',
         ABISCORES.AGI,
         layers.maininfo.saves.outfield_refl,
-        layers.maininfo.saves.outfield_refl //TODO
+        layers.face.block_stats.save_refl
     );
     this.will = new Save_Type_t(
         "Воля",
         'will',
         ABISCORES.WIS,
         layers.maininfo.saves.outfield_will,
-        layers.maininfo.saves.outfield_will //TODO
+        layers.face.block_stats.save_will
     );
 }
 
@@ -1282,19 +1282,19 @@ function Stats_t(){
     this.abiscores = new Abiscore_t();
     this.initiative = new Initative_t(
         layers.maininfo.numbers.outfield_initiative,
-        layers.maininfo.numbers.outfield_initiative //TODO
+        layers.face.block_stats.initiative
     );
     this.hp = new Health_t(
         layers.maininfo.numbers.outfield_hp,
-        layers.maininfo.numbers.outfield_hp //TODO
+        layers.face.block_stats.hp_max
     );
     this.sp = new Stamina_t(
         layers.maininfo.numbers.outfield_sp,
-        layers.maininfo.numbers.outfield_sp //TODO
+        layers.face.block_stats.sp_max
     );
     this.rp = new Resolve_t(
         layers.maininfo.numbers.outfield_rp,
-        layers.maininfo.numbers.outfield_rp //TODO
+        layers.face.block_stats.rp_max
     );
     this.saves = new Saves_t();
     this.attacks = new Attacks_t();

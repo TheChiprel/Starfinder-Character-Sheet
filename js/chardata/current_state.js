@@ -1,30 +1,19 @@
-function Numeric_State_t(class_field, max_value_func){
+function Numeric_State_t(
+    gui_block
+){
 //constants
-    const CLASS_FIELD = class_field;
+    const GUI_BLOCK = gui_block;
     
 //private methods
     var Init = function(){
-        let elems = document.getElementsByClassName(CLASS_FIELD);
-        for (let i = 0; i < elems.length; i++){
-            elems[i].onchange = Proc_OnChange_Event;
-            elems[i].value = 0;
-        }
+        GUI_BLOCK.Reset(self.Set_Value, self.Get_Value);
+        GUI_BLOCK.Set_Min_Value(self.min_value);
+        GUI_BLOCK.Set_Max_Value(self.max_value);
+        Set_Field_Values();
     }
     
-    var Proc_OnChange_Event = function(event){
-        let value = event.target.value;
-        if(isNaN(value)){
-            event.target.value = self.value;
-            return;
-        }
-        self.Set_Value(parseInt(value));
-    }
-
     var Set_Field_Values = function(){
-        let elems = document.getElementsByClassName(CLASS_FIELD);
-        for (let i = 0; i < elems.length; i++){
-            elems[i].value = self.value;
-        }
+        GUI_BLOCK.Set_Value(self.value);
     }
 
 //public methods
@@ -39,6 +28,10 @@ function Numeric_State_t(class_field, max_value_func){
             }
             Set_Field_Values();
         }
+    }
+    
+    this.Get_Value = function(){
+        return self.value;
     }
     
     
@@ -68,11 +61,8 @@ function Numeric_State_t(class_field, max_value_func){
             self.value += (self.max_value - prev_value);
         }
         
-        let elems = document.getElementsByClassName(CLASS_FIELD);
-        for (let i = 0; i < elems.length; i++){
-            elems[i].max = self.max_value;
-            elems[i].value = self.value;
-        }
+        GUI_BLOCK.Set_Max_Value(self.max_value);
+        GUI_BLOCK.Set_Value(self.value);
     }
     
     this.Get_SaveData_Obj = function(){
@@ -102,10 +92,6 @@ function Numeric_State_t(class_field, max_value_func){
 
 function Current_State_t(){
 //constants
-    const CLASS_TEMP_HP = "class_infield_temp_hp";
-    const CLASS_HP = "class_infield_hp";
-    const CLASS_SP = "class_infield_sp";
-    const CLASS_RP = "class_infield_rp";
     
 //private methods
 
@@ -136,10 +122,10 @@ function Current_State_t(){
     var self = this;
 
 //public properties
-    this.hp = new Numeric_State_t(CLASS_HP);
-    this.sp = new Numeric_State_t(CLASS_SP);
-    this.rp = new Numeric_State_t(CLASS_RP);
-    this.temp_hp = new Numeric_State_t(CLASS_TEMP_HP);
+    this.hp = new Numeric_State_t(layers.face.block_stats.hp_curr);
+    this.sp = new Numeric_State_t(layers.face.block_stats.sp_curr);
+    this.rp = new Numeric_State_t(layers.face.block_stats.rp_curr);
+    this.temp_hp = new Numeric_State_t(layers.face.block_stats.temp_hp);
 
 //additional initialization
 

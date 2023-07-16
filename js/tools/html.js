@@ -127,7 +127,14 @@ function HTML_Create_Input_Text(
     return ret_elem;
 }
 
-function HTML_Create_Input_Number(value = 0, min = 0, max = 100, onchange_elem = undefined, id = undefined, class_elem = undefined){
+function HTML_Create_Input_Number(
+    value = 0,
+    min = 0,
+    max = 100,
+    onchange_elem = undefined,
+    id = undefined,
+    class_elem = undefined
+){
     var ret_elem = document.createElement("input");
     ret_elem.type = 'number';
     ret_elem.min = min;

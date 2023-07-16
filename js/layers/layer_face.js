@@ -1,22 +1,40 @@
+//TODO: rework so value changed through functions
 function Block_Face_Abiscores_t(){
+//constants
+
 //private methods
     var Init = function(){
         const ABISCORE_ARR = Object.values(ABISCORES);
         
-        Clear_Table();
+        self.html_element.innerHTML = "Хар-ки:";
+        m_table = HTML_Create_Table(
+            1,
+            3,
+            true,
+            "100%",
+            ["34%", "33%", "33%"]
+        );
+        
+        m_table.rows[0].cells[0].innerHTML = "Хар-ка";
+        m_table.rows[0].cells[1].innerHTML = "Значение";
+        m_table.rows[0].cells[2].innerHTML = "Мод.";
+        
+        //Clear_Table();
         
         ABISCORE_ARR.forEach(abiscore => {
             Add_Abiscore(abiscore);
         });
+        
+        self.html_element.appendChild(m_table);
     }
 
 //public methods
-    var Clear_Table = function(){
+    // var Clear_Table = function(){
         //clearing table
-        while (m_table.rows.length > 1){
-            m_table.deleteRow(1);
-        }
-    }
+        // while (m_table.rows.length > 1){
+            // m_table.deleteRow(1);
+        // }
+    // }
     
     var Add_Abiscore = function(abiscore){
         var row = m_table.insertRow(m_table.rows.length);
@@ -41,12 +59,21 @@ function Block_Face_Abiscores_t(){
             "class_output_field " + Get_Class_Abiscore_Mod(abiscore));
         cell_mod.appendChild(cell_mod_output);
     }
+    
+    var Set_Abiscore_Value = function(){
+        //TODO
+    }
+    
+    var Set_Abiscore_Mod = function(){
+        //TODO
+    }
 
 //private properties
     var self = this;
-    var m_table = document.getElementById("table_face_abiscores");
+    var m_table; //created on init
 
 //public properties
+    this.html_element = HTML_Create_Div();
 
 //additional initialization
     Init();
@@ -55,32 +82,27 @@ function Block_Face_Abiscores_t(){
 function Block_Face_Skills_t(){
 //private methods
     var Init = function(){
-        let skills_arr = Object.values(SKILLS);
+        self.html_element.innerHTML = "Навыки:";
         
-        while (m_table.rows.length > 0){
-            m_table.deleteRow(0);
-        }
+        m_table = HTML_Create_Table(
+            1,
+            2,
+            true,
+            "100%",
+            ["75%", "25%"]
+        );
         
-        for (let i = 0; i < skills_arr.length; i++){
-            var row = m_table.insertRow(m_table.rows.length);
-            
-            var cell_name = document.createElement('th');
-            cell_name.innerHTML = skills_arr[i];
-            row.appendChild(cell_name);
-
-            let cell_mod = row.insertCell(1);
-            let cell_mod_function = chardata.skills.Show_Detail_Popup.bind(null, skills_arr[i]);
-            var cell_mod_output = HTML_Create_Output(0, cell_mod_function, undefined, "class_output_field class_output_skill_" + skills_arr[i]);
-            
-            cell_mod.appendChild(cell_mod_output);
-        }
+        m_table.rows[0].cells[0].innerHTML = "Навык";
+        m_table.rows[0].cells[1].innerHTML = "Мод.";
+        
+        self.html_element.appendChild(m_table);
     }
 
 //public methods
     this.Clear_Table = function(){
         //clearing table
-        while (m_table.rows.length > 0){
-            m_table.deleteRow(0);
+        while (m_table.rows.length > 1){
+            m_table.deleteRow(1);
         }
     }
     
@@ -104,16 +126,268 @@ function Block_Face_Skills_t(){
 
 //private properties
     var self = this;
-    var m_table = document.getElementById("table_face_skills");
+    var m_table; //created on init
 
 //public properties
+    this.html_element = HTML_Create_Div();
 
 //additional initialization
-    //Init();
+    Init();
 }
 
 function Block_Face_Stats_t(){
+//constants
+    GUI_BLOCK = document.getElementById("sublayer_face_stats");
+    
 //private methods
+    var Init = function(){
+        GUI_BLOCK.innerHTML = "";
+        var left_column = HTML_Create_Div("class_face_stats_column");
+        var middle_column = HTML_Create_Div("class_face_stats_column");
+        var right_column = HTML_Create_Div("class_face_stats_column");
+        
+        Init_Left_Column(left_column);
+        Init_Middle_Column(middle_column);
+        Init_Right_Column(right_column);
+        
+        GUI_BLOCK.appendChild(left_column);
+        GUI_BLOCK.appendChild(middle_column);
+        GUI_BLOCK.appendChild(right_column);
+    }
+    
+    var Init_Left_Column = function(clmn_block){
+        var div_init = HTML_Create_Div();
+        var div_temp_hp = HTML_Create_Div();
+        var div_sp = HTML_Create_Div();
+        var div_hp = HTML_Create_Div();
+        var div_rp = HTML_Create_Div();
+        
+        Append_Label_Element_Pair(
+            div_init,
+            "Инициатива:",
+            self.initiative.html_element,
+            true
+        );
+        
+        Append_Label_Element_Pair(
+            div_temp_hp,
+            "Временные ПЗ:",
+            self.temp_hp.html_element,
+            true
+        );
+        
+        Append_Label_Element_Pair(
+            div_sp,
+            "ПЖ:",
+            self.sp_curr.html_element,
+            true
+        );
+        div_sp.appendChild(document.createTextNode(" / "));
+        div_sp.appendChild(self.sp_max.html_element);
+        
+        Append_Label_Element_Pair(
+            div_hp,
+            "ПЗ:",
+            self.hp_curr.html_element,
+            true
+        );
+        div_hp.appendChild(document.createTextNode(" / "));
+        div_hp.appendChild(self.hp_max.html_element);
+        
+        Append_Label_Element_Pair(
+            div_rp,
+            "ПР:",
+            self.rp_curr.html_element,
+            true
+        );
+        div_rp.appendChild(document.createTextNode(" / "));
+        div_rp.appendChild(self.rp_max.html_element);
+        
+        clmn_block.appendChild(div_init);
+        clmn_block.appendChild(div_temp_hp);
+        clmn_block.appendChild(div_sp);
+        clmn_block.appendChild(div_hp);
+        clmn_block.appendChild(div_rp);
+        clmn_block.appendChild(self.abiscores.html_element);
+    }
+    
+    var Init_Middle_Column = function(clmn_block){
+        clmn_block.appendChild(self.skills.html_element);
+    }
+    
+    var Init_Right_Column = function(clmn_block){
+        var div_speed = HTML_Create_Div();
+        var div_attack = HTML_Create_Div();
+        var div_defense = HTML_Create_Div();
+        var div_saves = HTML_Create_Div();
+        
+        Init_Speed_Block(div_speed);
+        Init_Attack_Block(div_attack);
+        Init_Defense_Block(div_defense);
+        Init_Saves_Block(div_saves);
+        
+        
+        clmn_block.appendChild(div_speed);
+        clmn_block.appendChild(div_attack);
+        clmn_block.appendChild(div_defense);
+        clmn_block.appendChild(div_saves);
+
+    }
+    
+    var Init_Speed_Block = function(div_speed){
+        div_speed.innerHTML = "Скорости:";
+        div_speed.appendChild(HTML_Create_BR());
+        
+        Append_Label_Element_Pair(
+            div_speed,
+            "Наземная:",
+            self.speed_land.html_element,
+            false
+        );
+        div_speed.appendChild(HTML_Create_BR());
+        
+        Append_Label_Element_Pair(
+            div_speed,
+            "Полёт:",
+            self.speed_flight.html_element,
+            false
+        );
+        div_speed.appendChild(HTML_Create_BR());
+        
+        Append_Label_Element_Pair(
+            div_speed,
+            "Рытьё:",
+            self.speed_burrow.html_element,
+            false
+        );
+        div_speed.appendChild(HTML_Create_BR());
+        
+        Append_Label_Element_Pair(
+            div_speed,
+            "Плавание:",
+            self.speed_swim.html_element,
+            false
+        );
+        div_speed.appendChild(HTML_Create_BR());
+
+        Append_Label_Element_Pair(
+            div_speed,
+            "Лазание:",
+            self.speed_climb.html_element,
+            false
+        );
+    }
+    
+    var Init_Attack_Block = function(div_attack){
+        div_attack.innerHTML = "Атака:";
+        div_attack.appendChild(HTML_Create_BR());
+        
+        Append_Label_Element_Pair(
+            div_attack,
+            WEAPON_MODIFIER.MELEE,
+            self.attack_melee.html_element,
+            false
+        );
+        div_attack.appendChild(HTML_Create_BR());
+        
+        Append_Label_Element_Pair(
+            div_attack,
+            WEAPON_MODIFIER.OPERATIVE,
+            self.attack_operative.html_element,
+            false
+        );
+        div_attack.appendChild(HTML_Create_BR());
+        
+        Append_Label_Element_Pair(
+            div_attack,
+            WEAPON_MODIFIER.RANGED,
+            self.attack_ranged.html_element,
+            false
+        );
+        div_attack.appendChild(HTML_Create_BR());
+        
+        Append_Label_Element_Pair(
+            div_attack,
+            WEAPON_MODIFIER.THROWN,
+            self.attack_thrown.html_element,
+            false
+        );
+    }
+    
+    var Init_Defense_Block = function(div_defense){
+        div_defense.innerHTML = "Защита:";
+        div_defense.appendChild(HTML_Create_BR());
+        
+        Append_Label_Element_Pair(
+            div_defense,
+            "ЭКБ:",
+            self.eac.html_element,
+            false
+        );
+        div_defense.appendChild(HTML_Create_BR());
+        
+        Append_Label_Element_Pair(
+            div_defense,
+            "ККБ:",
+            self.kac.html_element,
+            false
+        );
+        div_defense.appendChild(HTML_Create_BR());
+        
+        Append_Label_Element_Pair(
+            div_defense,
+            "Против манёвров:",
+            self.against_maneuvers.html_element,
+            false
+        );
+        div_defense.appendChild(HTML_Create_BR());
+        
+        Append_Label_Element_Pair(
+            div_defense,
+            "Устойчивости:",
+            self.resistance.html_element,
+            false
+        );
+        div_defense.appendChild(HTML_Create_BR());
+
+        Append_Label_Element_Pair(
+            div_defense,
+            "СУ:",
+            self.dr.html_element,
+            false
+        );
+        
+        //TODO: remove later...
+        self.dr.Set_Value(0);
+    }
+    
+    var Init_Saves_Block = function(div_saves){
+        div_saves.innerHTML = "Скорости:";
+        div_saves.appendChild(HTML_Create_BR());
+        
+        Append_Label_Element_Pair(
+            div_saves,
+            "Стойкость:",
+            self.save_fort.html_element,
+            false
+        );
+        div_saves.appendChild(HTML_Create_BR());
+        
+        Append_Label_Element_Pair(
+            div_saves,
+            "Реакция:",
+            self.save_refl.html_element,
+            false
+        );
+        div_saves.appendChild(HTML_Create_BR());
+        
+        Append_Label_Element_Pair(
+            div_saves,
+            "Воля:",
+            self.save_will.html_element,
+            false
+        );
+    }
 
 //public methods
 
@@ -121,10 +395,46 @@ function Block_Face_Stats_t(){
     var self = this;
 
 //public properties
+    this.initiative = new GUI_Element_OutField_t();
+    
+    this.temp_hp = new GUI_Element_InNumber_t();
+    
+    this.sp_curr = new GUI_Element_InNumber_t();
+    this.sp_max = new GUI_Element_OutField_t();
+    
+    this.hp_curr = new GUI_Element_InNumber_t();
+    this.hp_max = new GUI_Element_OutField_t();
+    
+    this.rp_curr = new GUI_Element_InNumber_t();
+    this.rp_max = new GUI_Element_OutField_t();
+    
     this.abiscores = new Block_Face_Abiscores_t();
+    
     this.skills = new Block_Face_Skills_t();
+    
+    this.speed_land = new GUI_Element_OutField_t();
+    this.speed_flight = new GUI_Element_OutField_t();
+    this.speed_burrow = new GUI_Element_OutField_t();
+    this.speed_swim = new GUI_Element_OutField_t();
+    this.speed_climb = new GUI_Element_OutField_t();
+    
+    this.attack_melee = new GUI_Element_OutField_t();
+    this.attack_operative = new GUI_Element_OutField_t();
+    this.attack_ranged = new GUI_Element_OutField_t();
+    this.attack_thrown = new GUI_Element_OutField_t();
+    
+    this.eac = new GUI_Element_OutField_t();
+    this.kac = new GUI_Element_OutField_t();
+    this.against_maneuvers = new GUI_Element_OutField_t();
+    this.resistance = new GUI_Element_OutField_t();
+    this.dr = new GUI_Element_OutField_t();
+    
+    this.save_fort = new GUI_Element_OutField_t();
+    this.save_refl = new GUI_Element_OutField_t();
+    this.save_will = new GUI_Element_OutField_t();
 
 //additional initialization
+    Init();
 }
 
 function Block_Face_Weapons(){
