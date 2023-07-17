@@ -6,7 +6,7 @@ function Block_Face_Abiscores_t(){
     var Init = function(){
         const ABISCORE_ARR = Object.values(ABISCORES);
         
-        self.html_element.innerHTML = "Хар-ки:";
+        self.html_element.innerHTML = "";
         m_table = HTML_Create_Table(
             1,
             3,
@@ -15,7 +15,7 @@ function Block_Face_Abiscores_t(){
             ["34%", "33%", "33%"]
         );
         
-        m_table.rows[0].cells[0].innerHTML = "Хар-ка";
+        m_table.rows[0].cells[0].innerHTML = "Хар-ки";
         m_table.rows[0].cells[1].innerHTML = "Значение";
         m_table.rows[0].cells[2].innerHTML = "Мод.";
         
@@ -82,7 +82,7 @@ function Block_Face_Abiscores_t(){
 function Block_Face_Skills_t(){
 //private methods
     var Init = function(){
-        self.html_element.innerHTML = "Навыки:";
+        self.html_element.innerHTML = "";
         
         m_table = HTML_Create_Table(
             1,
@@ -92,7 +92,7 @@ function Block_Face_Skills_t(){
             ["75%", "25%"]
         );
         
-        m_table.rows[0].cells[0].innerHTML = "Навык";
+        m_table.rows[0].cells[0].innerHTML = "Навыки";
         m_table.rows[0].cells[1].innerHTML = "Мод.";
         
         self.html_element.appendChild(m_table);

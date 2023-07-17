@@ -127,11 +127,311 @@ function Block_Drone_Skills_t(){
     Init();
 }
 
+function Block_Drone_Numbers_t(){
+//constants
+
+//private methods
+    var Init = function(){
+        self.html_element.innerHTML = "";
+        
+        Append_Label_Element_Pair(
+            self.html_element,
+            "Макс. Пункты Живучести (ПЖ):",
+            self.outfield_sp.html_element,
+            true
+        );
+        self.html_element.appendChild(HTML_Create_BR());
+        
+        Append_Label_Element_Pair(
+            self.html_element,
+            "Макс. Пункты Здоровья (ПЗ):",
+            self.outfield_hp.html_element,
+            true
+        );
+        self.html_element.appendChild(HTML_Create_BR());
+        
+        Append_Label_Element_Pair(
+            self.html_element,
+            "Макс. Пункты Решимости (ПР):",
+            self.outfield_rp.html_element,
+            true
+        );
+    }
+
+//public methods
+
+//private properties
+    var self = this;
+
+//public properties
+    this.outfield_sp = new GUI_Element_OutField_t();
+    this.outfield_hp = new GUI_Element_OutField_t();
+    this.outfield_rp = new GUI_Element_OutField_t();
+    this.html_element = HTML_Create_Div("class_block_class_subblock");
+
+//additional initialization
+    Init();
+}
+
+function Block_Drone_Attack_t(){
+//constants
+
+//private methods
+    var Init = function(){
+        self.html_element.innerHTML = "Атака:";
+        self.html_element.appendChild(HTML_Create_BR());
+        
+        Append_Label_Element_Pair(
+            self.html_element,
+            "БМА:",
+            self.outfield_bab.html_element,
+            false
+        );
+        self.html_element.appendChild(HTML_Create_BR());
+        
+        Append_Label_Element_Pair(
+            self.html_element,
+            "Ближняя:",
+            self.outfield_melee.html_element,
+            false
+        );
+        self.html_element.appendChild(HTML_Create_BR());
+        
+        Append_Label_Element_Pair(
+            self.html_element,
+            "Оперативная:",
+            self.outfield_operative.html_element,
+            false
+        );
+        self.html_element.appendChild(HTML_Create_BR());
+        
+        Append_Label_Element_Pair(
+            self.html_element,
+            "Дистанционная:",
+            self.outfield_ranged.html_element,
+            false
+        );
+        self.html_element.appendChild(HTML_Create_BR());
+        
+        Append_Label_Element_Pair(
+            self.html_element,
+            "Метательная:",
+            self.outfield_thrown.html_element,
+            false
+        );
+    }
+
+//public methods
+
+//private properties
+    var self = this;
+
+//public properties
+    this.outfield_bab = new GUI_Element_OutField_t();
+    this.outfield_melee = new GUI_Element_OutField_t();
+    this.outfield_operative = new GUI_Element_OutField_t();
+    this.outfield_ranged = new GUI_Element_OutField_t();
+    this.outfield_thrown = new GUI_Element_OutField_t();
+    this.html_element = HTML_Create_Div("class_block_class_subblock");
+
+//additional initialization
+    Init();
+}
+
+function Block_Drone_Defense_t(){
+//constants
+
+//private methods
+    var Init = function(){
+        self.html_element.innerHTML = "Защита:";
+        self.html_element.appendChild(HTML_Create_BR());
+        
+        Append_Label_Element_Pair(
+            self.html_element,
+            "ЭКБ:",
+            self.outfield_eac.html_element,
+            false
+        );
+        self.html_element.appendChild(HTML_Create_BR());
+        
+        Append_Label_Element_Pair(
+            self.html_element,
+            "ККБ:",
+            self.outfield_kac.html_element,
+            false
+        );
+        self.html_element.appendChild(HTML_Create_BR());
+        
+        Append_Label_Element_Pair(
+            self.html_element,
+            "Против манёвров:",
+            self.outfield_maneuver.html_element,
+            false
+        );
+        self.html_element.appendChild(HTML_Create_BR());
+        
+        Append_Label_Element_Pair(
+            self.html_element,
+            "Устойчивости:",
+            self.outfield_resistance.html_element,
+            false
+        );
+        self.html_element.appendChild(HTML_Create_BR());
+        
+        Append_Label_Element_Pair(
+            self.html_element,
+            "СУ:",
+            self.outfield_dr.html_element,
+            false
+        );
+        
+        //TODO: remove, once implemented!
+        self.outfield_dr.Set_Value(0);
+    }
+
+//public methods
+
+//private properties
+    var self = this;
+
+//public properties
+    this.outfield_eac = new GUI_Element_OutField_t();
+    this.outfield_kac = new GUI_Element_OutField_t();
+    this.outfield_maneuver = new GUI_Element_OutField_t();
+    this.outfield_resistance = new GUI_Element_OutField_t();
+    this.outfield_dr = new GUI_Element_OutField_t();
+    this.html_element = HTML_Create_Div("class_block_class_subblock");
+
+//additional initialization
+    Init();
+}
+
+function Block_Drone_Speed_t(){
+//constants
+
+//private methods
+    var Init = function(){
+        self.html_element.innerHTML = "Скорости:";
+        self.html_element.appendChild(HTML_Create_BR());
+        
+        Append_Label_Element_Pair(
+            self.html_element,
+            "Наземная:",
+            self.outfield_land.html_element,
+            false
+        );
+        self.html_element.appendChild(HTML_Create_BR());
+        
+        Append_Label_Element_Pair(
+            self.html_element,
+            "Полёт:",
+            self.outfield_flight.html_element,
+            false
+        );
+        self.html_element.appendChild(HTML_Create_BR());
+        
+        Append_Label_Element_Pair(
+            self.html_element,
+            "Рытьё:",
+            self.outfield_burrow.html_element,
+            false
+        );
+        self.html_element.appendChild(HTML_Create_BR());
+        
+        Append_Label_Element_Pair(
+            self.html_element,
+            "Плавание:",
+            self.outfield_swim.html_element,
+            false
+        );
+        self.html_element.appendChild(HTML_Create_BR());
+        
+        Append_Label_Element_Pair(
+            self.html_element,
+            "Лазание:",
+            self.outfield_climb.html_element,
+            false
+        );
+    }
+
+//public methods
+
+//private properties
+    var self = this;
+
+//public properties
+    this.outfield_land = new GUI_Element_OutField_t();
+    this.outfield_flight = new GUI_Element_OutField_t();
+    this.outfield_burrow = new GUI_Element_OutField_t();
+    this.outfield_swim = new GUI_Element_OutField_t();
+    this.outfield_climb = new GUI_Element_OutField_t();
+    this.html_element = HTML_Create_Div("class_block_class_subblock");
+
+//additional initialization
+    Init();
+}
+
+function Block_Drone_Saves_t(){
+//constants
+
+//private methods
+    var Init = function(){
+        self.html_element.innerHTML = "Испытания:";
+        self.html_element.appendChild(HTML_Create_BR());
+        
+        Append_Label_Element_Pair(
+            self.html_element,
+            "Стойкость:",
+            self.outfield_fort.html_element,
+            false
+        );
+        self.html_element.appendChild(HTML_Create_BR());
+        
+        Append_Label_Element_Pair(
+            self.html_element,
+            "Реакция:",
+            self.outfield_refl.html_element,
+            false
+        );
+        self.html_element.appendChild(HTML_Create_BR());
+        
+        
+        Append_Label_Element_Pair(
+            self.html_element,
+            "Воля:",
+            self.outfield_will.html_element,
+            false
+        );
+    }
+
+//public methods
+
+//private properties
+    var self = this;
+
+//public properties
+    this.outfield_fort = new GUI_Element_OutField_t();
+    this.outfield_refl = new GUI_Element_OutField_t();
+    this.outfield_will = new GUI_Element_OutField_t();
+    this.html_element = HTML_Create_Div("class_block_class_subblock");
+
+//additional initialization
+    Init();
+}
+
 function Block_Drone_t(){
 //constants
     const GUI_BLOCK = document.getElementById("block_mechanic_drone");
+    const GUI_BLOCK_BODY = document.getElementById("block_mechanic_drone_body");
 
 //private methods
+    var Init = function(){
+        GUI_BLOCK_BODY.appendChild(self.numbers.html_element);
+        GUI_BLOCK_BODY.appendChild(self.attacks.html_element);
+        GUI_BLOCK_BODY.appendChild(self.defense.html_element);
+        GUI_BLOCK_BODY.appendChild(self.speed.html_element);
+        GUI_BLOCK_BODY.appendChild(self.saves.html_element);
+    }
 
 //public methods
     this.Reset = function(){
@@ -173,13 +473,28 @@ function Block_Drone_t(){
             true
         )
     );
+    
+    this.abilities = new Block_Ability_List_t(
+        document.getElementById('table_class_abilities_mechanic'),
+        null
+    );
+    
     this.abiscores = new Block_Drone_Abiscores_t();
     this.skills = new Block_Drone_Skills_t();
+    
+    this.numbers = new Block_Drone_Numbers_t();
+    this.attacks = new Block_Drone_Attack_t();
+    this.defense = new Block_Drone_Defense_t();
+    this.speed = new Block_Drone_Speed_t();
+    this.saves = new Block_Drone_Saves_t();
+    //TODO: weapons!
 
 //additional initialization
+    Init();
     //TODO: below is just test, remove
-    //this.feats.Reset(null, "Черты дрона", [1, 3, 6, 9, 11, 14, 17, 19]);
-    //this.mods.Reset(null, "Модификации дрона", [1, 3, 5, 7, 9, 11, 13, 15, 17, 19]);
+    // this.abilities.Reset(null, "Способности дрона", [1, 1, 1, 1, 7, 10, 11, 20]);
+    // this.feats.Reset(null, "Черты дрона", [1, 3, 6, 9, 11, 14, 17, 19]);
+    // this.mods.Reset(null, "Модификации дрона", [1, 3, 5, 7, 9, 11, 13, 15, 17, 19]);
 }
 
 function Block_Exocortex_t(){

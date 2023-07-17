@@ -410,7 +410,6 @@ function Block_MainInfo_Defense_t(){
     const GUI_BLOCK = document.getElementById("block_maininfo_defense");
 
 //private methods
-
     var Init = function(){
         GUI_BLOCK.innerHTML = "Защита:";
         GUI_BLOCK.appendChild(HTML_Create_BR());
@@ -480,7 +479,6 @@ function Block_MainInfo_Speed_t(){
     const GUI_BLOCK = document.getElementById("block_maininfo_speed");
 
 //private methods
-
     var Init = function(){
         GUI_BLOCK.innerHTML = "Скорости:";
         GUI_BLOCK.appendChild(HTML_Create_BR());
@@ -547,7 +545,6 @@ function Block_MainInfo_Saves_t(){
     const GUI_BLOCK = document.getElementById("block_maininfo_saves");
 
 //private methods
-
     var Init = function(){
         GUI_BLOCK.innerHTML = "Испытания:";
         GUI_BLOCK.appendChild(HTML_Create_BR());
