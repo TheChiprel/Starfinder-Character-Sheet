@@ -2,10 +2,35 @@ function Drone_t(gui_block, set_gui_lvl_func){
 //constants
     const GUI_BLOCK = gui_block;
     const SET_GUI_LVL_FUNC = set_gui_lvl_func;
+    const ABILITY_LIST = [
+        ["Базовые модификации"],
+        ["Модуль навыка"],
+        ["Ограниченный ИИ"],
+        ["Прямое управление"],
+        ["Экспертный ИИ"],
+        ["Улучшенный реактор"],
+        ["Улучшенные модификации"],
+        ["Истинный ИИ"]
+    ];
+    const ABILITY_LVLS = [1, 1, 1, 1, 7, 10, 11, 20];
+    const FEATS_LVLS = [1, 3, 6, 9, 11, 14, 17, 19];
+    const MODS_LVLS = [1, 3, 5, 7, 9, 11, 13, 15, 17, 19];
 
 //private methods
     var Init = function(){
         GUI_BLOCK.Reset(self);
+        
+        let db = Ability_Database_GetList(ABILITIES_DATABASE, "Класс", ["Механик", "Способность дрона"]);
+        for (let i = 0; i < ABILITY_LIST.length; i++){
+            if (ABILITY_LIST[i].length == 1){
+                let abi_name_full = ABILITY_LIST[i][0];
+                let [abi_name, abi_suffix] = Split_Ability_Name_Suffix(abi_name_full);
+                let abi_entry = Get_Ability_Entry_By_Name(db, abi_name);
+                self.abilities.Set(i, abi_entry, abi_suffix);
+            }else{
+                //TODO?
+            }
+        }
     }
 
 //public methods
@@ -26,8 +51,11 @@ function Drone_t(gui_block, set_gui_lvl_func){
     
     this.Get_SaveData_Obj = function(){
         var ret = {
-            lvl: self.lvl
-        }
+            lvl: self.lvl,
+            mods: self.mods.Get_SaveData_Obj(),
+            feats: self.feats.Get_SaveData_Obj()
+        };
+        
         return ret;
     }
     
@@ -37,6 +65,8 @@ function Drone_t(gui_block, set_gui_lvl_func){
         }
         
         self.Update_Lvl(obj.lvl);
+        self.mods.Load_From_Obj(obj.mods);
+        self.feats.Load_From_Obj(obj.feats);
     }
     
 //private properties
@@ -44,6 +74,30 @@ function Drone_t(gui_block, set_gui_lvl_func){
 
 //public properties
     this.lvl = 0;
+    this.abilities = new Leveled_Ability_List_t(
+        "abi_drone",
+        "Способности дрона",
+        ABILITY_LVLS,
+        "drone_",
+        layers.classes.Get_Block(CLASSES.MECHANIC).speciality.drone.abilities,
+        true
+    );
+    
+    this.mods = new Leveled_Ability_List_t(
+        "mods_drone",
+        "Модификации дрона",
+        MODS_LVLS,
+        "mods_drone_",
+        layers.classes.Get_Block(CLASSES.MECHANIC).speciality.drone.mods
+    );
+    
+    this.feats = new Leveled_Ability_List_t(
+        "feats_drone",
+        "Черты дрона",
+        FEATS_LVLS,
+        "feats_drone_",
+        layers.classes.Get_Block(CLASSES.MECHANIC).speciality.drone.feats
+    );
 
 //additional initialization
     Init();
@@ -370,6 +424,10 @@ const TRICKS_LVLS = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20];
                 let abi_name_full = ABILITY_LIST[i][0];
                 let [abi_name, abi_suffix] = Split_Ability_Name_Suffix(abi_name_full);
                 let abi_entry = Get_Ability_Entry_By_Name(db, abi_name);
+                if (abi_entry == null){
+                    console.error("Failed to find mechanic ability: " + abi_name);
+                    continue;
+                }
                 self.class_abilities.Set(i, abi_entry, abi_suffix);
             }else{
                 //TODO?

@@ -475,7 +475,7 @@ function Block_Drone_t(){
     );
     
     this.abilities = new Block_Ability_List_t(
-        document.getElementById('table_class_abilities_mechanic'),
+        document.getElementById('table_drone_abilities'),
         null
     );
     
