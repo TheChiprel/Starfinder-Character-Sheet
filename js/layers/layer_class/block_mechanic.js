@@ -105,7 +105,7 @@ function Block_Drone_Skills_t(){
         );
         
         m_table.rows[0].cells[0].innerHTML = "Навыки";
-        m_table.rows[0].cells[1].innerHTML = "Значение";
+        m_table.rows[0].cells[1].innerHTML = "";
         for (let i = 0; i < SKILLS_ARR.length; i++){
             let row = m_table.rows[i+1];
             row.cells[0].innerHTML = SKILLS_ARR[i];
