@@ -689,9 +689,6 @@ function Abiscore_Point_t (out_field_total, out_field_spent, out_field_left){
 
 function Abiscore_t (){
 //private methods
-    var Init = function(){
-        
-    }
 
 //public methods
     this.Get_SaveData_Obj = function(){
@@ -713,7 +710,6 @@ function Abiscore_t (){
     this.key = new Abiscore_Key_Collection_t();
     
 //additional initialization
-    Init();
 }
 
 function Init_Callbacks_Abiscores(){

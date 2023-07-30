@@ -314,8 +314,8 @@ function Leveled_Ability_List_t (
         for (let i = 0; i < m_additional_ids.length; i++){
             if(m_additional_ids[i] == id){
                 let row = i;
-                if (lvl_list != null){
-                    row += lvl_list.length;
+                if (m_lvl_list != null){
+                    row += m_lvl_list.length;
                 }
                 m_abilities.Remove(row);
                 GUI_BLOCK.Remove_Additional_Row(id);

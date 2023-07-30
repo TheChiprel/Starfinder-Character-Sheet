@@ -2,7 +2,7 @@
 //TODO: rework additional as separate table?
 function Block_Ability_List_t(
     gui_table,
-    database,
+    database = null,
     has_header = true,
     has_add_button = false,
     database_show_lvl = true,

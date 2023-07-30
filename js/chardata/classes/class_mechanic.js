@@ -1,3 +1,260 @@
+const DRONE_ABISCORES = Object.freeze(
+    [
+        ABISCORES.STR,
+        ABISCORES.AGI,
+        ABISCORES.INT,
+        ABISCORES.WIS,
+        ABISCORES.CHA
+    ]
+);
+
+function Drone_Abiscore_Value_t(name, set_value_func){
+//constants
+    const BASIC_VALUE_MOD_ID_T = Object.freeze(
+        {
+            "BASE_VALUE": 'BASE_VALUE',
+            "BOOSTS": 'BOOSTS'
+        }
+    );
+    const SET_VALUE_FUNC = set_value_func;
+
+//private methods
+    var Init = function(){
+        self.mod_map.Add(
+            BASIC_VALUE_MOD_ID_T.BASE_VALUE,
+            new Modifier_t(10, "Базовое значение"));
+        self.mod_map.Add(
+            BASIC_VALUE_MOD_ID_T.BOOSTS,
+            new Modifier_t(self.boosts, "Увеличение от уровней"));
+            
+        Set_Field_Value();
+    }
+    
+    var Set_Field_Value = function(){
+        SET_VALUE_FUNC(self.sum);
+    }
+
+//public methods
+    this.Set_Base_Value = function(new_value){
+        self.mod_map.Change_Value(BASIC_VALUE_MOD_ID_T.BASE_VALUE, new_value);
+        self.Recalc();
+    }
+    
+    this.Set_Upgr_Value = function(new_value){
+        self.mod_map.Change_Value(BASIC_VALUE_MOD_ID_T.BOOSTS, new_value);
+        self.Recalc();
+    }
+    
+    this.Recalc = function(){
+        let new_sum = self.mod_map.Get_Sum();
+        if (new_sum != self.sum){
+            self.sum = new_sum;
+            Set_Field_Value();
+            self.arr_recalc_functions.Call();
+        }
+    }
+
+//private properties
+    var self = this;
+    var m_name = name;
+
+//public properties
+    this.sum = 10;
+    this.mod_map = new Modifier_Map_t(this.Recalc);
+    this.arr_recalc_functions = new Recalc_Function_Collection_t();
+
+//additional initialization
+    Init();
+}
+
+function Drone_Abiscore_Mod_t(){
+//constants
+
+//private methods
+
+//public methods
+
+//private properties
+    var self = this;
+
+//public properties
+
+//additional initialization
+}
+
+function Drone_Abiscore_Value_Collection_t(gui_block){
+//constants
+    const GUI_BLOCK = gui_block;
+
+//private methods    
+    var FindAbiscoreByName = function(abiscore){
+        if (!m_map.has(abiscore)){
+            return null;
+        }
+
+        return m_map.get(abiscore);
+    }
+
+//public methods
+    this.Add_Abiscore = function(name){
+        m_map.set (
+            name,
+            new Drone_Abiscore_Value_t (
+                name,
+                GUI_BLOCK.Set_Value.bind(null, name)
+            )
+        );
+    }
+
+    this.Set_Base_Value_By_Array = function(arr){
+        
+    }
+    
+    this.Set_Upgr_Value_By_Array = function(arr){
+        
+    }
+    
+    this.Get_Sum = function(abiscore){
+        let item = FindAbiscoreByName(abiscore);
+        if (item == null){
+            console.error("Failed to get value of unknown drone ability score:" + abiscore);
+            return null;
+        }
+        
+        return item.sum;
+    }
+    
+    this.Show_Detail_Popup = function(abiscore){
+        //TODO
+    }
+    
+    this.AddRecalcFunc = function(abiscore, func){
+        let abiscore_obj = FindAbiscoreByName(abiscore);
+        if (abiscore_obj != null){
+            abiscore_obj.arr_recalc_functions.Add(func);
+        }else{
+            console.warn("Attempting to read unknown ability score modifier: " + abiscore);
+        }
+    }
+
+    this.RemoveRecalcFunc = function(abiscore, id){
+        let abiscore_obj = FindAbiscoreByName(abiscore);
+        if (abiscore_obj != null){
+            abiscore_obj.arr_recalc_functions.Remove(id);
+        }else{
+            console.warn("Attempting to read unknown ability score modifier: " + abiscore);
+        }
+    }
+    
+    this.Recalc_All = function(){
+        m_map.forEach((abiscore_obj, ) => {
+            abiscore_obj.Recalc();
+        });
+    }
+
+//private properties
+    var self = this;
+    var m_map = new Map();
+
+//public properties
+    
+
+//additional initialization
+}
+
+function Drone_Abiscore_Mod_Collection_t(gui_block){
+//constants
+    const GUI_BLOCK = gui_block;
+
+//private methods
+
+//public methods
+
+//private properties
+    var self = this;
+
+//public properties
+
+//additional initialization
+}
+
+function Drone_Abiscores_t(gui_block){
+//constants
+    const GUI_BLOCK = gui_block;
+
+//private methods
+    var Init = function(){
+        const abiscore_arr = Object.values(ABISCORES);
+        
+        GUI_BLOCK.Reset(self);
+        abiscore_arr.forEach(abiscore => {
+            GUI_BLOCK.Add_Abiscore(abiscore);
+            
+            if (DRONE_ABISCORES.includes(abiscore)){
+                self.values.Add_Abiscore(abiscore);
+                //self.modifiers.Add_Abiscore(abiscore);
+            }
+        });
+    }
+    
+    var Show_Detail_Popup_Value = function(){
+        
+    }
+    
+    var Show_Detail_Popup_Mod = function(){
+        
+    }
+
+//public methods
+
+//private properties
+    var self = this;
+
+//public properties
+    this.values = new Drone_Abiscore_Value_Collection_t(GUI_BLOCK);
+    //this.modifiers = new Drone_Abiscore_Mod_Collection_t(GUI_BLOCK);
+
+//additional initialization
+    Init();
+}
+
+
+//TBD
+function Drone_Chassis_t(gui_block){
+//constants
+    const GUI_BLOCK = gui_block;
+
+//private methods
+    var Init = function(){
+        GUI_BLOCK.Reset(self);
+    }
+
+//public methods
+    this.Set = function(chassis_name){
+        
+    }
+    
+    this.Clear = function(){
+        
+    }
+
+//private properties
+    var self = this;
+
+//public properties
+    this.name = null;
+    this.initial_mods = new Leveled_Ability_List_t(
+        "mods_drone_initial",
+        "Встроенные модификации",
+        null,
+        "mods_drone_initial_",
+        GUI_BLOCK.initial_mods
+    );
+
+//additional initialization
+    Init();
+}
+
 function Drone_t(gui_block, set_gui_lvl_func){
 //constants
     const GUI_BLOCK = gui_block;
@@ -97,6 +354,10 @@ function Drone_t(gui_block, set_gui_lvl_func){
         FEATS_LVLS,
         "feats_drone_",
         layers.classes.Get_Block(CLASSES.MECHANIC).speciality.drone.feats
+    );
+    
+    this.abiscores = new Drone_Abiscores_t(
+        layers.classes.Get_Block(CLASSES.MECHANIC).speciality.drone.abiscores
     );
 
 //additional initialization

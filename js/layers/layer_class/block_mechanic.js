@@ -20,6 +20,12 @@ function Block_Drone_Chassis_t(){
             "+",
             undefined //TODO: onclick event
         );
+        m_table = HTML_Create_Table(
+            0,
+            0,
+            false,
+            "100%"
+        );
         
         GUI_BLOCK.appendChild(HTML_Create_BR());
         GUI_BLOCK.appendChild(m_outfield);
@@ -32,8 +38,16 @@ function Block_Drone_Chassis_t(){
     var self = this;
     var m_outfield;
     var m_add_remove_button;
+    var m_table;    //TODO: do we need to keep this here?
 
 //public properties
+    this.initial_mods = new Block_Ability_List_t(
+        m_table,
+        null,
+        true,
+        false,
+        false
+    );
 
 //additional initialization
     Init();
@@ -45,38 +59,94 @@ function Block_Drone_Abiscores_t(){
 
 //private methods
     var Init = function(){
-        const ABISCORE_ARR = Object.values(ABISCORES);
-        
         //clear div
         GUI_BLOCK.innerHTML = "";
         
         //create and fill table
         m_table = HTML_Create_Table(
-            ABISCORE_ARR.length + 1,
+            1,
             3,
             true,
             "100%",
-            ["50%", "25%", "25%"]
+            ["34%", "33%", "33%"]
         );
         
         m_table.rows[0].cells[0].innerHTML = "Хар-ки";
         m_table.rows[0].cells[1].innerHTML = "Значение";
         m_table.rows[0].cells[2].innerHTML = "Мод.";
-        for (let i = 0; i < ABISCORE_ARR.length; i++){
-            let row = m_table.rows[i+1];
-            row.cells[0].innerHTML = ABISCORE_ARR[i];
-            row.cells[1].innerHTML = 10;
-            row.cells[2].innerHTML = 0;
+    }
+    
+    var Event_OnClick_Value = function(abiscore){
+        if (m_owner == null){
+            return;
+        }
+        
+        m_owner.Show_Detail_Popup_Value(abiscore);
+    }
+    
+    var Event_OnClick_Mod = function(abiscore){
+        if (m_owner == null){
+            return;
+        }
+        
+        m_owner.Show_Detail_Popup_Mod(abiscore);
+    }
+
+//public methods
+    this.Reset = function(owner){
+        m_owner = owner;
+        
+        //clear map
+        m_row_map = new Map();
+        
+        //clear table
+        while (m_table.rows.length > 1){
+            m_table.deleteRow(1);
         }
         
         GUI_BLOCK.appendChild(m_table);
     }
 
-//public methods
+    this.Add_Abiscore = function(name){
+        var row = m_table.insertRow(m_table.rows.length);
+        
+        var cell_name = row.insertCell(0);
+        var cell_value = row.insertCell(1);
+        var cell_mod = row.insertCell(2);
+        
+        cell_name.innerHTML = name;
+        cell_value.innerHTML = "-";
+        cell_mod.innerHTML = 0;
+        
+        cell_value.onclick = Event_OnClick_Value.bind(null, name);
+        cell_mod.onclick = Event_OnClick_Mod.bind(null, name);
+        
+        m_row_map.set(name, row);
+    }
+
+    this.Set_Value = function(abiscore, value){
+        if(!m_row_map.has(abiscore)){
+            console.error("Failed to set unknown drone ability score value: " + abiscore);
+            return;
+        }
+        let row = m_row_map.get(abiscore);
+        row.cells[1].innerHTML = value;
+    }
+    
+    this.Set_Mod = function(abiscore, mod){
+        if(!m_row_map.has(abiscore)){
+            console.error("Failed to set unknown drone ability score modifier: " + abiscore);
+            return;
+        }
+        let row = m_row_map.get(abiscore);
+        row.cells[2].innerHTML = value;
+    }
 
 //private properties
     var self = this;
-    var m_table;
+    var m_owner = null;
+    var m_table; //created in Init
+    var m_row_map; //created in Reset
 
 //public properties
 
