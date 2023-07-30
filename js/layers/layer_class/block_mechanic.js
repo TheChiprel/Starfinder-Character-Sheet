@@ -205,7 +205,7 @@ function Block_Drone_Abiscores_t(){
             return;
         }
         let row = m_row_map.get(abiscore);
-        row.cells[2].innerHTML = value;
+        row.cells[2].innerHTML = mod;
     }
 
 //private properties

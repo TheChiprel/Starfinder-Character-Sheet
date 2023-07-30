@@ -76,19 +76,74 @@ function Drone_Abiscore_Value_t(name, set_value_func){
     Init();
 }
 
-function Drone_Abiscore_Mod_t(){
+function Drone_Abiscore_Mod_t(
+    name,
+    set_value_func,
+    get_abiscore_value_func){
 //constants
+    const BASIC_VALUE_MOD_ID_T = Object.freeze(
+        {
+            "ABISCORE_VALUE": 'ABISCORE_VALUE'
+        }
+    );
+    const SET_VALUE_FUNC = set_value_func;
+    const GET_ABISCORE_VALUE_FUNC = get_abiscore_value_func;
 
 //private methods
+    var Init = function(){
+        self.mod_map.Add(
+            BASIC_VALUE_MOD_ID_T.ABISCORE_VALUE,
+            new Modifier_t(
+                0,
+                "Значение " + m_name
+            )
+        );
+            
+        Set_Field_Value();
+    }
+    
+    var Set_Field_Value = function(){
+        SET_VALUE_FUNC(GetModifierStr(self.sum));
+    }
+    
+    var Update_Mod_Map = function(){
+        let abiscore_value = GET_ABISCORE_VALUE_FUNC();
+        let abiscore_mod = Math.floor((abiscore_value - 10) / 2);
+        self.mod_map.Change_Value(BASIC_VALUE_MOD_ID_T.ABISCORE_VALUE, abiscore_mod);
+    }
 
 //public methods
+    this.Recalc = function(){
+        Update_Mod_Map();
+        
+        let new_sum = self.mod_map.Get_Sum();
+        if (new_sum != self.sum){
+            self.sum = new_sum;
+            Set_Field_Value();
+            self.arr_recalc_functions.Call();
+        }
+    }
+    
+    this.Show_Detail_Popup = function(){
+        Popup_Stat_Details.Call(
+            "Модификатор " + m_name,
+            self.sum,
+            self.mod_map.Get_Mod_Map(),
+            true
+        );
+    }
 
 //private properties
     var self = this;
+    var m_name = name;
 
 //public properties
+    this.sum = 0;
+    this.mod_map = new Modifier_Map_t(this.Recalc);
+    this.arr_recalc_functions = new Recalc_Function_Collection_t();
 
 //additional initialization
+    Init();
 }
 
 function Drone_Abiscore_Value_Collection_t(gui_block){
@@ -128,7 +183,15 @@ function Drone_Abiscore_Value_Collection_t(gui_block){
     }
     
     this.Set_Upgr_Value_By_Array = function(arr){
+        if (arr.length != m_map.size){
+            console.error("Attempt to set ability values with array of incorrect size.");
+            return;
+        }
         
+        const mapIter = m_map.values();
+        arr.forEach(curr_value => {
+            mapIter.next().value.Set_Upgr_Value(curr_value);
+        });
     }
     
     this.Get_Sum = function(abiscore){
@@ -187,14 +250,87 @@ function Drone_Abiscore_Mod_Collection_t(gui_block){
 //constants
     const GUI_BLOCK = gui_block;
 
-//private methods
+//private methods    
+    var FindAbiscoreByName = function(abiscore){
+        if (!m_map.has(abiscore)){
+            return null;
+        }
+
+        return m_map.get(abiscore);
+    }
 
 //public methods
+    this.Add_Abiscore = function(
+        name,
+        get_value_func
+    ){
+        m_map.set (
+            name,
+            new Drone_Abiscore_Mod_t (
+                name,
+                GUI_BLOCK.Set_Mod.bind(null, name),
+                get_value_func
+            )
+        );
+    }
+    
+    this.Get_Sum = function(abiscore){
+        let item = FindAbiscoreByName(abiscore);
+        if (item == null){
+            console.error("Failed to get value of unknown drone ability score:" + abiscore);
+            return null;
+        }
+        
+        return item.sum;
+    }
+    
+    this.Show_Detail_Popup = function(abiscore){
+        let obj = FindAbiscoreByName(abiscore);
+        if (obj == null){
+            console.error("Attempting to show popup for unknown ability score value: " + abiscore);
+        }
+        obj.Show_Detail_Popup();
+    }
+    
+    this.AddRecalcFunc = function(abiscore, func){
+        let abiscore_obj = FindAbiscoreByName(abiscore);
+        if (abiscore_obj != null){
+            abiscore_obj.arr_recalc_functions.Add(func);
+        }else{
+            console.warn("Attempting to read unknown ability score modifier: " + abiscore);
+        }
+    }
+
+    this.RemoveRecalcFunc = function(abiscore, id){
+        let abiscore_obj = FindAbiscoreByName(abiscore);
+        if (abiscore_obj != null){
+            abiscore_obj.arr_recalc_functions.Remove(id);
+        }else{
+            console.warn("Attempting to read unknown ability score modifier: " + abiscore);
+        }
+    }
+    
+    this.Get_Recalc_Func = function(abiscore){
+        let obj = FindAbiscoreByName(abiscore);
+        if (obj == null){
+            console.error("Attempting to recalculation function for unknown ability score value: " + abiscore);
+            return null;
+        }
+        return obj.Recalc;
+    }
+    
+    this.Recalc_All = function(){
+        m_map.forEach((abiscore_obj, ) => {
+            abiscore_obj.Recalc();
+        });
+    }
 
 //private properties
     var self = this;
+    var m_map = new Map();
 
 //public properties
+    
 
 //additional initialization
 }
@@ -213,7 +349,14 @@ function Drone_Abiscores_t(gui_block){
             
             if (DRONE_ABISCORES.includes(abiscore)){
                 self.values.Add_Abiscore(abiscore);
-                //self.modifiers.Add_Abiscore(abiscore);
+                self.modifiers.Add_Abiscore(
+                    abiscore,
+                    self.values.Get_Sum.bind(null, abiscore)
+                );
+                self.values.AddRecalcFunc(
+                    abiscore,
+                    self.modifiers.Get_Recalc_Func(abiscore)
+                );
             }
         });
     }
@@ -228,7 +371,11 @@ function Drone_Abiscores_t(gui_block){
     }
     
     this.Show_Detail_Popup_Mod = function(abiscore){
-        
+        if (abiscore != ABISCORES.CON){
+            self.modifiers.Show_Detail_Popup(abiscore);
+        }else{
+            //TODO
+        }
     }
 
 //private properties
@@ -236,7 +383,7 @@ function Drone_Abiscores_t(gui_block){
 
 //public properties
     this.values = new Drone_Abiscore_Value_Collection_t(GUI_BLOCK);
-    //this.modifiers = new Drone_Abiscore_Mod_Collection_t(GUI_BLOCK);
+    this.modifiers = new Drone_Abiscore_Mod_Collection_t(GUI_BLOCK);
 
 //additional initialization
     Init();
