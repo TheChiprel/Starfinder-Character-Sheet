@@ -8,37 +8,103 @@ function Block_Drone_Chassis_t(){
         
         //clear div
         GUI_BLOCK.innerHTML = "Корпус";
-        
-        //create and fill table
-        m_outfield = HTML_Create_Output(
-            "Не выбрано",
-            undefined, //TODO: onclick event
-            undefined,
-            "class_output_field"
-        );
-        m_add_remove_button = HTML_Create_Button(
-            "+",
-            undefined //TODO: onclick event
-        );
-        m_table = HTML_Create_Table(
-            0,
-            0,
-            false,
-            "100%"
-        );
-        
         GUI_BLOCK.appendChild(HTML_Create_BR());
         GUI_BLOCK.appendChild(m_outfield);
         GUI_BLOCK.appendChild(m_add_remove_button);
+        GUI_BLOCK.appendChild(HTML_Create_BR());
+        GUI_BLOCK.appendChild(m_table);
+    }
+    
+    var Event_OnClick_Open_Selector = function(){
+        var table_data = new Array(0);
+        var filters = new Array(0);
+
+        let headers = [
+            "Название"
+        ];
+
+        for (let i = 0; i < DRONE_CHASSIS_DATABASE.length; i++){
+            var row = new Array(1);
+            row[0] = DRONE_CHASSIS_DATABASE[i].name;
+            table_data.push(row);
+        }
+
+        filters.push(new Database_Filter_Input_t(POPUP_FILTER_TYPES.FIND,    0, "Название"     ));
+
+        Popup_Database.Open(
+            table_data,
+            Event_Callback_Set,
+            filters,
+            headers,
+            null//TODO: self.Show_Info_Database
+        );
+    }
+    
+    var Event_Callback_Set = function(entry_num){
+        if (m_owner == null){
+            return;
+        }
+        
+        m_owner.Set(DRONE_CHASSIS_DATABASE[entry_num]);
+        Popup_Database.Close();
+    }
+    
+    var Event_OnClick_Clear = function(){
+        if (m_owner == null){
+            return;
+        }
+        
+        m_owner.Clear();
+    }
+    
+    var Event_OnClick_Show_Detail_Popup = function(){
+        if (m_owner == null){
+            return;
+        }
+        
+        //TODO
     }
 
 //public methods
+    this.Reset = function(owner){
+        m_owner = owner;
+        
+        self.Clear();
+        
+    }
+    
+    this.Set = function(chassis_name){
+        m_outfield.value = chassis_name;
+        m_add_remove_button.value = "X";
+        m_add_remove_button.onclick = Event_OnClick_Clear;
+    }
+    
+    this.Clear = function(){
+        m_outfield.value = "Не выбрано";
+        
+        m_add_remove_button.value = "+";
+        m_add_remove_button.onclick = Event_OnClick_Open_Selector;
+    }
 
 //private properties
     var self = this;
-    var m_outfield;
-    var m_add_remove_button;
-    var m_table;    //TODO: do we need to keep this here?
+    var m_owner = null;
+    var m_outfield = HTML_Create_Output(
+        "Не выбрано",
+        undefined, //TODO: onclick event
+        undefined,
+        "class_output_field"
+    );
+    var m_add_remove_button = HTML_Create_Button(
+        "+",
+        Event_OnClick_Open_Selector
+    );
+    var m_table = HTML_Create_Table(
+        0,
+        0,
+        false,
+        "100%"
+    );    //TODO: do we need to keep this here?
 
 //public properties
     this.initial_mods = new Block_Ability_List_t(

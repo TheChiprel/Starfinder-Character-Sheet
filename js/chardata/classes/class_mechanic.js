@@ -25,7 +25,7 @@ function Drone_Abiscore_Value_t(name, set_value_func){
             new Modifier_t(10, "Базовое значение"));
         self.mod_map.Add(
             BASIC_VALUE_MOD_ID_T.BOOSTS,
-            new Modifier_t(self.boosts, "Увеличение от уровней"));
+            new Modifier_t(0, "Увеличение от уровней"));
             
         Set_Field_Value();
     }
@@ -52,6 +52,15 @@ function Drone_Abiscore_Value_t(name, set_value_func){
             Set_Field_Value();
             self.arr_recalc_functions.Call();
         }
+    }
+    
+    this.Show_Detail_Popup = function(){
+        Popup_Stat_Details.Call(
+            "Значение " + m_name,
+            self.sum,
+            self.mod_map.Get_Mod_Map(),
+            false
+        );
     }
 
 //private properties
@@ -107,7 +116,15 @@ function Drone_Abiscore_Value_Collection_t(gui_block){
     }
 
     this.Set_Base_Value_By_Array = function(arr){
+        if (arr.length != m_map.size){
+            console.error("Attempt to set ability values with array of incorrect size.");
+            return;
+        }
         
+        const mapIter = m_map.values();
+        arr.forEach(curr_value => {
+            mapIter.next().value.Set_Base_Value(curr_value);
+        });
     }
     
     this.Set_Upgr_Value_By_Array = function(arr){
@@ -125,7 +142,11 @@ function Drone_Abiscore_Value_Collection_t(gui_block){
     }
     
     this.Show_Detail_Popup = function(abiscore){
-        //TODO
+        let obj = FindAbiscoreByName(abiscore);
+        if (obj == null){
+            console.error("Attempting to show popup for unknown ability score value: " + abiscore);
+        }
+        obj.Show_Detail_Popup();
     }
     
     this.AddRecalcFunc = function(abiscore, func){
@@ -196,16 +217,19 @@ function Drone_Abiscores_t(gui_block){
             }
         });
     }
-    
-    var Show_Detail_Popup_Value = function(){
-        
-    }
-    
-    var Show_Detail_Popup_Mod = function(){
-        
-    }
 
 //public methods
+    this.Show_Detail_Popup_Value = function(abiscore){
+        if (abiscore != ABISCORES.CON){
+            self.values.Show_Detail_Popup(abiscore);
+        }else{
+            //TODO
+        }
+    }
+    
+    this.Show_Detail_Popup_Mod = function(abiscore){
+        
+    }
 
 //private properties
     var self = this;
@@ -218,11 +242,14 @@ function Drone_Abiscores_t(gui_block){
     Init();
 }
 
-
-//TBD
-function Drone_Chassis_t(gui_block){
+function Drone_Chassis_t(
+    drone_obj,
+    gui_block
+){
 //constants
+    const DRONE_OBJ = drone_obj;
     const GUI_BLOCK = gui_block;
+    const DEFAULT_ABISCORE_VALUES = new Array(DRONE_ABISCORES.length).fill(10);
 
 //private methods
     var Init = function(){
@@ -230,19 +257,40 @@ function Drone_Chassis_t(gui_block){
     }
 
 //public methods
-    this.Set = function(chassis_name){
+    this.Set = function(entry){
+        self.entry = entry;
+        
+        DRONE_OBJ.abiscores.values.Set_Base_Value_By_Array(entry.abiscores);
+        
+        //TODO: set speed
+        //TODO: set ac
+        //TODO: set saves
+        //TODO: set modules
+        //TODO: set mods
+        
+        GUI_BLOCK.Set(entry.name); //TODO: add size
         
     }
     
     this.Clear = function(){
+        self.entry = null;
         
+        DRONE_OBJ.abiscores.values.Set_Base_Value_By_Array(DEFAULT_ABISCORE_VALUES);
+        
+        //TODO: set speed
+        //TODO: set ac
+        //TODO: set saves
+        //TODO: set modules
+        //TODO: set mods
+        
+        GUI_BLOCK.Clear();
     }
 
 //private properties
     var self = this;
 
 //public properties
-    this.name = null;
+    this.entry = null;
     this.initial_mods = new Leveled_Ability_List_t(
         "mods_drone_initial",
         "Встроенные модификации",
@@ -358,6 +406,11 @@ function Drone_t(gui_block, set_gui_lvl_func){
     
     this.abiscores = new Drone_Abiscores_t(
         layers.classes.Get_Block(CLASSES.MECHANIC).speciality.drone.abiscores
+    );
+    
+    this.chassis = new Drone_Chassis_t(
+        self,
+        layers.classes.Get_Block(CLASSES.MECHANIC).speciality.drone.chassis
     );
 
 //additional initialization
