@@ -338,6 +338,7 @@ function Drone_Abiscore_Mod_Collection_t(gui_block){
 function Drone_Abiscores_t(gui_block){
 //constants
     const GUI_BLOCK = gui_block;
+    const UGPR_LEVELS = [4, 7, 10, 13, 16, 19];
 
 //private methods
     var Init = function(){
@@ -360,8 +361,44 @@ function Drone_Abiscores_t(gui_block){
             }
         });
     }
+    
+    var Get_Uprg_Array = function(){
+        let arr = new Array(DRONE_ABISCORES.length).fill(0);
+        if (self.upgr_abiscores == null){
+            return arr;
+        }
+        
+        let upgr_value = UGPR_LEVELS.filter(x => (x <= m_lvl)).length;
+        
+        for (let i = 0; i < DRONE_ABISCORES.length; i++){
+            if (self.upgr_abiscores.includes(DRONE_ABISCORES[i])){
+                arr[i] = upgr_value;
+            }
+        }
+        return arr;
+    }
 
 //public methods
+    this.Set_Upgr_Abiscores = function(arr){
+        self.upgr_abiscores = arr;
+        
+        if (m_lvl == 0){
+            return;
+        }
+        
+        self.values.Set_Upgr_Value_By_Array(Get_Uprg_Array());
+    }
+
+    this.Update_Lvl = function(lvl){
+        m_lvl = lvl;
+        
+        if (self.upgr_abiscores == null){
+            return;
+        }
+        
+        self.values.Set_Upgr_Value_By_Array(Get_Uprg_Array());
+    }
+
     this.Show_Detail_Popup_Value = function(abiscore){
         if (abiscore != ABISCORES.CON){
             self.values.Show_Detail_Popup(abiscore);
@@ -380,10 +417,12 @@ function Drone_Abiscores_t(gui_block){
 
 //private properties
     var self = this;
+    var m_lvl = 0;
 
 //public properties
     this.values = new Drone_Abiscore_Value_Collection_t(GUI_BLOCK);
     this.modifiers = new Drone_Abiscore_Mod_Collection_t(GUI_BLOCK);
+    this.upgr_abiscores = null;
 
 //additional initialization
     Init();
@@ -408,6 +447,7 @@ function Drone_Chassis_t(
         self.entry = entry;
         
         DRONE_OBJ.abiscores.values.Set_Base_Value_By_Array(entry.abiscores);
+        DRONE_OBJ.abiscores.Set_Upgr_Abiscores(entry.abiscore_incr);
         
         //TODO: set speed
         //TODO: set ac
@@ -423,6 +463,7 @@ function Drone_Chassis_t(
         self.entry = null;
         
         DRONE_OBJ.abiscores.values.Set_Base_Value_By_Array(DEFAULT_ABISCORE_VALUES);
+        DRONE_OBJ.abiscores.Set_Upgr_Abiscores(null);
         
         //TODO: set speed
         //TODO: set ac
@@ -499,6 +540,7 @@ function Drone_t(gui_block, set_gui_lvl_func){
         }
         
         SET_GUI_LVL_FUNC(lvl);
+        self.abiscores.Update_Lvl(lvl);
     }
     
     this.Get_SaveData_Obj = function(){
