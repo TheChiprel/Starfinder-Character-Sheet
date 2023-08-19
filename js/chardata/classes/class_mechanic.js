@@ -1,3 +1,5 @@
+//TODO: rename skill module to skill unit
+
 const DRONE_ABISCORES = Object.freeze(
     [
         ABISCORES.STR,
@@ -543,15 +545,22 @@ function Drone_Skill_Mod_t(
     Init();
 }
 
-function Drone_Skills_t(gui_block, abiscores_mod_obj){
+function Drone_Skills_t(
+    gui_skills_block,
+    gui_module_block,
+    abiscores_mod_obj
+){
 //constants
-    const GUI_BLOCK = gui_block;
+    const GUI_BLOCK_SKILLS = gui_skills_block;
+    const GUI_MODULE_SKILLS = gui_module_block;
     const ABISCORES_MOD_OBJ = abiscores_mod_obj;
-    const CHASSIS_SKILL_MODULE_ID = "CHASSIS_SKILL_MODULE";
+    const SKILL_MODULE_CHASSIS_ID = "SKILL_MODULE_CHASSIS";
+    const SKILL_MODULE_ABILITY_ID = "SKILL_MODULE_ABILITY";
 
 //private methods
     var Init = function(){
-        GUI_BLOCK.Reset(self);
+        GUI_BLOCK_SKILLS.Reset(self);
+        GUI_MODULE_SKILLS.Reset(self);
         
         Add_Skill(SKILLS.ACROBATICS,         ABISCORES.AGI, false, true  );
         Add_Skill(SKILLS.ATHLETICS,          ABISCORES.STR, false, true  );
@@ -587,14 +596,14 @@ function Drone_Skills_t(gui_block, abiscores_mod_obj){
     }
     
     var Add_Skill = function(skill_name, abiscore, has_armor_penalty){
-        GUI_BLOCK.Add_Skill(skill_name);
+        GUI_BLOCK_SKILLS.Add_Skill(skill_name);
         m_map.set(
             skill_name,
             new Drone_Skill_Mod_t(
                 skill_name,
                 abiscore,
                 has_armor_penalty,
-                GUI_BLOCK.Set_Mod.bind(null, skill_name)
+                GUI_BLOCK_SKILLS.Set_Mod.bind(null, skill_name)
             )
         );
     }
@@ -643,27 +652,58 @@ function Drone_Skills_t(gui_block, abiscores_mod_obj){
         obj.Show_Detail_Popup();
     }
     
-    this.Add_Chassis_Module = function(skill){
+    this.Set_Chassis_Module = function(skill){
         let obj = FindSkillByName(skill);
         if (obj == null){
-            console.error("Attempting to add chassis module to unknown skill: " + skill);
+            console.error("Attempting to add chassis skill module to unknown skill: " + skill);
         }
         m_chassis_module_skill = skill;
-        obj.Add_Module_Source(CHASSIS_SKILL_MODULE_ID);
+        obj.Add_Module_Source(SKILL_MODULE_CHASSIS_ID);
     }
     
     this.Remove_Chassis_Module = function(){
         if (m_chassis_module_skill == null){
-            console.warn("Attempt to remove chassis module, that is not set");
+            console.warn("Attempt to remove chassis skill module, that is not set");
             return;
         }
         
-        let obj = FindSkillByName(skill);
+        let obj = FindSkillByName(m_chassis_module_skill);
         if (obj == null){
-            console.error("Attempting to remove chassis module of unknown skill: " + skill);
+            console.error("Attempting to remove chassis skill module of unknown skill: " + m_chassis_module_skill);
         }
         m_chassis_module_skill = null;
-        obj.Remove_Module_Source(CHASSIS_SKILL_MODULE_ID);
+        obj.Remove_Module_Source(SKILL_MODULE_CHASSIS_ID);
+    }
+    
+    this.Set_Ability_Module = function(skill, do_update_field = true){
+        let obj = FindSkillByName(skill);
+        if (obj == null){
+            console.error("Attempting to add ability skill module to unknown skill: " + skill);
+        }
+        m_ability_module_skill = skill;
+        obj.Add_Module_Source(SKILL_MODULE_ABILITY_ID);
+        
+        if (do_update_field){
+            GUI_MODULE_SKILLS.Set(m_ability_module_skill);
+        }
+    }
+    
+    this.Remove_Ability_Module = function(do_update_field = true){
+        if (m_ability_module_skill == null){
+            console.warn("Attempt to remove ability skill module, that is not set");
+            return;
+        }
+        
+        let obj = FindSkillByName(m_ability_module_skill);
+        if (obj == null){
+            console.error("Attempting to remove ability skill module of unknown skill: " + m_ability_module_skill);
+        }
+        m_ability_module_skill = null;
+        obj.Remove_Module_Source(SKILL_MODULE_ABILITY_ID);
+        
+        if (do_update_field){
+            GUI_MODULE_SKILLS.Clear();
+        }
     }
     
     this.AddRecalcFunc = function(skill, func){
@@ -704,6 +744,7 @@ function Drone_Skills_t(gui_block, abiscores_mod_obj){
     var m_lvl = 0;
     var m_map = new Map();
     var m_chassis_module_skill = null;
+    var m_ability_module_skill = null;
 
 //public properties
     this.modules = null;
@@ -746,8 +787,6 @@ function Drone_Chassis_t(
     }
     
     this.Clear = function(){
-        self.entry = null;
-        
         DRONE_OBJ.abiscores.values.Set_Base_Value_By_Array(DEFAULT_ABISCORE_VALUES);
         DRONE_OBJ.abiscores.Set_Upgr_Abiscores(null);
         
@@ -759,6 +798,7 @@ function Drone_Chassis_t(
         }
         //TODO: set mods
         
+        self.entry = null;
         GUI_BLOCK.Clear();
     }
 
@@ -888,6 +928,7 @@ function Drone_t(gui_block, set_gui_lvl_func){
     
     this.skills = new Drone_Skills_t(
         layers.classes.Get_Block(CLASSES.MECHANIC).speciality.drone.skills,
+        layers.classes.Get_Block(CLASSES.MECHANIC).speciality.drone.skill_module,
         self.abiscores.modifiers
     );
     

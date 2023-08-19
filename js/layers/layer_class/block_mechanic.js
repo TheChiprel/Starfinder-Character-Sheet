@@ -592,6 +592,66 @@ function Block_Drone_Saves_t(){
     Init();
 }
 
+function Block_Drone_Skill_Module_t(){
+//constants
+    const SKILL_OPTIONS = [
+        SKILLS.ACROBATICS,
+        SKILLS.ATHLETICS,
+        SKILLS.COMPUTERS,
+        SKILLS.ENGINEERING,
+        SKILLS.PERCEPTION,
+        SKILLS.STEALTH
+    ];
+
+//private methods
+    var Init = function(){
+        self.html_element.innerHTML = "Модуль навыка";
+        self.html_element.appendChild(HTML_Create_BR());
+        self.html_element.appendChild(m_selector);
+    }
+    
+    var Event_OnSelectionChange = function(event){
+        if (m_owner == null){
+            return;
+        }
+        
+        if (event.target.value == "---"){
+            m_owner.Remove_Ability_Module(false);
+        }else{
+            m_owner.Set_Ability_Module(event.target.value, false);
+        }
+    }
+
+//public methods
+    this.Reset = function(owner){
+        m_owner = owner;
+        m_selector.value = "---";
+    }
+    
+    this.Set = function(value){
+        m_selector.value = value;
+    }
+    
+    this.Clear = function(){
+        m_selector.value = "---";
+    }
+
+//private properties
+    var self = this;
+    var m_owner = null;
+    var m_selector = HTML_Create_Selector(
+        true,
+        SKILL_OPTIONS,
+        Event_OnSelectionChange
+    );
+
+//public properties
+    this.html_element = HTML_Create_Div("class_block_class_subblock");
+
+//additional initialization
+    Init();
+}
+
 function Block_Drone_t(){
 //constants
     const GUI_BLOCK = document.getElementById("block_mechanic_drone");
@@ -599,6 +659,7 @@ function Block_Drone_t(){
 
 //private methods
     var Init = function(){
+        GUI_BLOCK_BODY.appendChild(self.skill_module.html_element);
         GUI_BLOCK_BODY.appendChild(self.numbers.html_element);
         GUI_BLOCK_BODY.appendChild(self.attacks.html_element);
         GUI_BLOCK_BODY.appendChild(self.defense.html_element);
@@ -654,6 +715,7 @@ function Block_Drone_t(){
     
     this.abiscores = new Block_Drone_Abiscores_t();
     this.skills = new Block_Drone_Skills_t();
+    this.skill_module = new Block_Drone_Skill_Module_t();
     
     this.numbers = new Block_Drone_Numbers_t();
     this.attacks = new Block_Drone_Attack_t();
@@ -664,10 +726,6 @@ function Block_Drone_t(){
 
 //additional initialization
     Init();
-    //TODO: below is just test, remove
-    // this.abilities.Reset(null, "Способности дрона", [1, 1, 1, 1, 7, 10, 11, 20]);
-    // this.feats.Reset(null, "Черты дрона", [1, 3, 6, 9, 11, 14, 17, 19]);
-    // this.mods.Reset(null, "Модификации дрона", [1, 3, 5, 7, 9, 11, 13, 15, 17, 19]);
 }
 
 function Block_Exocortex_t(){
