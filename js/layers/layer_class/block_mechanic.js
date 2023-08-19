@@ -226,14 +226,12 @@ function Block_Drone_Skills_t(){
 
 //private methods
     var Init = function(){
-        const SKILLS_ARR = Object.values(SKILLS);
-        
         //clear div
         GUI_BLOCK.innerHTML = "";
         
         //create and fill table
         m_table = HTML_Create_Table(
-            SKILLS_ARR.length + 1,
+            1,
             2,
             true,
             "100%",
@@ -241,21 +239,60 @@ function Block_Drone_Skills_t(){
         );
         
         m_table.rows[0].cells[0].innerHTML = "Навыки";
-        m_table.rows[0].cells[1].innerHTML = "";
-        for (let i = 0; i < SKILLS_ARR.length; i++){
-            let row = m_table.rows[i+1];
-            row.cells[0].innerHTML = SKILLS_ARR[i];
-            row.cells[1].innerHTML = 0;
+        m_table.rows[0].cells[1].innerHTML = "Мод.";
+    }
+    
+    var Event_OnClick_Mod = function(skill){
+        if (m_owner == null){
+            return;
+        }
+        
+        m_owner.Show_Detail_Popup_Mod(skill);
+    }
+
+//public methods
+    this.Reset = function(owner){
+        m_owner = owner;
+        
+        //clear map
+        m_row_map = new Map();
+        
+        //clear table
+        while (m_table.rows.length > 1){
+            m_table.deleteRow(1);
         }
         
         GUI_BLOCK.appendChild(m_table);
     }
 
-//public methods
+    this.Add_Skill = function(name){
+        var row = m_table.insertRow(m_table.rows.length);
+        
+        var cell_name = row.insertCell(0);
+        var cell_mod = row.insertCell(1);
+        
+        cell_name.innerHTML = name;
+        cell_mod.innerHTML = 0;
+        
+        cell_mod.onclick = Event_OnClick_Mod.bind(null, name);
+        
+        m_row_map.set(name, row);
+    }
+    
+    this.Set_Mod = function(skill, mod){
+        if(!m_row_map.has(skill)){
+            console.error("Failed to set unknown drone skill modifier: " + skill);
+            return;
+        }
+        let row = m_row_map.get(skill);
+        row.cells[1].innerHTML = mod;
+    }
 
 //private properties
     var self = this;
-    var m_table;
+    var m_owner = null;
+    var m_table; //created in Init
+    var m_row_map; //created in Reset
 
 //public properties
 

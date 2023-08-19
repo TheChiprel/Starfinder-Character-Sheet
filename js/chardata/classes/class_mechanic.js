@@ -80,6 +80,7 @@ function Drone_Abiscore_Mod_t(
     name,
     set_value_func,
     get_abiscore_value_func){
+        
 //constants
     const BASIC_VALUE_MOD_ID_T = Object.freeze(
         {
@@ -428,6 +429,264 @@ function Drone_Abiscores_t(gui_block){
     Init();
 }
 
+function Drone_Skill_Mod_t(
+    name,
+    abiscore,
+    has_armor_penalty,
+    set_value_func
+){
+//constants
+    const NAME = name;
+    const BASIC_VALUE_MOD_ID_T = Object.freeze(
+        {
+            "ABISCORE_MOD": 'ABISCORE_MOD',
+            "CLASS_SKILL": 'CLASS_SKILL',
+            "DRONE_LVL": 'DRONE_LVL'
+        }
+    );
+    const SET_VALUE_FUNC = set_value_func;
+
+//private methods
+    var Init = function(){
+        self.mod_map.Add(
+            BASIC_VALUE_MOD_ID_T.ABISCORE_VALUE,
+            new Modifier_t(
+                0,
+                "Хар-ка (" + self.abiscore + ");"
+            )
+        );
+        self.mod_map.Add(
+            BASIC_VALUE_MOD_ID_T.CLASS_SKILL,
+            new Modifier_t(
+                0,
+                "Классовый навык"
+            )
+        );
+        self.mod_map.Add(
+            BASIC_VALUE_MOD_ID_T.DRONE_LVL,
+            new Modifier_t(
+                0,
+                "Уровень дрона"
+            )
+        );
+            
+        Set_Field_Value();
+    }
+    
+    var Set_Field_Value = function(){
+        SET_VALUE_FUNC(GetModifierStr(self.sum));
+    }
+    
+    var Update_Mod_Map = function(){
+        if (m_has_module_map.Get_Value()){
+            self.mod_map.Change_Value(BASIC_VALUE_MOD_ID_T.CLASS_SKILL, 3);
+            self.mod_map.Change_Value(BASIC_VALUE_MOD_ID_T.DRONE_LVL, m_lvl_mod);
+        }else{
+            self.mod_map.Change_Value(BASIC_VALUE_MOD_ID_T.CLASS_SKILL, 0);
+            self.mod_map.Change_Value(BASIC_VALUE_MOD_ID_T.DRONE_LVL, 0);
+        }
+    }
+
+//public methods
+    this.Set_Abiscore_Mod = function(value){
+        self.mod_map.Change_Value(BASIC_VALUE_MOD_ID_T.ABISCORE_VALUE, value);
+        self.Recalc();
+    }
+
+    this.Set_Level_Mod = function(lvl){
+        m_lvl_mod = lvl;
+        self.Recalc();
+    }
+    
+    this.Recalc = function(){
+        Update_Mod_Map();
+        
+        let new_sum = self.mod_map.Get_Sum();
+        if (new_sum != self.sum){
+            self.sum = new_sum;
+            Set_Field_Value();
+            self.arr_recalc_functions.Call();
+        }
+    }
+    
+    this.Add_Module_Source = function(id){
+        m_has_module_map.Add(id, true);
+    }
+    
+    this.Remove_Module_Source = function(id){
+        m_has_module_map.Remove(id, true);
+    }
+    
+    this.Show_Detail_Popup = function(){
+        Popup_Stat_Details.Call(
+            "Модификатор " + NAME,
+            self.sum,
+            self.mod_map.Get_Mod_Map(),
+            true
+        );
+    }
+
+//private properties
+    var self = this;
+    var m_has_module_map = new Boolean_Modifier_t (false, self.Recalc);
+    var m_lvl_mod = 0;
+
+//public properties
+    this.sum = 0;
+    this.abiscore = abiscore;
+    this.mod_map = new Modifier_Map_t(this.Recalc);
+    this.arr_recalc_functions = new Recalc_Function_Collection_t();
+
+//additional initialization
+    Init();
+}
+
+function Drone_Skills_t(gui_block, abiscores_mod_obj){
+//constants
+    const GUI_BLOCK = gui_block;
+    const ABISCORES_MOD_OBJ = abiscores_mod_obj;
+
+//private methods
+    var Init = function(){
+        GUI_BLOCK.Reset(self);
+        
+        Add_Skill(SKILLS.ACROBATICS,         ABISCORES.AGI, false, true  );
+        Add_Skill(SKILLS.ATHLETICS,          ABISCORES.STR, false, true  );
+        Add_Skill(SKILLS.LIFE_SCIENCE,       ABISCORES.INT, true,  false );
+        Add_Skill(SKILLS.BLUFF,              ABISCORES.CHA, false, false );
+        Add_Skill(SKILLS.PERCEPTION,         ABISCORES.WIS, false, false );
+        Add_Skill(SKILLS.SURVIVAL,           ABISCORES.WIS, false, false );
+        Add_Skill(SKILLS.DIPLOMACY,          ABISCORES.CHA, false, false );
+        Add_Skill(SKILLS.INTIMIDATE,         ABISCORES.CHA, false, false );
+        Add_Skill(SKILLS.ENGINEERING,        ABISCORES.INT, true,  false );
+        Add_Skill(SKILLS.COMPUTERS,          ABISCORES.INT, true,  false );
+        Add_Skill(SKILLS.CULTURE,            ABISCORES.INT, true,  false );
+        Add_Skill(SKILLS.SLEIGHT_OF_HAND,    ABISCORES.AGI, true,  true  );
+        Add_Skill(SKILLS.DISGUISE,           ABISCORES.CHA, false, false );
+        Add_Skill(SKILLS.MEDICINE,           ABISCORES.INT, true,  false );
+        Add_Skill(SKILLS.MYSTICISM,          ABISCORES.WIS, true,  false );
+        Add_Skill(SKILLS.PILOTING,           ABISCORES.AGI, false, false );
+        Add_Skill(SKILLS.SENSE_MOTIVE,       ABISCORES.WIS, false, false );
+        Add_Skill(SKILLS.STEALTH,            ABISCORES.AGI, false, true  );
+        Add_Skill(SKILLS.PHYSICAL_SCIENCE,   ABISCORES.INT, true,  false );
+        
+        //TODO: move below to separate function?
+        const abiscore_arr = Object.values(ABISCORES);
+        
+        abiscore_arr.forEach(abiscore => {
+            if (DRONE_ABISCORES.includes(abiscore)){
+                ABISCORES_MOD_OBJ.AddRecalcFunc(
+                    abiscore,
+                    self.Update_Abiscore_Mod.bind(null, abiscore)
+                );
+            }
+        });
+    }
+    
+    var Add_Skill = function(skill_name, abiscore, has_armor_penalty){
+        GUI_BLOCK.Add_Skill(skill_name);
+        m_map.set(
+            skill_name,
+            new Drone_Skill_Mod_t(
+                skill_name,
+                abiscore,
+                has_armor_penalty,
+                GUI_BLOCK.Set_Mod.bind(null, skill_name)
+            )
+        );
+    }
+    
+    var FindSkillByName = function(abiscore){
+        if (!m_map.has(abiscore)){
+            return null;
+        }
+
+        return m_map.get(abiscore);
+    }
+
+//public methods
+    this.Update_Lvl = function(lvl){
+        m_lvl = lvl;
+        
+        m_map.forEach((skill, ) => {
+            skill.Set_Level(m_lvl);
+        });
+    }
+    
+    this.Update_Abiscore_Mod = function(abiscore){
+        let abiscore_mod = ABISCORES_MOD_OBJ.Get_Sum(abiscore);
+        m_map.forEach((skill_obj, ) => {
+            if (skill_obj.abiscore == abiscore){
+                skill_obj.Set_Abiscore_Mod(abiscore_mod);
+            }
+        });
+    }
+    
+    this.Get_Sum = function(skill){
+        let item = FindSkillByName(skill);
+        if (item == null){
+            console.error("Failed to get value of unknown drone ability score:" + skill);
+            return null;
+        }
+        
+        return item.sum;
+    }
+    
+    this.Show_Detail_Popup = function(skill){
+        let obj = FindSkillByName(skill);
+        if (obj == null){
+            console.error("Attempting to show popup for unknown ability score value: " + skill);
+        }
+        obj.Show_Detail_Popup();
+    }
+    
+    //TODO: add/remove module
+    
+    this.AddRecalcFunc = function(skill, func){
+        let skill_obj = FindSkillByName(skill);
+        if (skill_obj != null){
+            skill_obj.arr_recalc_functions.Add(func);
+        }else{
+            console.warn("Attempting to read unknown ability score modifier: " + skill);
+        }
+    }
+
+    this.RemoveRecalcFunc = function(skill, id){
+        let skill_obj = FindSkillByName(skill);
+        if (skill_obj != null){
+            skill_obj.arr_recalc_functions.Remove(id);
+        }else{
+            console.warn("Attempting to read unknown ability score modifier: " + skill);
+        }
+    }
+    
+    this.Get_Recalc_Func = function(skill){
+        let obj = FindSkillByName(skill);
+        if (obj == null){
+            console.error("Attempting to recalculation function for unknown ability score value: " + skill);
+            return null;
+        }
+        return obj.Recalc;
+    }
+    
+    this.Recalc_All = function(){
+        m_map.forEach((skill_obj, ) => {
+            skill_obj.Recalc();
+        });
+    }
+
+//private properties
+    var self = this;
+    var m_lvl = 0;
+    var m_map = new Map();
+
+//public properties
+    this.modules = null;
+
+//additional initialization
+    Init();
+}
+
 function Drone_Chassis_t(
     drone_obj,
     gui_block
@@ -595,6 +854,11 @@ function Drone_t(gui_block, set_gui_lvl_func){
     
     this.abiscores = new Drone_Abiscores_t(
         layers.classes.Get_Block(CLASSES.MECHANIC).speciality.drone.abiscores
+    );
+    
+    this.skills = new Drone_Skills_t(
+        layers.classes.Get_Block(CLASSES.MECHANIC).speciality.drone.skills,
+        self.abiscores.modifiers
     );
     
     this.chassis = new Drone_Chassis_t(
