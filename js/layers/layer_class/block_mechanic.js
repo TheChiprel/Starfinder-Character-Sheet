@@ -247,7 +247,7 @@ function Block_Drone_Skills_t(){
             return;
         }
         
-        m_owner.Show_Detail_Popup_Mod(skill);
+        m_owner.Show_Detail_Popup(skill);
     }
 
 //public methods

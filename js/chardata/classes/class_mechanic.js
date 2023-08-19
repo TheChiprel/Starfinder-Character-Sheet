@@ -452,21 +452,23 @@ function Drone_Skill_Mod_t(
             BASIC_VALUE_MOD_ID_T.ABISCORE_VALUE,
             new Modifier_t(
                 0,
-                "Хар-ка (" + self.abiscore + ");"
+                "Хар-ка (" + self.abiscore + ")"
             )
         );
         self.mod_map.Add(
             BASIC_VALUE_MOD_ID_T.CLASS_SKILL,
             new Modifier_t(
                 0,
-                "Классовый навык"
+                "Классовый навык",
+                "Модуль навыка"
             )
         );
         self.mod_map.Add(
             BASIC_VALUE_MOD_ID_T.DRONE_LVL,
             new Modifier_t(
                 0,
-                "Уровень дрона"
+                "Пункты от уровня дрона",
+                "Модуль навыка"
             )
         );
             
@@ -519,7 +521,7 @@ function Drone_Skill_Mod_t(
     
     this.Show_Detail_Popup = function(){
         Popup_Stat_Details.Call(
-            "Модификатор " + NAME,
+            NAME,
             self.sum,
             self.mod_map.Get_Mod_Map(),
             true
@@ -545,6 +547,7 @@ function Drone_Skills_t(gui_block, abiscores_mod_obj){
 //constants
     const GUI_BLOCK = gui_block;
     const ABISCORES_MOD_OBJ = abiscores_mod_obj;
+    const CHASSIS_SKILL_MODULE_ID = "CHASSIS_SKILL_MODULE";
 
 //private methods
     var Init = function(){
@@ -609,7 +612,7 @@ function Drone_Skills_t(gui_block, abiscores_mod_obj){
         m_lvl = lvl;
         
         m_map.forEach((skill, ) => {
-            skill.Set_Level(m_lvl);
+            skill.Set_Level_Mod(m_lvl);
         });
     }
     
@@ -640,7 +643,28 @@ function Drone_Skills_t(gui_block, abiscores_mod_obj){
         obj.Show_Detail_Popup();
     }
     
-    //TODO: add/remove module
+    this.Add_Chassis_Module = function(skill){
+        let obj = FindSkillByName(skill);
+        if (obj == null){
+            console.error("Attempting to add chassis module to unknown skill: " + skill);
+        }
+        m_chassis_module_skill = skill;
+        obj.Add_Module_Source(CHASSIS_SKILL_MODULE_ID);
+    }
+    
+    this.Remove_Chassis_Module = function(){
+        if (m_chassis_module_skill == null){
+            console.warn("Attempt to remove chassis module, that is not set");
+            return;
+        }
+        
+        let obj = FindSkillByName(skill);
+        if (obj == null){
+            console.error("Attempting to remove chassis module of unknown skill: " + skill);
+        }
+        m_chassis_module_skill = null;
+        obj.Remove_Module_Source(CHASSIS_SKILL_MODULE_ID);
+    }
     
     this.AddRecalcFunc = function(skill, func){
         let skill_obj = FindSkillByName(skill);
@@ -679,6 +703,7 @@ function Drone_Skills_t(gui_block, abiscores_mod_obj){
     var self = this;
     var m_lvl = 0;
     var m_map = new Map();
+    var m_chassis_module_skill = null;
 
 //public properties
     this.modules = null;
@@ -705,13 +730,15 @@ function Drone_Chassis_t(
     this.Set = function(entry){
         self.entry = entry;
         
-        DRONE_OBJ.abiscores.values.Set_Base_Value_By_Array(entry.abiscores);
-        DRONE_OBJ.abiscores.Set_Upgr_Abiscores(entry.abiscore_incr);
+        DRONE_OBJ.abiscores.values.Set_Base_Value_By_Array(self.entry.abiscores);
+        DRONE_OBJ.abiscores.Set_Upgr_Abiscores(self.entry.abiscore_incr);
         
         //TODO: set speed
         //TODO: set ac
         //TODO: set saves
-        //TODO: set modules
+        if (self.entry.skill_modules != null){
+            DRONE_OBJ.skills.Add_Chassis_Module(self.entry.skill_modules);
+        }
         //TODO: set mods
         
         GUI_BLOCK.Set(entry.name); //TODO: add size
@@ -727,7 +754,9 @@ function Drone_Chassis_t(
         //TODO: set speed
         //TODO: set ac
         //TODO: set saves
-        //TODO: set modules
+        if (self.entry.skill_modules != null){
+            DRONE_OBJ.skills.Remove_Chassis_Module();
+        }
         //TODO: set mods
         
         GUI_BLOCK.Clear();
@@ -800,6 +829,7 @@ function Drone_t(gui_block, set_gui_lvl_func){
         
         SET_GUI_LVL_FUNC(lvl);
         self.abiscores.Update_Lvl(lvl);
+        self.skills.Update_Lvl(lvl);
     }
     
     this.Get_SaveData_Obj = function(){
