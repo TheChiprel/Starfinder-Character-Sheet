@@ -10,6 +10,83 @@ const DRONE_ABISCORES = Object.freeze(
     ]
 );
 
+function Drone_Health_t(
+    gui_element_main,
+    //gui_element_face
+){
+//constants
+    const BASIC_MOD_ID_T = Object.freeze(
+        {
+            "DRONE_LVL": 'DRONE_LVL',
+        }
+    );
+    
+    const HP_BY_LVL = [
+          0,
+         10,  20,  30,  40,  50,  60,  70,  80,  90, 100,
+        110, 120, 130, 140, 150, 160, 170, 190, 210, 230
+    ];
+    
+    const GUI_ELEMENT_MAIN = gui_element_main;
+    //const GUI_ELEMENT_FACE = gui_element_face; //TODO
+
+//private methods
+    var Init = function(){
+        self.modifier_map.Add(
+            BASIC_MOD_ID_T.DRONE_LVL,
+            new Modifier_t(0, "Уровень дрона", 0));
+        
+        GUI_ELEMENT_MAIN.Reset(self, self.Show_Detail_Popup);
+        //GUI_ELEMENT_FACE.Reset(self, self.Show_Detail_Popup);
+        Set_Field_Values();
+    }
+
+    var Set_Field_Values = function(){
+        GUI_ELEMENT_MAIN.Set_Value(self.sum);
+        //GUI_ELEMENT_FACE.Set_Value(self.sum);
+    }
+
+//public methods
+    this.Update_Lvl = function(lvl){
+        self.modifier_map.Change_Value(
+            BASIC_MOD_ID_T.DRONE_LVL,
+            HP_BY_LVL[lvl]);
+        self.modifier_map.Change_Substring(
+            BASIC_MOD_ID_T.DRONE_LVL,
+            lvl);
+
+        self.Recalc();
+    }
+
+    this.Recalc = function (){
+        let new_sum = self.modifier_map.Get_Sum();
+        if (new_sum != self.sum){
+            self.sum = new_sum;
+            Set_Field_Values();
+            self.arr_recalc_functions.Call();
+        }
+    }
+
+    this.Get_Mod_Map = function(unused){
+        return self.modifier_map;
+    }
+
+    this.Show_Detail_Popup = function(){
+        Popup_Stat_Details.Call("Пункты Здоровья (ПЗ) Дрона", self.sum, self.modifier_map.Get_Mod_Map(), false);
+    }
+
+//private properties
+    var self = this;
+
+//public properties
+    this.sum = 0;
+    this.modifier_map = new Modifier_Map_t(this.Recalc);
+    this.arr_recalc_functions = new Recalc_Function_Collection_t();
+
+//additional initialization
+    Init();
+}
+
 function Drone_Abiscore_Value_t(name, set_value_func){
 //constants
     const BASIC_VALUE_MOD_ID_T = Object.freeze(
@@ -868,6 +945,7 @@ function Drone_t(gui_block, set_gui_lvl_func){
         }
         
         SET_GUI_LVL_FUNC(lvl);
+        self.hp.Update_Lvl(lvl);
         self.abiscores.Update_Lvl(lvl);
         self.skills.Update_Lvl(lvl);
     }
@@ -935,6 +1013,11 @@ function Drone_t(gui_block, set_gui_lvl_func){
     this.chassis = new Drone_Chassis_t(
         self,
         layers.classes.Get_Block(CLASSES.MECHANIC).speciality.drone.chassis
+    );
+    
+    this.hp = new Drone_Health_t(
+        layers.classes.Get_Block(CLASSES.MECHANIC).speciality.drone.numbers.outfield_hp,
+        null //TODO:
     );
 
 //additional initialization

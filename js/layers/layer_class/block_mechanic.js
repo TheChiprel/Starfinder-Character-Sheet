@@ -309,14 +309,6 @@ function Block_Drone_Numbers_t(){
         
         Append_Label_Element_Pair(
             self.html_element,
-            "Макс. Пункты Живучести (ПЖ):",
-            self.outfield_sp.html_element,
-            true
-        );
-        self.html_element.appendChild(HTML_Create_BR());
-        
-        Append_Label_Element_Pair(
-            self.html_element,
             "Макс. Пункты Здоровья (ПЗ):",
             self.outfield_hp.html_element,
             true
@@ -337,7 +329,6 @@ function Block_Drone_Numbers_t(){
     var self = this;
 
 //public properties
-    this.outfield_sp = new GUI_Element_OutField_t();
     this.outfield_hp = new GUI_Element_OutField_t();
     this.outfield_rp = new GUI_Element_OutField_t();
     this.html_element = HTML_Create_Div("class_block_class_subblock");
